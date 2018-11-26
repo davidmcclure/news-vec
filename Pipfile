@@ -9,6 +9,8 @@ ipython = "*"
 torch = "*"
 jupyterlab = "*"
 pandas = "*"
+matplotlib = "*"
+seaborn = "*"
 
 [dev-packages]
 
