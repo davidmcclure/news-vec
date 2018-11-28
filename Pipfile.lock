@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0508caa2ad02289de5bdb59ea0fda53ea39de9d7508833668e24f4883a7a5d9b"
+            "sha256": "e20def8e4081759a020f8b2ac3bbf9dfa6a8fb72530eeacdc58f181dab9b7e17"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -536,12 +536,27 @@
             ],
             "version": "==5.1.1"
         },
+        "tqdm": {
+            "hashes": [
+                "sha256:3c4d4a5a41ef162dd61f1edb86b0e1c7859054ab656b2e7c7b77e7fbf6d9f392",
+                "sha256:5b4d5549984503050883bc126280b386f5f4ca87e6c023c5d015655ad75bdebb"
+            ],
+            "index": "pypi",
+            "version": "==4.28.1"
+        },
         "traitlets": {
             "hashes": [
                 "sha256:9c4bd2d267b7153df9152698efb1050a5d84982d3384a37b2c1f7723ba3e7835",
                 "sha256:c6cb5e6f57c5a9bdaa40fa71ce7b4af30298fbab9ece9815b5d995ab6217c7d9"
             ],
             "version": "==4.3.2"
+        },
+        "ujson": {
+            "hashes": [
+                "sha256:f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a222f5f86"
+            ],
+            "index": "pypi",
+            "version": "==1.35"
         },
         "wcwidth": {
             "hashes": [

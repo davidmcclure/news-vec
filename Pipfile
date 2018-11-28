@@ -11,6 +11,8 @@ jupyterlab = "*"
 pandas = "*"
 matplotlib = "*"
 seaborn = "*"
+tqdm = "*"
+ujson = "*"
 
 [dev-packages]
 
