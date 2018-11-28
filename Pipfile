@@ -13,6 +13,8 @@ matplotlib = "*"
 seaborn = "*"
 tqdm = "*"
 ujson = "*"
+boltons = "*"
+sklearn = "*"
 
 [dev-packages]
 
