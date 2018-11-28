@@ -15,6 +15,7 @@ tqdm = "*"
 ujson = "*"
 boltons = "*"
 sklearn = "*"
+altair = "*"
 
 [dev-packages]
 
