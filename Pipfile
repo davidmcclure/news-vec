@@ -16,6 +16,8 @@ ujson = "*"
 boltons = "*"
 sklearn = "*"
 altair = "*"
+sqlalchemy = "*"
+click = "*"
 
 [dev-packages]
 

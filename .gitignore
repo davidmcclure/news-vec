@@ -106,3 +106,4 @@ venv.bak/
 /data
 .vector_cache
 *.p
+*.db
