@@ -18,6 +18,7 @@ sklearn = "*"
 altair = "*"
 sqlalchemy = "*"
 click = "*"
+torchtext = "*"
 
 [dev-packages]
 
