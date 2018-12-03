@@ -1,6 +1,10 @@
 
 
+import ujson
+import gzip
+
 from boltons.iterutils import pairwise
+from glob import glob
 
 
 SEP_TOKENS = {':', '-', '–', '—', '|', 'via', '[', ']'}
@@ -67,3 +71,40 @@ def clean_headline(tokens):
     tokens = scrub_paratext(tokens)
     tokens = scrub_quotes(tokens)
     return tokens
+
+
+class Line:
+
+    def __init__(self, tokens, label, lower=True):
+        self.tokens = [t.lower() for t in tokens] if lower else tokens
+        self.label = label
+
+    def __repr__(self):
+
+        pattern = '{cls_name}<{token_count} tokens -> {label}>'
+
+        return pattern.format(
+            cls_name=self.__class__.__name__,
+            token_count=len(self.tokens),
+            label=self.label,
+        )
+
+
+def read_json_lines(root, lower=True):
+    """Read JSON corpus.
+
+    Yields: Line
+    """
+    for path in glob('%s/*.gz' % root):
+        with gzip.open(path) as fh:
+            for line in fh:
+
+                data = ujson.loads(line)
+
+                tokens = data.get('tokens')
+                tokens = clean_headline(tokens)
+
+                if not tokens:
+                    continue
+
+                yield Line(tokens, data['label'], lower=lower)
