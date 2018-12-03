@@ -3,17 +3,23 @@
 import ujson
 import gzip
 import string
+import math
 
-from boltons.iterutils import pairwise
+import numpy as np
+
+from collections import Counter
+from itertools import islice, chain
 from glob import glob
 from tqdm import tqdm
-from collections import Counter
-from itertools import islice
+from boltons.iterutils import pairwise, chunked_iter
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
 
 import torch
 from torchtext.vocab import Vocab, Vectors
-from torch import nn
+from torch import nn, optim
 from torch.nn import functional as F
+from torch.nn.utils import rnn
 
 from . import logger
 from .cuda import DEVICE
@@ -327,3 +333,224 @@ class TokenEmbedding(nn.Module):
         x = torch.cat([xt, xc], dim=1)
 
         return x
+
+
+class LineEncoder(nn.Module):
+
+    def __init__(self, embed_dim, lstm_dim, num_layers=1):
+        """Initialize LSTM.
+        """
+        super().__init__()
+
+        self.lstm = nn.LSTM(
+            embed_dim,
+            lstm_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True,
+        )
+
+        self.dropout = nn.Dropout()
+
+    def forward(self, x):
+        """Sort, pack, encode, reorder.
+
+        Args:
+            x (list<Tensor>): Variable-length embedding tensors.
+        """
+        sizes = list(map(len, x))
+
+        # Indexes to sort descending.
+        sort_idxs = np.argsort(sizes)[::-1]
+
+        # Indexes to restore original order.
+        unsort_idxs = (torch
+            .from_numpy(np.argsort(sort_idxs))
+            .to(device=DEVICE))
+
+        # Sort by size descending.
+        x = [x[i] for i in sort_idxs]
+
+        # Pad + pack, LSTM.
+        x = rnn.pack_sequence(x)
+        _, (hn, _) = self.lstm(x)
+
+        # Cat forward + backward hidden layers.
+        x = torch.cat([hn[0,:,:], hn[1,:,:]], dim=1)
+        x = self.dropout(x)
+
+        return x[unsort_idxs]
+
+
+def group_by_sizes(L, sizes):
+    """Given a flat list and a list of sizes that sum to the length of the
+    list, group the list into sublists with corresponding sizes.
+
+    Args:
+        L (list)
+        sizes (list<int>)
+
+    Returns: list<list>
+    """
+    parts = []
+
+    total = 0
+    for s in sizes:
+        parts.append(L[total:total+s])
+        total += s
+
+    return parts
+
+
+class Classifier(nn.Module):
+
+    def __init__(self, labels, token_counts, lstm_dim, embed_dim):
+        """Initialize encoders + clf.
+        """
+        super().__init__()
+
+        self.labels = labels
+
+        self.ltoi = {label: i for i, label in enumerate(labels)}
+
+        self.embed_tokens = TokenEmbedding(token_counts)
+
+        self.embed_lines = LineEncoder(self.embed_tokens.out_dim, lstm_dim)
+
+        self.merge = nn.Linear(lstm_dim*2, embed_dim)
+
+        self.predict = nn.Sequential(
+            nn.Linear(embed_dim, len(labels)),
+            nn.LogSoftmax(1),
+        )
+
+    def batches_iter(self, lines_iter, size=20):
+        """Generate (lines, label idx) batches.
+        """
+        for lines in chunked_iter(lines_iter, size):
+
+            # Labels -> indexes.
+            yt_idx = [self.ltoi[line.label] for line in lines]
+            yt = torch.LongTensor(yt_idx, device=DEVICE)
+
+            yield lines, yt
+
+    def embed(self, lines):
+        """Embed lines.
+        """
+        # Flat tokens.
+        tokens = [line.tokens for line in lines]
+
+        # Line lengths.
+        sizes = [len(ts) for ts in tokens]
+
+        # Embed tokens, regroup by line.
+        x = self.embed_tokens(list(chain(*tokens)))
+        x = group_by_sizes(x, sizes)
+
+        # Embed lines.
+        x = self.embed_lines(x)
+
+        return self.merge(x)
+
+    def forward(self, lines):
+        return self.predict(self.embed(lines))
+
+
+class Trainer:
+
+    def __init__(self, root, skim=None, lstm_dim=1024, embed_dim=512, lr=1e-4,
+        batch_size=50, test_size=10000, eval_every=100000):
+
+        self.corpus = Corpus(root, skim)
+
+        labels = self.corpus.labels()
+
+        token_counts = self.corpus.token_counts()
+
+        self.model = Classifier(labels, token_counts, lstm_dim, embed_dim)
+
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+
+        self.batch_size = batch_size
+
+        self.eval_every = eval_every
+
+        self.train_lines, self.val_lines = train_test_split(
+            self.corpus.lines, test_size=test_size)
+
+        if torch.cuda.is_available():
+            self.model.cuda()
+
+    def train(self, epochs=10):
+        """Train for N epochs.
+        """
+        for epoch in range(epochs):
+            self.train_epoch(epoch)
+
+    def train_epoch(self, epoch):
+
+        logger.info('Epoch %d' % epoch)
+
+        lines_iter = tqdm(self.train_lines)
+
+        batches = self.model.batches_iter(lines_iter, self.batch_size)
+
+        batch_losses = []
+        eval_n = 0
+        for lines, yt in batches:
+
+            self.model.train()
+            self.optimizer.zero_grad()
+
+            yp = self.model(lines)
+
+            loss = F.nll_loss(yp, yt)
+            loss.backward()
+
+            self.optimizer.step()
+
+            batch_losses.append(loss.item())
+
+            n = math.floor(lines_iter.n / self.eval_every)
+
+            if n > eval_n:
+                self.log_metrics(batch_losses)
+                eval_n = n
+
+        self.log_metrics(batch_losses)
+
+    def log_val_metrics(self):
+
+        self.model.eval()
+
+        batches = self.model.batches_iter(tqdm(self.val_lines))
+
+        yt, yp = [], []
+        for lines, yti in batches:
+            yp += self.model(lines).tolist()
+            yt += yti.tolist()
+
+        yt = torch.LongTensor(yt, device=DEVICE)
+        yp = torch.FloatTensor(yp, device=DEVICE)
+
+        preds = yp.argmax(1)
+
+        # LOSS
+        loss = F.nll_loss(yp, yt)
+        logger.info('Val loss: %f' % loss)
+
+        # ACCURACY
+        acc = metrics.accuracy_score(yt, preds)
+        logger.info('Val acc: %f' % acc)
+
+        yt_lb = [self.model.labels[i] for i in yt.tolist()]
+        yp_lb = [self.model.labels[i] for i in preds.tolist()]
+
+        # REPORT
+        report = metrics.classification_report(yt_lb, yp_lb)
+        logger.info('\n' + report)
+
+    def log_metrics(self, train_losses):
+        logger.info('Train loss: %f' % np.mean(train_losses))
+        self.log_val_metrics()
