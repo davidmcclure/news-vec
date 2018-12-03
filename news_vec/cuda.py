@@ -3,4 +3,10 @@
 import torch
 
 
-DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+if torch.cuda.is_available():
+    itype = torch.cuda.LongTensor
+    ftype = torch.cuda.FloatTensor
+
+else:
+    itype = torch.LongTensor
+    ftype = torch.FloatTensor

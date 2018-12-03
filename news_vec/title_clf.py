@@ -22,7 +22,7 @@ from torch.nn import functional as F
 from torch.nn.utils import rnn
 
 from . import logger
-from .cuda import DEVICE
+from .cuda import itype, ftype
 
 
 SEP_TOKENS = {':', '-', '–', '—', '|', 'via', '[', ']'}
@@ -205,7 +205,7 @@ class PretrainedTokenEmbedding(nn.Module):
         """Map to token embeddings.
         """
         x = [self.vocab.stoi[t] for t in tokens]
-        x = torch.LongTensor(x, device=DEVICE)
+        x = torch.LongTensor(x).type(itype)
 
         return self.embed(x)
 
@@ -241,7 +241,7 @@ class CharEmbedding(nn.Embedding):
 
         idxs = [self.ctoi(c) for c in chars]
 
-        return torch.LongTensor(idxs, device=DEVICE)
+        return torch.LongTensor(idxs).type(itype)
 
     def forward(self, tokens, min_size=7):
         """Batch-embed token chars.
@@ -364,9 +364,7 @@ class LineEncoder(nn.Module):
         sort_idxs = np.argsort(sizes)[::-1]
 
         # Indexes to restore original order.
-        unsort_idxs = (torch
-            .from_numpy(np.argsort(sort_idxs))
-            .to(device=DEVICE))
+        unsort_idxs = torch.from_numpy(np.argsort(sort_idxs)).type(itype)
 
         # Sort by size descending.
         x = [x[i] for i in sort_idxs]
@@ -431,7 +429,7 @@ class Classifier(nn.Module):
 
             # Labels -> indexes.
             yt_idx = [self.ltoi[line.label] for line in lines]
-            yt = torch.LongTensor(yt_idx, device=DEVICE)
+            yt = torch.LongTensor(yt_idx).type(itype)
 
             yield lines, yt
 
@@ -531,8 +529,8 @@ class Trainer:
             yp += self.model(lines).tolist()
             yt += yti.tolist()
 
-        yt = torch.LongTensor(yt, device=DEVICE)
-        yp = torch.FloatTensor(yp, device=DEVICE)
+        yt = torch.LongTensor(yt).type(itype)
+        yp = torch.FloatTensor(yp).type(ftype)
 
         preds = yp.argmax(1)
 
