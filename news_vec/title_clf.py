@@ -5,6 +5,11 @@ import gzip
 
 from boltons.iterutils import pairwise
 from glob import glob
+from tqdm import tqdm
+from collections import Counter
+from itertools import islice
+
+from . import logger
 
 
 SEP_TOKENS = {':', '-', '–', '—', '|', 'via', '[', ']'}
@@ -108,3 +113,56 @@ def read_json_lines(root, lower=True):
                     continue
 
                 yield Line(tokens, data['label'], lower=lower)
+
+
+class Corpus:
+
+    def __init__(self, root, skim=None, lower=True):
+        """Read lines.
+        """
+        logger.info('Parsing line corpus.')
+
+        lines_iter = islice(read_json_lines(root, lower), skim)
+
+        self.lines = list(tqdm(lines_iter))
+
+    def __repr__(self):
+
+        pattern = '{cls_name}<{line_count} lines>'
+
+        return pattern.format(
+            cls_name=self.__class__.__name__,
+            line_count=len(self),
+        )
+
+    def __len__(self):
+        return len(self.lines)
+
+    def __iter__(self):
+        return iter(self.lines)
+
+    def token_counts(self):
+        """Collect all token -> count.
+        """
+        logger.info('Gathering token counts.')
+
+        counts = Counter()
+        for line in tqdm(self):
+            counts.update(line.tokens)
+
+        return counts
+
+    def label_counts(self):
+        """Label -> count.
+        """
+        logger.info('Gathering label counts.')
+
+        counts = Counter()
+        for line in tqdm(self):
+            counts[line.label] += 1
+
+        return counts
+
+    def labels(self):
+        counts = self.label_counts()
+        return [label for label, _ in counts.most_common()]
