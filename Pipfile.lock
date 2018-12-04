@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9be064abfd2d0e81534687c4c060f93778f61f7857855936056338c1140451e6"
+            "sha256": "6d8e2544fe15e45124f7075b8d13de2ff01f9264d55d89f6c55e646672c446ae"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -23,6 +23,13 @@
             ],
             "index": "pypi",
             "version": "==2.2.2"
+        },
+        "annoy": {
+            "hashes": [
+                "sha256:abad73eb198fb3089763dd8ce36e26a0339ee8da1b6082ff80c88cae9bf19caa"
+            ],
+            "index": "pypi",
+            "version": "==1.14.0"
         },
         "appnope": {
             "hashes": [
