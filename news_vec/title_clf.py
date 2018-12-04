@@ -94,12 +94,19 @@ def scrub_quotes(tokens):
     return [t for t in tokens if uncurl_quotes(t) not in QUOTES]
 
 
+def drop_empty_strings(tokens):
+    """Remove empty tokens.
+    """
+    return [t for t in tokens if len(t)]
+
+
 def clean_headline(tokens):
     """Raw tokens -> clf tokens.
     """
     tokens = split_first_token(tokens)
     tokens = scrub_paratext(tokens)
     tokens = scrub_quotes(tokens)
+    tokens = drop_empty_strings(tokens)
     return tokens
 
 
