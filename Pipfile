@@ -19,6 +19,7 @@ altair = "*"
 sqlalchemy = "*"
 click = "*"
 torchtext = "*"
+umap-learn = "*"
 
 [dev-packages]
 
