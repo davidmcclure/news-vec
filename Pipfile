@@ -21,6 +21,7 @@ click = "*"
 torchtext = "*"
 umap-learn = "*"
 annoy = "*"
+spacy = "*"
 
 [dev-packages]
 
