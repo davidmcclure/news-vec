@@ -4,6 +4,8 @@ import ujson
 import gzip
 import string
 import math
+import pickle
+import os
 
 import numpy as np
 
@@ -552,3 +554,62 @@ class Trainer:
     def log_metrics(self, train_losses):
         logger.info('Train loss: %f' % np.mean(train_losses))
         self.log_val_metrics()
+
+
+def write_fs(path, data):
+    """Dump data to disk.
+    """
+    logger.info('Flushing to disk: %s' % path)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    with open(path, 'wb') as fh:
+        fh.write(data)
+
+
+class CorpusEncoder:
+
+    def __init__(self, corpus, model, segment_size=1000, batch_size=100):
+        """Wrap corpus + model.
+        """
+        self.corpus = corpus
+
+        self.model = model
+        self.model.eval()
+
+        self.segment_size = segment_size
+        self.batch_size = batch_size
+
+    def lines_iter(self):
+        """Generate encoded lines + metadata.
+        """
+        batches = self.model.batches_iter(tqdm(self.corpus), self.batch_size)
+
+        for lines, yt in batches:
+
+            embeds = self.model.embed(lines)
+            embeds = embeds.cpu().detach().numpy()
+
+            for line, embed in zip(lines, embeds):
+
+                # Metadata + embedding.
+                data = {**line.__dict__}
+                data['embedding'] = embed
+
+                yield data
+
+    def segments_iter(self):
+        """Generate (fname, data).
+        """
+        chunks = chunked_iter(self.lines_iter(), self.segment_size)
+
+        for i, lines in enumerate(chunks):
+            fname = '%s.p' % str(i).zfill(5)
+            yield fname, pickle.dumps(lines)
+
+    def write_fs(self, root):
+        """Flush to local filesystem.
+        """
+        for fname, data in self.segments_iter():
+            path = os.path.join(root, fname)
+            write_fs(path, data)
