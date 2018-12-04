@@ -112,9 +112,10 @@ def clean_headline(tokens):
 
 class Line:
 
-    def __init__(self, tokens, label, lower=True):
+    def __init__(self, tokens, label, count, lower=True):
         self.tokens = [t.lower() for t in tokens] if lower else tokens
         self.label = label
+        self.count = count
 
     def __repr__(self):
 
@@ -137,6 +138,7 @@ def read_json_lines(root, lower=True):
             for line in fh:
 
                 data = ujson.loads(line)
+                print(data)
 
                 tokens = data.get('tokens')
                 tokens = clean_headline(tokens)
@@ -144,7 +146,12 @@ def read_json_lines(root, lower=True):
                 if not tokens:
                     continue
 
-                yield Line(tokens, data['label'], lower=lower)
+                yield Line(
+                    tokens,
+                    data['label'],
+                    data['count'],
+                    lower=lower,
+                )
 
 
 class Corpus:
