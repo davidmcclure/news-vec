@@ -6,6 +6,7 @@ import string
 import math
 import pickle
 import os
+import re
 
 import numpy as np
 
@@ -28,6 +29,14 @@ from .cuda import itype, ftype
 
 
 SEP_TOKENS = {':', '-', '–', '—', '|', 'via', '[', ']'}
+
+
+# TODO: Reuters hack for "brief-XXX". Learn with char LSTM?
+def split_first_token(tokens):
+    """If the first token has a hyphen, break into separate tokens.
+    """
+    first = re.split('(-)', tokens[0])
+    return [*first, *tokens[1:]]
 
 
 def scrub_paratext(tokens):
@@ -88,6 +97,7 @@ def scrub_quotes(tokens):
 def clean_headline(tokens):
     """Raw tokens -> clf tokens.
     """
+    tokens = split_first_token(tokens)
     tokens = scrub_paratext(tokens)
     tokens = scrub_quotes(tokens)
     return tokens
