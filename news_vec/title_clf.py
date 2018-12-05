@@ -138,6 +138,7 @@ def read_json_lines(root, lower=True):
             for line in fh:
 
                 data = ujson.loads(line)
+                print(data)
 
                 tokens = data.get('tokens')
                 tokens = clean_headline(tokens)
@@ -147,7 +148,7 @@ def read_json_lines(root, lower=True):
 
                 yield Line(
                     tokens,
-                    data['domain'],
+                    data['label'],
                     data['count'],
                     lower=lower,
                 )
@@ -425,12 +426,16 @@ def group_by_sizes(L, sizes):
     return parts
 
 
-class Regressor(nn.Module):
+class Classifier(nn.Module):
 
-    def __init__(self, token_counts, lstm_dim, embed_dim):
+    def __init__(self, labels, token_counts, lstm_dim, embed_dim):
         """Initialize encoders + clf.
         """
         super().__init__()
+
+        self.labels = labels
+
+        self.ltoi = {label: i for i, label in enumerate(labels)}
 
         self.embed_tokens = TokenEmbedding(token_counts)
 
@@ -438,7 +443,10 @@ class Regressor(nn.Module):
 
         self.merge = nn.Linear(lstm_dim*2, embed_dim)
 
-        self.predict = nn.Linear(embed_dim, 1)
+        self.predict = nn.Sequential(
+            nn.Linear(embed_dim, len(labels)),
+            nn.LogSoftmax(1),
+        )
 
     def batches_iter(self, lines_iter, size=20):
         """Generate (lines, label idx) batches.
@@ -446,8 +454,8 @@ class Regressor(nn.Module):
         for lines in chunked_iter(lines_iter, size):
 
             # Labels -> indexes.
-            yt = [np.log(line.count) for line in lines]
-            yt = torch.FloatTensor(yt).type(ftype)
+            yt_idx = [self.ltoi[line.label] for line in lines]
+            yt = torch.LongTensor(yt_idx).type(itype)
 
             yield lines, yt
 
@@ -470,7 +478,7 @@ class Regressor(nn.Module):
         return self.merge(x)
 
     def forward(self, lines):
-        return self.predict(self.embed(lines)).view(-1)
+        return self.predict(self.embed(lines))
 
 
 class Trainer:
@@ -480,9 +488,11 @@ class Trainer:
 
         self.corpus = Corpus(root, skim)
 
+        labels = self.corpus.labels()
+
         token_counts = self.corpus.token_counts()
 
-        self.model = Regressor(token_counts, lstm_dim, embed_dim)
+        self.model = Classifier(labels, token_counts, lstm_dim, embed_dim)
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
@@ -519,7 +529,7 @@ class Trainer:
 
             yp = self.model(lines)
 
-            loss = F.mse_loss(yp, yt)
+            loss = F.nll_loss(yp, yt)
             loss.backward()
 
             self.optimizer.step()
@@ -545,71 +555,85 @@ class Trainer:
             yp += self.model(lines).tolist()
             yt += yti.tolist()
 
-        yt = torch.FloatTensor(yt).type(ftype)
+        yt = torch.LongTensor(yt).type(itype)
         yp = torch.FloatTensor(yp).type(ftype)
 
-        loss = F.mse_loss(yp, yt)
+        preds = yp.argmax(1)
+
+        # LOSS
+        loss = F.nll_loss(yp, yt)
         logger.info('Val loss: %f' % loss)
+
+        # ACCURACY
+        acc = metrics.accuracy_score(yt, preds)
+        logger.info('Val acc: %f' % acc)
+
+        yt_lb = [self.model.labels[i] for i in yt.tolist()]
+        yp_lb = [self.model.labels[i] for i in preds.tolist()]
+
+        # REPORT
+        report = metrics.classification_report(yt_lb, yp_lb)
+        logger.info('\n' + report)
 
     def log_metrics(self, train_losses):
         logger.info('Train loss: %f' % np.mean(train_losses))
         self.log_val_metrics()
 
 
-# def write_fs(path, data):
-#     """Dump data to disk.
-#     """
-#     logger.info('Flushing to disk: %s' % path)
-#
-#     os.makedirs(os.path.dirname(path), exist_ok=True)
-#
-#     with open(path, 'wb') as fh:
-#         fh.write(data)
-#
-#
-# class CorpusEncoder:
-#
-#     def __init__(self, corpus, model, segment_size=1000, batch_size=100):
-#         """Wrap corpus + model.
-#         """
-#         self.corpus = corpus
-#
-#         self.model = model
-#         self.model.eval()
-#
-#         self.segment_size = segment_size
-#         self.batch_size = batch_size
-#
-#     def lines_iter(self):
-#         """Generate encoded lines + metadata.
-#         """
-#         batches = self.model.batches_iter(tqdm(self.corpus), self.batch_size)
-#
-#         for lines, yt in batches:
-#
-#             embeds = self.model.embed(lines)
-#             embeds = embeds.cpu().detach().numpy()
-#
-#             for line, embed in zip(lines, embeds):
-#
-#                 # Metadata + embedding.
-#                 data = {**line.__dict__}
-#                 data['embedding'] = embed
-#
-#                 yield data
-#
-#     def segments_iter(self):
-#         """Generate (fname, data).
-#         """
-#         chunks = chunked_iter(self.lines_iter(), self.segment_size)
-#
-#         for i, lines in enumerate(chunks):
-#             fname = '%s.p' % str(i).zfill(5)
-#             yield fname, pickle.dumps(lines)
-#
-#     def write_fs(self, root):
-#         """Flush to local filesystem.
-#         """
-#         for fname, data in self.segments_iter():
-#             path = os.path.join(root, fname)
-#             write_fs(path, data)
+def write_fs(path, data):
+    """Dump data to disk.
+    """
+    logger.info('Flushing to disk: %s' % path)
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
+    with open(path, 'wb') as fh:
+        fh.write(data)
+
+
+class CorpusEncoder:
+
+    def __init__(self, corpus, model, segment_size=1000, batch_size=100):
+        """Wrap corpus + model.
+        """
+        self.corpus = corpus
+
+        self.model = model
+        self.model.eval()
+
+        self.segment_size = segment_size
+        self.batch_size = batch_size
+
+    def lines_iter(self):
+        """Generate encoded lines + metadata.
+        """
+        batches = self.model.batches_iter(tqdm(self.corpus), self.batch_size)
+
+        for lines, yt in batches:
+
+            embeds = self.model.embed(lines)
+            embeds = embeds.cpu().detach().numpy()
+
+            for line, embed in zip(lines, embeds):
+
+                # Metadata + embedding.
+                data = {**line.__dict__}
+                data['embedding'] = embed
+
+                yield data
+
+    def segments_iter(self):
+        """Generate (fname, data).
+        """
+        chunks = chunked_iter(self.lines_iter(), self.segment_size)
+
+        for i, lines in enumerate(chunks):
+            fname = '%s.p' % str(i).zfill(5)
+            yield fname, pickle.dumps(lines)
+
+    def write_fs(self, root):
+        """Flush to local filesystem.
+        """
+        for fname, data in self.segments_iter():
+            path = os.path.join(root, fname)
+            write_fs(path, data)
