@@ -5,7 +5,7 @@ import re
 from boltons.iterutils import pairwise
 
 
-SEP_TOKENS = {':', '-', '–', '—', '|', 'via', '[', ']'}
+SEP_TOKENS = {':', '-', '–', '—', '|', 'via', '[', ']', '»'}
 
 
 # TODO: Reuters hack for "brief-XXX". Learn with char LSTM?
