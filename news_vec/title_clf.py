@@ -25,7 +25,7 @@ from torch.nn import functional as F
 from torch.nn.utils import rnn
 
 from . import logger
-from .utils import group_by_sizes
+from .utils import group_by_sizes, tensor_to_np
 from .cuda import itype, ftype
 from .headlines import clean_headline
 
@@ -513,8 +513,8 @@ class CorpusEncoder:
             embeds = self.model.embed(lines)
             yps = self.model.predict(embeds).exp()
 
-            embeds = embeds.cpu().detach().numpy()
-            yps = yps.cpu().detach().numpy()
+            embeds = tensor_to_np(embeds)
+            yps = tensor_to_np(yps)
 
             for line, embed, yp in zip(lines, embeds, yps):
 

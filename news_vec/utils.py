@@ -18,3 +18,7 @@ def group_by_sizes(L, sizes):
         total += s
 
     return parts
+
+
+def tensor_to_np(tensor):
+    return tensor.cpu().detach().numpy()
