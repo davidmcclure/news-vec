@@ -138,7 +138,6 @@ def read_json_lines(root, lower=True):
             for line in fh:
 
                 data = ujson.loads(line)
-                print(data)
 
                 tokens = data.get('tokens')
                 tokens = clean_headline(tokens)
@@ -612,12 +611,18 @@ class CorpusEncoder:
         for lines, yt in batches:
 
             embeds = self.model.embed(lines)
+            yps = self.model.predict(embeds).exp()
+
             embeds = embeds.cpu().detach().numpy()
+            yps = yps.cpu().detach().numpy()
 
-            for line, embed in zip(lines, embeds):
+            for line, embed, yp in zip(lines, embeds, yps):
 
-                # Metadata + embedding.
+                preds = dict(zip(self.model.labels, yp))
+
+                # Metadata + embedding + preds.
                 data = {**line.__dict__}
+                data['preds'] = preds
                 data['embedding'] = embed
 
                 yield data
