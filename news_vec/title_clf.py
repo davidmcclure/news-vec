@@ -25,6 +25,7 @@ from torch.nn import functional as F
 from torch.nn.utils import rnn
 
 from . import logger
+from .utils import group_by_sizes
 from .cuda import itype, ftype
 
 
@@ -403,26 +404,6 @@ class LineEncoder(nn.Module):
         x = self.dropout(x)
 
         return x[unsort_idxs]
-
-
-def group_by_sizes(L, sizes):
-    """Given a flat list and a list of sizes that sum to the length of the
-    list, group the list into sublists with corresponding sizes.
-
-    Args:
-        L (list)
-        sizes (list<int>)
-
-    Returns: list<list>
-    """
-    parts = []
-
-    total = 0
-    for s in sizes:
-        parts.append(L[total:total+s])
-        total += s
-
-    return parts
 
 
 class Classifier(nn.Module):
