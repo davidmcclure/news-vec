@@ -30,24 +30,6 @@ from .cuda import itype, ftype
 from .headlines import clean_headline
 
 
-class Line:
-
-    def __init__(self, tokens, label, count, lower=True):
-        self.tokens = [t.lower() for t in tokens] if lower else tokens
-        self.label = label
-        self.count = count
-
-    def __repr__(self):
-
-        pattern = '{cls_name}<{token_count} tokens -> {label}>'
-
-        return pattern.format(
-            cls_name=self.__class__.__name__,
-            token_count=len(self.tokens),
-            label=self.label,
-        )
-
-
 def read_json_lines(root, lower=True):
     """Read JSON corpus.
 
@@ -59,18 +41,36 @@ def read_json_lines(root, lower=True):
 
                 data = ujson.loads(line)
 
-                tokens = data.get('tokens')
+                tokens = data.pop('tokens')
                 tokens = clean_headline(tokens)
 
                 if not tokens:
                     continue
 
-                yield Line(
-                    tokens,
-                    data['label'],
-                    data['count'],
-                    lower=lower,
-                )
+                label = data.pop('label')
+
+                yield Line(tokens, label, data, lower)
+
+
+class Line:
+
+    def __init__(self, tokens, label=None, metadata=None, lower=True):
+        self.tokens = [t.lower() for t in tokens] if lower else tokens
+        self.label = label
+        self.metadata = metadata or {}
+
+    def __repr__(self):
+
+        pattern = '{cls_name}<{token_count} tokens -> {label}>'
+
+        return pattern.format(
+            cls_name=self.__class__.__name__,
+            token_count=len(self.tokens),
+            label=self.label,
+        )
+
+    def to_dict(self):
+        return dict(tokens=self.tokens, label=self.label, **self.metadata)
 
 
 class Corpus:
@@ -520,10 +520,12 @@ class CorpusEncoder:
 
                 preds = dict(zip(self.model.labels, yp))
 
-                # Metadata + embedding + preds.
-                data = {**line.__dict__}
-                data['preds'] = preds
-                data['embedding'] = embed
+                # Metadata + clf output.
+                data = dict(
+                    **line.to_dict(),
+                    preds=preds,
+                    embedding=embed,
+                )
 
                 yield data
 
