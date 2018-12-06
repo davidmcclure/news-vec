@@ -518,12 +518,15 @@ class CorpusEncoder:
 
             for line, embed, yp in zip(lines, embeds, yps):
 
-                preds = dict(zip(self.model.labels, yp))
+                preds = {
+                    f'p_{domain}': mass
+                    for domain, mass in zip(self.model.labels, yp)
+                }
 
                 # Metadata + clf output.
                 data = dict(
                     **line.to_dict(),
-                    preds=preds,
+                    **preds,
                     embedding=embed,
                 )
 
