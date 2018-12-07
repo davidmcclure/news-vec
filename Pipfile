@@ -22,6 +22,7 @@ torchtext = "*"
 umap-learn = "*"
 annoy = "*"
 spacy = "*"
+networkx = "*"
 
 [dev-packages]
 
