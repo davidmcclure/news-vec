@@ -282,7 +282,7 @@ class TokenEmbedding(nn.Module):
 
 class LineEncoder(nn.Module):
 
-    def __init__(self, input_size, hidden_size=4096, num_layers=2):
+    def __init__(self, input_size, hidden_size=1024, num_layers=2):
         """Initialize LSTM.
         """
         super().__init__()
