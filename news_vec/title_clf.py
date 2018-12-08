@@ -282,20 +282,24 @@ class TokenEmbedding(nn.Module):
 
 class LineEncoder(nn.Module):
 
-    def __init__(self, embed_dim, lstm_dim, num_layers=1):
+    def __init__(self, input_size, hidden_size=4096, num_layers=2):
         """Initialize LSTM.
         """
         super().__init__()
 
         self.lstm = nn.LSTM(
-            embed_dim,
-            lstm_dim,
+            input_size=input_size,
+            hidden_size=hidden_size,
             num_layers=num_layers,
             batch_first=True,
             bidirectional=True,
         )
 
         self.dropout = nn.Dropout()
+
+    @property
+    def out_dim(self):
+        return self.lstm.hidden_size * 2
 
     def forward(self, x):
         """Sort, pack, encode, reorder.
@@ -327,7 +331,7 @@ class LineEncoder(nn.Module):
 
 class Classifier(nn.Module):
 
-    def __init__(self, labels, token_counts, lstm_dim, embed_dim):
+    def __init__(self, labels, token_counts, embed_dim=512, lstm_kwargs=None):
         """Initialize encoders + clf.
         """
         super().__init__()
@@ -338,9 +342,10 @@ class Classifier(nn.Module):
 
         self.embed_tokens = TokenEmbedding(token_counts)
 
-        self.embed_lines = LineEncoder(self.embed_tokens.out_dim, lstm_dim)
+        self.embed_lines = LineEncoder(self.embed_tokens.out_dim,
+            **(lstm_kwargs or {}))
 
-        self.merge = nn.Linear(lstm_dim*2, embed_dim)
+        self.merge = nn.Linear(self.embed_lines.out_dim, embed_dim)
 
         self.predict = nn.Sequential(
             nn.Linear(embed_dim, len(labels)),
@@ -382,16 +387,16 @@ class Classifier(nn.Module):
 
 class Trainer:
 
-    def __init__(self, root, skim=None, lstm_dim=1024, embed_dim=512, lr=1e-4,
-        batch_size=50, test_size=10000, eval_every=100000):
+    def __init__(self, corpus_root, lr=1e-4, batch_size=50, test_size=10000,
+        eval_every=100000, corpus_kwargs=None, model_kwargs=None):
 
-        self.corpus = Corpus(root, skim)
+        self.corpus = Corpus(corpus_root, **(corpus_kwargs or {}))
 
         labels = self.corpus.labels()
 
         token_counts = self.corpus.token_counts()
 
-        self.model = Classifier(labels, token_counts, lstm_dim, embed_dim)
+        self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
 
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
