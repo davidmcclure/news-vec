@@ -23,6 +23,7 @@ umap-learn = "*"
 annoy = "*"
 spacy = "*"
 networkx = "*"
+maya = "*"
 
 [dev-packages]
 
