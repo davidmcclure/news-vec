@@ -24,6 +24,7 @@ annoy = "*"
 spacy = "*"
 networkx = "*"
 maya = "*"
+textblob = "*"
 
 [dev-packages]
 
