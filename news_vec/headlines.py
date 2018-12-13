@@ -71,7 +71,7 @@ def text_clf(token):
     text = re.sub('[^a-z0-9\$\.,]', '', token.text.lower())
 
     # Drop periods and commas, unless inside of a number.
-    if not re.match('[0-9\.,]', text):
+    if not re.match('^[0-9]+[0-9\.,]+[0-9]+$', text):
         text = re.sub('[\.,]', '', text)
 
     return text
