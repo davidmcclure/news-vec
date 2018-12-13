@@ -27,7 +27,6 @@ from torch.nn.utils import rnn
 from . import logger
 from .utils import group_by_sizes, tensor_to_np
 from .cuda import itype, ftype
-from .headlines import clean_headline
 
 
 def read_json_lines(root, lower=True):
@@ -42,7 +41,6 @@ def read_json_lines(root, lower=True):
                 data = ujson.loads(line)
 
                 tokens = data.pop('tokens')
-                tokens = clean_headline(tokens)
 
                 if not tokens:
                     continue
