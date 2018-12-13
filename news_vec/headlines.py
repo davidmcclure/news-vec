@@ -9,15 +9,16 @@ from boltons.iterutils import pairwise
 from functools import reduce
 
 
-CURLY_STRAIGHT = (('“', '"'), ('”', '"'), ('‘', "'"), ('’', "'"))
+# TODO: What to do with "/"?
+
+
+QUOTES = (('“', '"'), ('”', '"'), ('‘', "'"), ('’', "'"))
 
 def standardize_quotes(text):
     """Curly -> straight.
     """
-    for c, s in CURLY_STRAIGHT:
-        text = text.replace(c, s)
-
-    text = text.replace("''", '"')
+    for special, standard in QUOTES:
+        text = text.replace(special, standard)
 
     return text
 
@@ -51,7 +52,10 @@ def standardize_text(text):
     return reduce(lambda t, func: func(t), STANDARDIZERS, text)
 
 
+# Headlines can contain letters, numbers, ".,;", "?!", $, and spaces.
 BREAK_CHAR_PATTERN = '[^a-z0-9\.,;\'"\?!\$\s]'
+
+# Regular tokens that constitute a break.
 ALPHA_BREAK_TOKENS = {'via'}
 
 def is_break_token(token):
@@ -65,14 +69,17 @@ def is_break_token(token):
     return has_break_char or is_alpha_break_token
 
 
+# For the classifier, drop everything except letters, numbers, and $.
+CLF_REMOVED_CHAR_PATTERN = '[^a-z0-9\$]'
+
 def text_clf(token):
     """Drop everything but letters, numbers, and currency ($.,)
     """
-    text = re.sub('[^a-z0-9\$\.,]', '', token.text.lower())
+    # Drop everything but letters, numbers, $.
+    text = re.sub(CLF_REMOVED_CHAR_PATTERN, '', token.text.lower())
 
-    # Drop periods and commas, unless inside of a number.
-    if not re.match('^[0-9]+[0-9\.,]+[0-9]+$', text):
-        text = re.sub('[\.,]', '', text)
+    # Digits -> '#'.
+    text = re.sub('[0-9]+', '#', text)
 
     return text
 
