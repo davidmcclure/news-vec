@@ -500,13 +500,12 @@ class Trainer:
 
         yt, yp = self.predict_val()
 
-        preds = yp.argmax(1)
-
         # LOSS
         loss = F.nll_loss(yp, yt)
         logger.info('Val loss: %f' % loss)
 
         # ACCURACY
+        preds = yp.argmax(1)
         acc = metrics.accuracy_score(yt, preds)
         logger.info('Val acc: %f' % acc)
 
