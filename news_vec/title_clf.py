@@ -458,8 +458,9 @@ class Trainer:
 
         self.log_metrics(batch_losses)
 
-    def log_val_metrics(self):
-
+    def predict_val(self):
+        """Predict val lines.
+        """
         self.model.eval()
 
         loader = DataLoader(
@@ -478,6 +479,12 @@ class Trainer:
 
         yt = torch.LongTensor(yt).type(itype)
         yp = torch.FloatTensor(yp).type(ftype)
+
+        return yt, yp
+
+    def log_val_metrics(self):
+
+        yt, yp = self.predict_val()
 
         preds = yp.argmax(1)
 
