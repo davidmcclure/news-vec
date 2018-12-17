@@ -103,7 +103,7 @@ class Corpus(Dataset):
         """Get (tokens -> label idx) training pair.
         """
         line = self.lines[i]
-        return (line.tokens, line.label)
+        return (line, line.label)
 
     def token_counts(self):
         """Collect all token -> count.
@@ -361,11 +361,13 @@ class Classifier(nn.Module):
     def embed(self, lines):
         """Embed lines.
         """
+        tokens = [line.tokens for line in lines]
+
         # Line lengths.
-        sizes = [len(ts) for ts in lines]
+        sizes = [len(ts) for ts in tokens]
 
         # Embed tokens, regroup by line.
-        x = self.embed_tokens(list(chain(*lines)))
+        x = self.embed_tokens(list(chain(*tokens)))
         x = group_by_sizes(x, sizes)
 
         # Embed lines.
@@ -407,27 +409,28 @@ class BarDataLoader(DataLoader):
 
 class Trainer:
 
-    # TODO: Pass dataset, not corpus root.
-    def __init__(self, corpus_root, lr=1e-4, batch_size=50, test_size=10000,
+    @classmethod
+    def from_spark_json(cls, root, skim=None, *args, **kwargs):
+        corpus = Corpus(root, skim)
+        return cls(corpus, *args, **kwargs)
+
+    def __init__(self, corpus, lr=1e-4, batch_size=50, test_size=10000,
         eval_every=100000, corpus_kwargs=None, model_kwargs=None):
 
-        self.corpus = Corpus(corpus_root, **(corpus_kwargs or {}))
+        self.corpus = corpus
+
+        token_counts = self.corpus.token_counts()
+        labels = self.corpus.labels()
+
+        self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+
+        self.batch_size = batch_size
+        self.eval_every = eval_every
 
         # Train / test split.
         s1, s2 = len(self.corpus) - test_size, test_size
         self.train_ds, self.val_ds = random_split(self.corpus, (s1, s2))
-
-        labels = self.corpus.labels()
-
-        token_counts = self.corpus.token_counts()
-
-        self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
-
-        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
-
-        self.batch_size = batch_size
-
-        self.eval_every = eval_every
 
         if torch.cuda.is_available():
             self.model.cuda()
@@ -546,9 +549,13 @@ class CorpusEncoder:
     def lines_iter(self):
         """Generate encoded lines + metadata.
         """
-        batches = self.model.batches_iter(tqdm(self.corpus), self.batch_size)
+        loader = BarDataLoader(
+            self.corpus,
+            collate_fn=self.model.collate_batch,
+            batch_size=self.batch_size,
+        )
 
-        for lines, yt in batches:
+        for lines, yt in loader:
 
             embeds = self.model.embed(lines)
             yps = self.model.predict(embeds).exp()
