@@ -358,23 +358,9 @@ class Classifier(nn.Module):
             nn.LogSoftmax(1),
         )
 
-    # def batches_iter(self, lines_iter, size=20):
-    #     """Generate (lines, label idx) batches.
-    #     """
-    #     for lines in chunked_iter(lines_iter, size):
-    #
-    #         # Labels -> indexes.
-    #         yt_idx = [self.ltoi[line.label] for line in lines]
-    #         yt = torch.LongTensor(yt_idx).type(itype)
-    #
-    #         yield lines, yt
-
     def embed(self, lines):
         """Embed lines.
         """
-        # Flat tokens.
-        # tokens = [line.tokens for line in lines]
-
         # Line lengths.
         sizes = [len(ts) for ts in lines]
 
@@ -403,11 +389,13 @@ class Classifier(nn.Module):
 
 class Trainer:
 
+    # TODO: Pass dataset, not corpus root.
     def __init__(self, corpus_root, lr=1e-4, batch_size=50, test_size=10000,
         eval_every=100000, corpus_kwargs=None, model_kwargs=None):
 
         self.corpus = Corpus(corpus_root, **(corpus_kwargs or {}))
 
+        # Train / test split.
         s1, s2 = len(self.corpus) - test_size, test_size
         self.train_ds, self.val_ds = random_split(self.corpus, (s1, s2))
 
@@ -422,9 +410,6 @@ class Trainer:
         self.batch_size = batch_size
 
         self.eval_every = eval_every
-
-        # self.train_lines, self.val_lines = train_test_split(
-        #     self.corpus.lines, test_size=test_size)
 
         if torch.cuda.is_available():
             self.model.cuda()
@@ -446,10 +431,6 @@ class Trainer:
         )
 
         bar = tqdm(total=len(self.train_ds))
-
-        # lines_iter = tqdm(self.train_lines)
-        #
-        # batches = self.model.batches_iter(lines_iter, self.batch_size)
 
         batch_losses = []
         eval_n = 0
