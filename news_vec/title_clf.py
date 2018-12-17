@@ -407,6 +407,10 @@ class BarDataLoader(DataLoader):
         return self.bar.n
 
 
+class EarlyStoppingException(Exception):
+    pass
+
+
 class Trainer:
 
     @classmethod
@@ -415,9 +419,12 @@ class Trainer:
         return cls(corpus, *args, **kwargs)
 
     def __init__(self, corpus, lr=1e-4, batch_size=50, test_size=10000,
-        eval_every=100000, corpus_kwargs=None, model_kwargs=None):
+        eval_every=100000, es_wait=5, corpus_kwargs=None, model_kwargs=None):
 
         self.corpus = corpus
+        self.batch_size = batch_size
+        self.eval_every = eval_every
+        self.es_wait = es_wait
 
         token_counts = self.corpus.token_counts()
         labels = self.corpus.labels()
@@ -425,21 +432,27 @@ class Trainer:
         self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
-        self.batch_size = batch_size
-        self.eval_every = eval_every
+        if torch.cuda.is_available():
+            self.model.cuda()
 
         # Train / test split.
         s1, s2 = len(self.corpus) - test_size, test_size
         self.train_ds, self.val_ds = random_split(self.corpus, (s1, s2))
 
-        if torch.cuda.is_available():
-            self.model.cuda()
+        self.train_losses, self.val_losses = [], []
+        self.n = 0
 
-    def train(self, epochs=10):
+    def train(self, max_epochs=100):
         """Train for N epochs.
         """
-        for epoch in range(epochs):
-            self.train_epoch(epoch)
+        for epoch in range(max_epochs):
+
+            # Listen for early stopping exception.
+            try:
+                self.train_epoch(epoch)
+            except EarlyStoppingException:
+                logger.info('Stopping early.')
+                break
 
     def train_epoch(self, epoch):
 
@@ -451,7 +464,6 @@ class Trainer:
             batch_size=self.batch_size,
         )
 
-        batch_losses = []
         eval_n = 0
         for lines, yt in loader:
 
@@ -465,15 +477,17 @@ class Trainer:
 
             self.optimizer.step()
 
-            batch_losses.append(loss.item())
+            self.train_losses.append(loss.item())
 
-            n = math.floor(loader.n / self.eval_every)
+            self.n += len(lines)
 
-            if n > eval_n:
-                self.log_metrics(batch_losses)
-                eval_n = n
+            if self.n >= self.eval_every:
 
-        self.log_metrics(batch_losses)
+                self.validate()
+                self.n = 0
+
+                if self.is_finished():
+                    raise EarlyStoppingException()
 
     def predict_val(self):
         """Predict val lines.
@@ -496,13 +510,21 @@ class Trainer:
 
         return yt, yp
 
-    def log_val_metrics(self):
+    def validate(self, log=True):
 
         yt, yp = self.predict_val()
 
-        # LOSS
         loss = F.nll_loss(yp, yt)
-        logger.info('Val loss: %f' % loss)
+        self.val_losses.append(loss.item())
+
+        if log:
+            self.log_perf(yt, yp)
+
+    def log_perf(self, yt, yp, ntl=100):
+
+        # LOSS
+        logger.info('Train loss: %f' % np.mean(self.train_losses[-ntl:]))
+        logger.info('Val loss: %f' % self.val_losses[-1])
 
         # ACCURACY
         preds = yp.argmax(1)
@@ -516,9 +538,21 @@ class Trainer:
         report = metrics.classification_report(yt_lb, yp_lb)
         logger.info('\n' + report)
 
-    def log_metrics(self, train_losses, ntl=100):
-        logger.info('Train loss: %f' % np.mean(train_losses[-ntl:]))
-        self.log_val_metrics()
+    def is_finished(self):
+        """Has val loss stalled?
+        """
+        window = self.val_losses[-self.es_wait:]
+        window_mean = np.mean(window)
+
+        # TODO: Format.
+        logger.info(f'ES: {}, {window_mean}')
+
+        return (
+            # Eval'ed at least N times.
+            len(window) >= self.es_wait and
+            # Window average is greater than earliest loss.
+            window[0] < np.mean(window)
+        )
 
 
 def write_fs(path, data):
