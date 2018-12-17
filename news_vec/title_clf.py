@@ -387,6 +387,24 @@ class Classifier(nn.Module):
         return lines, yt
 
 
+class BarDataLoader(DataLoader):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.bar = tqdm(self.dataset)
+
+    def __iter__(self):
+        """Update progress bar.
+        """
+        for x, y in super().__iter__():
+            yield x, y
+            self.bar.update(len(x))
+
+    @property
+    def n(self):
+        return self.bar.n
+
+
 class Trainer:
 
     # TODO: Pass dataset, not corpus root.
@@ -424,13 +442,11 @@ class Trainer:
 
         logger.info('Epoch %d' % epoch)
 
-        loader = DataLoader(
+        loader = BarDataLoader(
             self.train_ds,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
-
-        bar = tqdm(total=len(self.train_ds))
 
         batch_losses = []
         eval_n = 0
@@ -448,9 +464,7 @@ class Trainer:
 
             batch_losses.append(loss.item())
 
-            bar.update(len(lines))
-
-            n = math.floor(bar.n / self.eval_every)
+            n = math.floor(loader.n / self.eval_every)
 
             if n > eval_n:
                 self.log_metrics(batch_losses)
@@ -463,19 +477,16 @@ class Trainer:
         """
         self.model.eval()
 
-        loader = DataLoader(
+        loader = BarDataLoader(
             self.val_ds,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
 
-        bar = tqdm(total=len(self.val_ds))
-
         yt, yp = [], []
         for lines, yti in loader:
             yp += self.model(lines).tolist()
             yt += yti.tolist()
-            bar.update(len(lines))
 
         yt = torch.LongTensor(yt).type(itype)
         yp = torch.FloatTensor(yp).type(ftype)
