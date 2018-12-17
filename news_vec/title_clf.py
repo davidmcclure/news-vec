@@ -29,7 +29,7 @@ from .utils import group_by_sizes, tensor_to_np
 from .cuda import itype, ftype
 
 
-def read_json_lines(root, lower=True):
+def read_json_lines(root):
     """Read JSON corpus.
 
     Yields: Line
@@ -47,13 +47,13 @@ def read_json_lines(root, lower=True):
 
                 label = data.pop('label')
 
-                yield Line(tokens, label, data, lower)
+                yield Line(tokens, label, data)
 
 
 class Line:
 
-    def __init__(self, tokens, label=None, metadata=None, lower=True):
-        self.tokens = [t.lower() for t in tokens] if lower else tokens
+    def __init__(self, tokens, label=None, metadata=None):
+        self.tokens = tokens
         self.label = label
         self.metadata = metadata or {}
 
@@ -73,12 +73,12 @@ class Line:
 
 class Corpus:
 
-    def __init__(self, root, skim=None, lower=True):
+    def __init__(self, root, skim=None):
         """Read lines.
         """
         logger.info('Parsing line corpus.')
 
-        lines_iter = islice(read_json_lines(root, lower), skim)
+        lines_iter = islice(read_json_lines(root), skim)
 
         self.lines = list(tqdm(lines_iter))
 
