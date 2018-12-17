@@ -25,6 +25,7 @@ spacy = "*"
 networkx = "*"
 maya = "*"
 textblob = "*"
+cached-property = "*"
 
 [dev-packages]
 

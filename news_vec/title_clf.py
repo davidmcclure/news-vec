@@ -17,9 +17,11 @@ from tqdm import tqdm
 from boltons.iterutils import pairwise, chunked_iter
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+from cached_property import cached_property
 
 import torch
 from torchtext.vocab import Vocab, Vectors
+from torch.utils.data import Dataset, DataLoader, random_split
 from torch import nn, optim
 from torch.nn import functional as F
 from torch.nn.utils import rnn
@@ -71,7 +73,7 @@ class Line:
         return dict(tokens=self.tokens, label=self.label, **self.metadata)
 
 
-class Corpus:
+class Corpus(Dataset):
 
     def __init__(self, root, skim=None):
         """Read lines.
@@ -96,6 +98,12 @@ class Corpus:
 
     def __iter__(self):
         return iter(self.lines)
+
+    def __getitem__(self, i):
+        """Get (tokens -> label idx) training pair.
+        """
+        line = self.lines[i]
+        return (line.tokens, line.label)
 
     def token_counts(self):
         """Collect all token -> count.
@@ -350,28 +358,28 @@ class Classifier(nn.Module):
             nn.LogSoftmax(1),
         )
 
-    def batches_iter(self, lines_iter, size=20):
-        """Generate (lines, label idx) batches.
-        """
-        for lines in chunked_iter(lines_iter, size):
-
-            # Labels -> indexes.
-            yt_idx = [self.ltoi[line.label] for line in lines]
-            yt = torch.LongTensor(yt_idx).type(itype)
-
-            yield lines, yt
+    # def batches_iter(self, lines_iter, size=20):
+    #     """Generate (lines, label idx) batches.
+    #     """
+    #     for lines in chunked_iter(lines_iter, size):
+    #
+    #         # Labels -> indexes.
+    #         yt_idx = [self.ltoi[line.label] for line in lines]
+    #         yt = torch.LongTensor(yt_idx).type(itype)
+    #
+    #         yield lines, yt
 
     def embed(self, lines):
         """Embed lines.
         """
         # Flat tokens.
-        tokens = [line.tokens for line in lines]
+        # tokens = [line.tokens for line in lines]
 
         # Line lengths.
-        sizes = [len(ts) for ts in tokens]
+        sizes = [len(ts) for ts in lines]
 
         # Embed tokens, regroup by line.
-        x = self.embed_tokens(list(chain(*tokens)))
+        x = self.embed_tokens(list(chain(*lines)))
         x = group_by_sizes(x, sizes)
 
         # Embed lines.
@@ -382,6 +390,16 @@ class Classifier(nn.Module):
     def forward(self, lines):
         return self.predict(self.embed(lines))
 
+    def collate_batch(self, batch):
+        """Labels -> indexes.
+        """
+        lines, labels = list(zip(*batch))
+
+        yt_idx = [self.ltoi[label] for label in labels]
+        yt = torch.LongTensor(yt_idx).type(itype)
+
+        return lines, yt
+
 
 class Trainer:
 
@@ -389,6 +407,9 @@ class Trainer:
         eval_every=100000, corpus_kwargs=None, model_kwargs=None):
 
         self.corpus = Corpus(corpus_root, **(corpus_kwargs or {}))
+
+        s1, s2 = len(self.corpus) - test_size, test_size
+        self.train_ds, self.val_ds = random_split(self.corpus, (s1, s2))
 
         labels = self.corpus.labels()
 
@@ -402,8 +423,8 @@ class Trainer:
 
         self.eval_every = eval_every
 
-        self.train_lines, self.val_lines = train_test_split(
-            self.corpus.lines, test_size=test_size)
+        # self.train_lines, self.val_lines = train_test_split(
+        #     self.corpus.lines, test_size=test_size)
 
         if torch.cuda.is_available():
             self.model.cuda()
@@ -418,13 +439,21 @@ class Trainer:
 
         logger.info('Epoch %d' % epoch)
 
-        lines_iter = tqdm(self.train_lines)
+        loader = DataLoader(
+            self.train_ds,
+            collate_fn=self.model.collate_batch,
+            batch_size=self.batch_size,
+        )
 
-        batches = self.model.batches_iter(lines_iter, self.batch_size)
+        bar = tqdm(total=len(self.train_ds))
+
+        # lines_iter = tqdm(self.train_lines)
+        #
+        # batches = self.model.batches_iter(lines_iter, self.batch_size)
 
         batch_losses = []
         eval_n = 0
-        for lines, yt in batches:
+        for lines, yt in loader:
 
             self.model.train()
             self.optimizer.zero_grad()
@@ -438,7 +467,9 @@ class Trainer:
 
             batch_losses.append(loss.item())
 
-            n = math.floor(lines_iter.n / self.eval_every)
+            bar.update(len(lines))
+
+            n = math.floor(bar.n / self.eval_every)
 
             if n > eval_n:
                 self.log_metrics(batch_losses)
@@ -450,12 +481,19 @@ class Trainer:
 
         self.model.eval()
 
-        batches = self.model.batches_iter(tqdm(self.val_lines))
+        loader = DataLoader(
+            self.val_ds,
+            collate_fn=self.model.collate_batch,
+            batch_size=self.batch_size,
+        )
+
+        bar = tqdm(total=len(self.val_ds))
 
         yt, yp = [], []
-        for lines, yti in batches:
+        for lines, yti in loader:
             yp += self.model(lines).tolist()
             yt += yti.tolist()
+            bar.update(len(lines))
 
         yt = torch.LongTensor(yt).type(itype)
         yp = torch.FloatTensor(yp).type(ftype)
@@ -477,8 +515,8 @@ class Trainer:
         report = metrics.classification_report(yt_lb, yp_lb)
         logger.info('\n' + report)
 
-    def log_metrics(self, train_losses):
-        logger.info('Train loss: %f' % np.mean(train_losses))
+    def log_metrics(self, train_losses, ntl=100):
+        logger.info('Train loss: %f' % np.mean(train_losses[-ntl:]))
         self.log_val_metrics()
 
 
