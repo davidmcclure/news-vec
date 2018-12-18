@@ -17,7 +17,6 @@ from tqdm import tqdm
 from boltons.iterutils import pairwise, chunked_iter
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
-from cached_property import cached_property
 
 import torch
 from torchtext.vocab import Vocab, Vectors
