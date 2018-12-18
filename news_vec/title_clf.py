@@ -405,6 +405,9 @@ class Predictions:
         self.yt = yt
         self.yp = yp
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}<{len(self.yt)}>'
+
     @cached_property
     def accuracy(self):
         return metrics.accuracy_score(self.yt, self.yp.argmax(1))
@@ -525,29 +528,23 @@ class Trainer:
         yt = torch.LongTensor(yt).type(itype)
         yp = torch.FloatTensor(yp).type(ftype)
 
-        return yt, yp
+        return Predictions(yt, yp)
 
     def validate(self, log=True):
 
-        yt, yp = self._predict(self.val_ds)
+        preds = self._predict(self.val_ds)
 
-        loss = self.loss_func(yp, yt)
+        loss = self.loss_func(preds.yp, preds.yt)
         self.val_losses.append(loss.item())
 
         if log:
-
-            # LOSS
-            logger.info('Train loss: ~%f' % np.mean(self.train_losses[-100:]))
+            recent_tl = np.mean(self.train_losses[-100:])
+            logger.info('Train loss: ~%f' % recent_tl)
             logger.info('Val loss: %f' % self.val_losses[-1])
+            logger.info('Val acc: %f' % preds.accuracy)
 
-            # ACCURACY
-            acc = metrics.accuracy_score(yt, yp.argmax(1))
-            logger.info('Val acc: %f' % acc)
-
-    # TODO: DRY
     def eval_test(self):
-        yt, yp = self._predict(self.test_ds)
-        return metrics.accuracy_score(yt, yp.argmax(1))
+        return self._predict(self.test_ds)
 
     def is_finished(self):
         """Has val loss stalled?
