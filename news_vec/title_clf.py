@@ -544,8 +544,10 @@ class Trainer:
         window = self.val_losses[-self.es_wait:]
         window_mean = np.mean(window)
 
-        # TODO: Format.
-        logger.info(f'ES: {}, {window_mean}')
+        window_strs = ' '.join(['{0:.5g}'.format(val) for val in window])
+        window_mean_str = '{0:.5g}'.format(window_mean)
+
+        logger.info(f'ES window: {window_strs} | {window_mean_str}')
 
         return (
             # Eval'ed at least N times.
