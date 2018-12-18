@@ -18,6 +18,7 @@ from tqdm import tqdm
 from boltons.iterutils import pairwise, chunked_iter
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
+from cached_property import cached_property
 
 import torch
 from torchtext.vocab import Vocab, Vectors
@@ -398,6 +399,17 @@ def print_replace(msg):
     sys.stdout.flush()
 
 
+class Predictions:
+
+    def __init__(self, yt, yp):
+        self.yt = yt
+        self.yp = yp
+
+    @cached_property
+    def accuracy(self):
+        return metrics.accuracy_score(self.yt, self.yp.argmax(1))
+
+
 class Trainer:
 
     @classmethod
@@ -515,29 +527,27 @@ class Trainer:
 
         return yt, yp
 
-    def predict_val(self):
-        return self._predict(self.val_ds)
-
     def validate(self, log=True):
 
-        yt, yp = self.predict_val()
+        yt, yp = self._predict(self.val_ds)
 
         loss = self.loss_func(yp, yt)
         self.val_losses.append(loss.item())
 
         if log:
-            self.log_perf(yt, yp)
 
-    def log_perf(self, yt, yp, ntl=100):
+            # LOSS
+            logger.info('Train loss: ~%f' % np.mean(self.train_losses[-100:]))
+            logger.info('Val loss: %f' % self.val_losses[-1])
 
-        # LOSS
-        logger.info('Train loss: %f' % np.mean(self.train_losses[-ntl:]))
-        logger.info('Val loss: %f' % self.val_losses[-1])
+            # ACCURACY
+            acc = metrics.accuracy_score(yt, yp.argmax(1))
+            logger.info('Val acc: %f' % acc)
 
-        # ACCURACY
-        preds = yp.argmax(1)
-        acc = metrics.accuracy_score(yt, preds)
-        logger.info('Val acc: %f' % acc)
+    # TODO: DRY
+    def eval_test(self):
+        yt, yp = self._predict(self.test_ds)
+        return metrics.accuracy_score(yt, yp.argmax(1))
 
     def is_finished(self):
         """Has val loss stalled?
