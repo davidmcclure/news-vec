@@ -5,14 +5,15 @@ import gzip
 import string
 import math
 import pickle
+import random
 import os
 import sys
 import re
 
 import numpy as np
 
-from collections import Counter
 from itertools import islice, chain
+from collections import Counter, defaultdict
 from glob import glob
 from tqdm import tqdm
 from boltons.iterutils import pairwise, chunked_iter
@@ -74,7 +75,7 @@ class Line:
         return dict(tokens=self.tokens, label=self.label, **self.metadata)
 
 
-class Corpus(Dataset):
+class Corpus:
 
     def __init__(self, root, skim=None):
         """Read lines.
@@ -100,11 +101,33 @@ class Corpus(Dataset):
     def __iter__(self):
         return iter(self.lines)
 
-    def __getitem__(self, i):
-        """Get (tokens -> label idx) training pair.
+    def sample_all_vs_all(self):
+        """All domains.
         """
-        line = self.lines[i]
-        return (line, line.label)
+        domain_lines = defaultdict(list)
+        for line in self:
+            domain_lines[line.label].append(line)
+
+        min_count = min([len(lines) for _, lines in domain_lines.items()])
+
+        pairs = [
+            random.sample([(line, domain) for line in lines], min_count)
+            for domain, lines in domain_lines.items()
+        ]
+
+        return LineDataset(list(chain(*pairs)))
+
+
+class LineDataset(Dataset):
+
+    def __init__(self, pairs):
+        self.pairs = pairs
+
+    def __len__(self):
+        return len(self.pairs)
+
+    def __getitem__(self, i):
+        return self.pairs[i]
 
     def token_counts(self):
         """Collect all token -> count.
@@ -112,7 +135,7 @@ class Corpus(Dataset):
         logger.info('Gathering token counts.')
 
         counts = Counter()
-        for line in tqdm(self):
+        for line, _ in tqdm(self.pairs):
             counts.update(line.tokens)
 
         return counts
@@ -123,8 +146,8 @@ class Corpus(Dataset):
         logger.info('Gathering label counts.')
 
         counts = Counter()
-        for line in tqdm(self):
-            counts[line.label] += 1
+        for _, label in tqdm(self.pairs):
+            counts[label] += 1
 
         return counts
 
@@ -418,7 +441,8 @@ class Trainer:
     @classmethod
     def from_spark_json(cls, root, skim=None, *args, **kwargs):
         corpus = Corpus(root, skim)
-        return cls(corpus, *args, **kwargs)
+        dataset = corpus.sample_all_vs_all()
+        return cls(dataset, *args, **kwargs)
 
     def __init__(self, corpus, lr=1e-4, batch_size=50, test_size=10000,
         eval_every=100000, es_wait=10, model_kwargs=None):
