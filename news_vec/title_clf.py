@@ -6,6 +6,7 @@ import string
 import math
 import pickle
 import os
+import sys
 import re
 
 import numpy as np
@@ -388,26 +389,13 @@ class Classifier(nn.Module):
         return lines, yt
 
 
-class BarDataLoader(DataLoader):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.bar = tqdm(self.dataset)
-
-    def __iter__(self):
-        """Update progress bar.
-        """
-        for x, y in super().__iter__():
-            yield x, y
-            self.bar.update(len(x))
-
-    @property
-    def n(self):
-        return self.bar.n
-
-
 class EarlyStoppingException(Exception):
     pass
+
+
+def print_replace(msg):
+    sys.stdout.write(f'\r{msg}')
+    sys.stdout.flush()
 
 
 class Trainer:
@@ -418,7 +406,7 @@ class Trainer:
         return cls(corpus, *args, **kwargs)
 
     def __init__(self, corpus, lr=1e-4, batch_size=50, test_size=10000,
-        eval_every=100000, es_wait=5, corpus_kwargs=None, model_kwargs=None):
+        eval_every=100000, es_wait=10, corpus_kwargs=None, model_kwargs=None):
 
         self.corpus = corpus
         self.batch_size = batch_size
@@ -457,14 +445,14 @@ class Trainer:
 
         logger.info('Epoch %d' % epoch)
 
-        loader = BarDataLoader(
+        loader = DataLoader(
             self.train_ds,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
 
         eval_n = 0
-        for lines, yt in loader:
+        for i, (lines, yt) in enumerate(loader):
 
             self.model.train()
             self.optimizer.zero_grad()
@@ -480,7 +468,16 @@ class Trainer:
 
             self.n += len(lines)
 
+            print_replace(loader.batch_size * (i+1))
+
             if self.n >= self.eval_every:
+
+                print('\r')
+
+                logger.info(
+                    'Evaluating: %d / %d' %
+                    (loader.batch_size * (i+1), len(self.train_ds))
+                )
 
                 self.validate()
                 self.n = 0
@@ -493,16 +490,19 @@ class Trainer:
         """
         self.model.eval()
 
-        loader = BarDataLoader(
+        loader = DataLoader(
             self.val_ds,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
 
         yt, yp = [], []
-        for lines, yti in loader:
+        for i, (lines, yti) in enumerate(loader):
             yp += self.model(lines).tolist()
             yt += yti.tolist()
+            print_replace(loader.batch_size * (i+1))
+
+        print('\r')
 
         yt = torch.LongTensor(yt).type(itype)
         yp = torch.FloatTensor(yp).type(ftype)
@@ -529,13 +529,6 @@ class Trainer:
         preds = yp.argmax(1)
         acc = metrics.accuracy_score(yt, preds)
         logger.info('Val acc: %f' % acc)
-
-        yt_lb = [self.model.labels[i] for i in yt.tolist()]
-        yp_lb = [self.model.labels[i] for i in preds.tolist()]
-
-        # REPORT
-        report = metrics.classification_report(yt_lb, yp_lb)
-        logger.info('\n' + report)
 
     def is_finished(self):
         """Has val loss stalled?
