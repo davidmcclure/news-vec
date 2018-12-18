@@ -429,10 +429,11 @@ class Trainer:
         """
         self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
 
-        train_size = len(self.corpus) - self.test_size
+        train_size = len(self.corpus) - (self.test_size * 2)
+        sizes = (train_size, self.test_size, self.test_size)
 
-        self.train_ds, self.val_ds = \
-            random_split(self.corpus, (train_size, self.test_size))
+        self.train_ds, self.val_ds, self.test_ds = \
+            random_split(self.corpus, sizes)
 
         self.train_losses, self.val_losses = [], []
         self.n = 0
@@ -490,13 +491,13 @@ class Trainer:
                 if self.is_finished():
                     raise EarlyStoppingException()
 
-    def predict_val(self):
-        """Predict val lines.
+    def _predict(self, split):
+        """Predict a val/test split.
         """
         self.model.eval()
 
         loader = DataLoader(
-            self.val_ds,
+            split,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
@@ -513,6 +514,9 @@ class Trainer:
         yp = torch.FloatTensor(yp).type(ftype)
 
         return yt, yp
+
+    def predict_val(self):
+        return self._predict(self.val_ds)
 
     def validate(self, log=True):
 
