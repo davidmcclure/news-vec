@@ -406,10 +406,12 @@ class Trainer:
         return cls(corpus, *args, **kwargs)
 
     def __init__(self, corpus, lr=1e-4, batch_size=50, test_size=10000,
-        eval_every=100000, es_wait=10, corpus_kwargs=None, model_kwargs=None):
+        eval_every=100000, es_wait=10, model_kwargs=None):
 
         self.corpus = corpus
+        self.lr = lr
         self.batch_size = batch_size
+        self.test_size = test_size
         self.eval_every = eval_every
         self.es_wait = es_wait
 
@@ -417,22 +419,24 @@ class Trainer:
         labels = self.corpus.labels()
 
         self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
-        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.loss_func = nn.NLLLoss()
 
         if torch.cuda.is_available():
             self.model.cuda()
 
-        # Train / test split.
-        s1, s2 = len(self.corpus) - test_size, test_size
-        self.train_ds, self.val_ds = random_split(self.corpus, (s1, s2))
+    def train(self, max_epochs=100):
+        """Train for N epochs.
+        """
+        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+
+        train_size = len(self.corpus) - self.test_size
+
+        self.train_ds, self.val_ds = \
+            random_split(self.corpus, (train_size, self.test_size))
 
         self.train_losses, self.val_losses = [], []
         self.n = 0
 
-    def train(self, max_epochs=100):
-        """Train for N epochs.
-        """
         for epoch in range(max_epochs):
 
             # Listen for early stopping exception.
