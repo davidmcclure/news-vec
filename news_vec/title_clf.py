@@ -525,8 +525,8 @@ class Trainer:
 
         print('\r')
 
-        yt = torch.LongTensor(yt).type(itype)
-        yp = torch.FloatTensor(yp).type(ftype)
+        yt = torch.LongTensor(yt).type(itype).cpu()
+        yp = torch.FloatTensor(yp).type(ftype).cpu()
 
         return Predictions(yt, yp)
 
