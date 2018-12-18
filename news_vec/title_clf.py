@@ -418,6 +418,7 @@ class Trainer:
 
         self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+        self.loss_func = nn.NLLLoss()
 
         if torch.cuda.is_available():
             self.model.cuda()
@@ -459,7 +460,7 @@ class Trainer:
 
             yp = self.model(lines)
 
-            loss = F.nll_loss(yp, yt)
+            loss = self.loss_func(yp, yt)
             loss.backward()
 
             self.optimizer.step()
@@ -513,7 +514,7 @@ class Trainer:
 
         yt, yp = self.predict_val()
 
-        loss = F.nll_loss(yp, yt)
+        loss = self.loss_func(yp, yt)
         self.val_losses.append(loss.item())
 
         if log:
