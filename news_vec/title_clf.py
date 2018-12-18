@@ -581,7 +581,7 @@ class CorpusEncoder:
         self.segment_size = segment_size
         self.batch_size = batch_size
 
-    def lines_iter(self):
+    def preds_iter(self):
         """Generate encoded lines + metadata.
         """
         loader = BarDataLoader(
@@ -617,7 +617,7 @@ class CorpusEncoder:
     def segments_iter(self):
         """Generate (fname, data).
         """
-        chunks = chunked_iter(self.lines_iter(), self.segment_size)
+        chunks = chunked_iter(self.preds_iter(), self.segment_size)
 
         for i, lines in enumerate(chunks):
             fname = '%s.p' % str(i).zfill(5)
