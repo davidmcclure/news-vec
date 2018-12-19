@@ -100,9 +100,11 @@ class Corpus:
     def sample_all_vs_all(self):
         """All domains.
         """
+        logger.info('Sampling all-label corpus.')
+
         groups = defaultdict(list)
 
-        for line in self:
+        for line in tqdm(self):
             groups[line.label].append(line)
 
         return LineDataset.downsample(groups)
@@ -110,9 +112,11 @@ class Corpus:
     def sample_a_vs_b(self, a, b, size):
         """Domain A vs domain B.
         """
+        logger.info('Sampling A-vs-B corpus.')
+
         groups = defaultdict(list)
 
-        for line in self:
+        for line in tqdm(self):
             if line.label in (a, b):
                 groups[line.label].append(line)
 
@@ -451,21 +455,15 @@ class EarlyStoppingException(Exception):
 
 class Trainer:
 
-    @classmethod
-    def from_spark_json(cls, root, skim=None, *args, **kwargs):
-        corpus = Corpus(root, skim)
-        dataset = corpus.sample_all_vs_all()
-        return cls(dataset, *args, **kwargs)
-
-    def __init__(self, corpus, lr=1e-4, batch_size=50, test_size=10000,
-        eval_every=100000, es_wait=10, model_kwargs=None):
+    def __init__(self, corpus, eval_every, test_size, es_wait, lr=1e-4,
+        batch_size=50, model_kwargs=None):
 
         self.corpus = corpus
-        self.lr = lr
-        self.batch_size = batch_size
-        self.test_size = test_size
         self.eval_every = eval_every
+        self.test_size = test_size
         self.es_wait = es_wait
+        self.batch_size = batch_size
+        self.lr = lr
 
         token_counts = self.corpus.token_counts()
         labels = self.corpus.labels()
