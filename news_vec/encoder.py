@@ -3,10 +3,10 @@
 import os
 import pickle
 
-from torch.utils.data import DataLoader
 from boltons.iterutils import chunked_iter
 
-from . import logger, utils
+from . import logger
+from .utils import ProgressDataLoader, tensor_to_np
 
 
 def write_fs(path, data):
@@ -36,7 +36,7 @@ class CorpusEncoder:
     def preds_iter(self):
         """Generate encoded lines + metadata.
         """
-        loader = DataLoader(
+        loader = ProgressDataLoader(
             self.corpus,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
@@ -47,8 +47,8 @@ class CorpusEncoder:
             embeds = self.model.embed(lines)
             yps = self.model.predict(embeds).exp()
 
-            embeds = utils.tensor_to_np(embeds)
-            yps = utils.tensor_to_np(yps)
+            embeds = tensor_to_np(embeds)
+            yps = tensor_to_np(yps)
 
             for line, embed, yp in zip(lines, embeds, yps):
 

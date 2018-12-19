@@ -8,21 +8,10 @@ from cached_property import cached_property
 from torch import nn, optim
 from torch.utils.data import DataLoader, random_split
 
-from . import logger, utils
+from . import logger
 from .cuda import itype, ftype
+from .utils import ProgressDataLoader
 from .model import Classifier
-
-
-class ProgressDataLoader(DataLoader):
-
-    def __iter__(self):
-        """Track # generated pairs.
-        """
-        self.n = 0
-
-        for x, y in super().__iter__():
-            self.n += len(x)
-            yield x, y
 
 
 class Predictions:
@@ -118,8 +107,7 @@ class Trainer:
 
             if self.n >= self.eval_every:
 
-                logger.info('Evaluating: %d / %d' %
-                    (loader.n, len(self.train_ds)))
+                logger.info(f'Evaluating: {epoch} | {loader.n}')
 
                 self.validate()
                 self.n = 0
@@ -132,7 +120,7 @@ class Trainer:
         """
         self.model.eval()
 
-        loader = DataLoader(
+        loader = ProgressDataLoader(
             split,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
@@ -156,7 +144,7 @@ class Trainer:
         self.val_losses.append(loss.item())
 
         if log:
-            recent_tl = np.mean(self.train_losses[-100:])
+            recent_tl = np.mean(self.train_losses[-10:])
             logger.info('Train loss: ~%f' % recent_tl)
             logger.info('Val loss: %f' % self.val_losses[-1])
             logger.info('Val accuracy: %f' % preds.accuracy)
