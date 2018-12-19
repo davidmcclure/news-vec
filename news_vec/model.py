@@ -6,9 +6,8 @@ from torch import nn
 from itertools import chain
 
 from . import utils
-from .tokens import TokenEmbedding
+from .nn import TokenEmbedding, LineEncoder
 from .cuda import itype
-from .lines import LineEncoder
 
 
 class Classifier(nn.Module):
