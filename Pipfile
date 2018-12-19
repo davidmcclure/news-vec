@@ -26,6 +26,7 @@ networkx = "*"
 maya = "*"
 textblob = "*"
 cached-property = "*"
+"flake8" = "*"
 
 [dev-packages]
 
