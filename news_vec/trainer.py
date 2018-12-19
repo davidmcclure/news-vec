@@ -13,6 +13,21 @@ from .cuda import itype, ftype
 from .model import Classifier
 
 
+class ProgressDataLoader(DataLoader):
+
+    def __iter__(self):
+        """Track and log total generated pairs.
+        """
+        self.n = 0
+
+        for i, (x, y) in enumerate(super().__iter__()):
+            yield x, y
+            self.n += len(x)
+            utils.print_replace(self.n)
+
+        print('\r')
+
+
 class Predictions:
 
     def __init__(self, yt, yp):
@@ -81,13 +96,13 @@ class Trainer:
 
         logger.info('Epoch %d' % epoch)
 
-        loader = DataLoader(
+        loader = ProgressDataLoader(
             self.train_ds,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
 
-        for i, (lines, yt) in enumerate(loader):
+        for lines, yt in loader:
 
             self.model.train()
             self.optimizer.zero_grad()
@@ -103,16 +118,12 @@ class Trainer:
 
             self.n += len(lines)
 
-            utils.print_replace(loader.batch_size * (i+1))
-
             if self.n >= self.eval_every:
 
                 print('\r')
 
-                logger.info(
-                    'Evaluating: %d / %d' %
-                    (loader.batch_size * (i+1), len(self.train_ds))
-                )
+                logger.info('Evaluating: %d / %d' %
+                    (loader.n, len(self.train_ds)))
 
                 self.validate()
                 self.n = 0
@@ -125,19 +136,16 @@ class Trainer:
         """
         self.model.eval()
 
-        loader = DataLoader(
+        loader = ProgressDataLoader(
             split,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
 
         yt, yp = [], []
-        for i, (lines, yti) in enumerate(loader):
+        for lines, yti in loader:
             yp += self.model(lines).tolist()
             yt += yti.tolist()
-            utils.print_replace(loader.batch_size * (i+1))
-
-        print('\r')
 
         yt = torch.LongTensor(yt).type(itype).cpu()
         yp = torch.FloatTensor(yp).type(ftype).cpu()
@@ -155,7 +163,7 @@ class Trainer:
             recent_tl = np.mean(self.train_losses[-100:])
             logger.info('Train loss: ~%f' % recent_tl)
             logger.info('Val loss: %f' % self.val_losses[-1])
-            logger.info('Val acc: %f' % preds.accuracy)
+            logger.info('Val accuracy: %f' % preds.accuracy)
 
     def eval_test(self):
         return self._predict(self.test_ds)

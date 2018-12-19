@@ -7,11 +7,13 @@ from torch.utils.data import DataLoader
 from boltons.iterutils import chunked_iter
 
 from . import logger, utils
+from .trainer import ProgressDataLoader
 
 
 def write_fs(path, data):
     """Dump data to disk.
     """
+    print('\r')
     logger.info('Flushing to disk: %s' % path)
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -36,13 +38,13 @@ class CorpusEncoder:
     def preds_iter(self):
         """Generate encoded lines + metadata.
         """
-        loader = DataLoader(
+        loader = ProgressDataLoader(
             self.corpus,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
 
-        for i, (lines, yt) in enumerate(loader):
+        for lines, yt in loader:
 
             embeds = self.model.embed(lines)
             yps = self.model.predict(embeds).exp()
@@ -65,8 +67,6 @@ class CorpusEncoder:
                 )
 
                 yield data
-
-            utils.print_replace(loader.batch_size * (i+1))
 
     def segments_iter(self):
         """Generate (fname, data).
