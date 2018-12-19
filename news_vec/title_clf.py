@@ -101,27 +101,55 @@ class Corpus:
     def __iter__(self):
         return iter(self.lines)
 
+    def min_label_count(self):
+        """Get the count of the most infrequent label.
+        """
+        counts = Counter([line.label for line in self])
+        return counts.most_common()[-1][1]
+
     def sample_all_vs_all(self):
         """All domains.
         """
-        domain_lines = defaultdict(list)
+        groups = defaultdict(list)
+
         for line in self:
-            domain_lines[line.label].append(line)
+            groups[line.label].append(line)
 
-        min_count = min([len(lines) for _, lines in domain_lines.items()])
+        return LineDataset.downsample(groups)
 
-        pairs = [
-            random.sample([(line, domain) for line in lines], min_count)
-            for domain, lines in domain_lines.items()
-        ]
+    def sample_one_vs_all(self, label, size):
+        """Domain X vs all others.
+        """
+        groups = defaultdict(list)
 
-        return LineDataset(list(chain(*pairs)))
+        for line in self:
+            key = 'one' if line.label == label else 'all'
+            groups[key].append(line)
+
+        return LineDataset.downsample(groups, size)
 
 
 class LineDataset(Dataset):
 
+    @classmethod
+    def downsample(cls, groups, size=None):
+        """Downsample grouped lines.
+
+        Args:
+            groups (dict<str, list<Line>>)
+        """
+        size = size or min([len(lines) for _, lines in groups.items()])
+
+        pairs = [
+            random.sample([(line, label) for line in lines], size)
+            for label, lines in groups.items()
+        ]
+
+        return cls(list(chain(*pairs)))
+
     def __init__(self, pairs):
         self.pairs = pairs
+        random.shuffle(self.pairs)
 
     def __len__(self):
         return len(self.pairs)
