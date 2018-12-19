@@ -28,8 +28,7 @@ from torch import nn, optim
 from torch.nn import functional as F
 from torch.nn.utils import rnn
 
-from . import logger
-from .utils import group_by_sizes, tensor_to_np
+from . import logger, utils
 from .cuda import itype, ftype
 
 
@@ -420,7 +419,7 @@ class Classifier(nn.Module):
 
         # Embed tokens, regroup by line.
         x = self.embed_tokens(list(chain(*tokens)))
-        x = group_by_sizes(x, sizes)
+        x = utils.group_by_sizes(x, sizes)
 
         # Embed lines.
         x = self.embed_lines(x)
@@ -441,15 +440,6 @@ class Classifier(nn.Module):
         return lines, yt
 
 
-class EarlyStoppingException(Exception):
-    pass
-
-
-def print_replace(msg):
-    sys.stdout.write(f'\r{msg}')
-    sys.stdout.flush()
-
-
 class Predictions:
 
     def __init__(self, yt, yp):
@@ -462,6 +452,10 @@ class Predictions:
     @cached_property
     def accuracy(self):
         return metrics.accuracy_score(self.yt, self.yp.argmax(1))
+
+
+class EarlyStoppingException(Exception):
+    pass
 
 
 class Trainer:
@@ -541,7 +535,7 @@ class Trainer:
 
             self.n += len(lines)
 
-            print_replace(loader.batch_size * (i+1))
+            utils.print_replace(loader.batch_size * (i+1))
 
             if self.n >= self.eval_every:
 
@@ -573,7 +567,7 @@ class Trainer:
         for i, (lines, yti) in enumerate(loader):
             yp += self.model(lines).tolist()
             yt += yti.tolist()
-            print_replace(loader.batch_size * (i+1))
+            utils.print_replace(loader.batch_size * (i+1))
 
         print('\r')
 
@@ -655,8 +649,8 @@ class CorpusEncoder:
             embeds = self.model.embed(lines)
             yps = self.model.predict(embeds).exp()
 
-            embeds = tensor_to_np(embeds)
-            yps = tensor_to_np(yps)
+            embeds = utils.tensor_to_np(embeds)
+            yps = utils.tensor_to_np(yps)
 
             for line, embed, yp in zip(lines, embeds, yps):
 
