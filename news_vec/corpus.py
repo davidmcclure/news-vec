@@ -42,9 +42,6 @@ class Line:
             label=self.label,
         )
 
-    def to_dict(self):
-        return dict(tokens=self.tokens, label=self.label, **self.metadata)
-
 
 class Corpus:
 
