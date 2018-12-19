@@ -22,7 +22,7 @@ def read_json_gz_lines(root):
 
     Yields: dict
     """
-    for path in glob('%s/*.gz' % root):
+    for path in tqdm(glob('%s/*.gz' % root)):
         with gzip.open(path) as fh:
             for line in fh:
                 yield ujson.loads(line)
@@ -65,7 +65,7 @@ class BaseModel:
 
         pages = chunked_iter(read_json_gz_lines(root), n)
 
-        for mappings in tqdm(pages):
+        for mappings in pages:
             session.bulk_insert_mappings(cls, mappings)
             session.flush()
 
