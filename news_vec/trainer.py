@@ -166,6 +166,6 @@ class Trainer:
         return (
             # Eval'ed at least N times.
             len(window) >= self.es_wait and
-            # Window average is greater than earliest loss.
+            # Earliest loss < window average.
             window[0] < np.mean(window)
         )
