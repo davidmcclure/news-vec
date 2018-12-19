@@ -16,16 +16,13 @@ from .model import Classifier
 class ProgressDataLoader(DataLoader):
 
     def __iter__(self):
-        """Track and log total generated pairs.
+        """Track # generated pairs.
         """
         self.n = 0
 
-        for i, (x, y) in enumerate(super().__iter__()):
-            yield x, y
+        for x, y in super().__iter__():
             self.n += len(x)
-            utils.print_replace(self.n)
-
-        print('\r')
+            yield x, y
 
 
 class Predictions:
@@ -53,36 +50,37 @@ class Trainer:
 
         self.corpus = corpus
         self.eval_every = eval_every
-        self.test_size = test_size
         self.es_wait = es_wait
         self.batch_size = batch_size
-        self.lr = lr
 
         token_counts = self.corpus.token_counts()
         labels = self.corpus.labels()
 
+        # Initialize model.
         self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
-        self.loss_func = nn.NLLLoss()
 
         if torch.cuda.is_available():
             self.model.cuda()
 
-    def train(self, max_epochs=100):
-        """Train for N epochs.
-        """
-        # TODO: Move to init?
-        self.optimizer = optim.Adam(self.model.parameters(), lr=self.lr)
+        # Initialize optimizer + loss.
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+        self.loss_func = nn.NLLLoss()
 
-        train_size = len(self.corpus) - (self.test_size * 2)
-
-        sizes = (train_size, self.test_size, self.test_size)
+        # Set train / val / test splits.
+        train_size = len(self.corpus) - (test_size * 2)
+        sizes = (train_size, test_size, test_size)
 
         self.train_ds, self.val_ds, self.test_ds = \
             random_split(self.corpus, sizes)
 
         self.train_losses, self.val_losses = [], []
+
+        # Pairs trained since last eval.
         self.n = 0
 
+    def train(self, max_epochs=100):
+        """Train for N epochs.
+        """
         for epoch in range(max_epochs):
 
             # Listen for early stopping exception.
@@ -120,8 +118,6 @@ class Trainer:
 
             if self.n >= self.eval_every:
 
-                print('\r')
-
                 logger.info('Evaluating: %d / %d' %
                     (loader.n, len(self.train_ds)))
 
@@ -136,7 +132,7 @@ class Trainer:
         """
         self.model.eval()
 
-        loader = ProgressDataLoader(
+        loader = DataLoader(
             split,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
