@@ -6,7 +6,7 @@ import numpy as np
 from sklearn import metrics
 from cached_property import cached_property
 from torch import nn, optim
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import random_split
 
 from . import logger
 from .cuda import itype, ftype
