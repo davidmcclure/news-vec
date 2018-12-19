@@ -40,25 +40,16 @@ def read_json_lines(root):
     for path in glob('%s/*.gz' % root):
         with gzip.open(path) as fh:
             for line in fh:
-
                 data = ujson.loads(line)
-
-                tokens = data.pop('tokens')
-
-                if not tokens:
-                    continue
-
-                label = data.pop('label')
-
-                yield Line(tokens, label, data)
+                yield Line(data['tokens'], data['label'], data['first_ts'])
 
 
 class Line:
 
-    def __init__(self, tokens, label=None, metadata=None):
+    def __init__(self, tokens, label, timestamp):
         self.tokens = tokens
         self.label = label
-        self.metadata = metadata or {}
+        self.timestamp = timestamp
 
     def __repr__(self):
 
@@ -101,7 +92,7 @@ class Corpus:
         return iter(self.lines)
 
     def min_label_count(self):
-        """Get the count of the most infrequent label.
+        """Count of the most infrequent label.
         """
         counts = Counter([line.label for line in self])
         return counts.most_common()[-1][1]
@@ -116,14 +107,14 @@ class Corpus:
 
         return LineDataset.downsample(groups)
 
-    def sample_one_vs_all(self, label, size):
-        """Domain X vs all others.
+    def sample_a_vs_b(self, a, b, size):
+        """Domain A vs domain B.
         """
         groups = defaultdict(list)
 
         for line in self:
-            key = 'one' if line.label == label else 'all'
-            groups[key].append(line)
+            if line.label in (a, b):
+                groups[line.label].append(line)
 
         return LineDataset.downsample(groups, size)
 
