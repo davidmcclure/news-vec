@@ -1,0 +1,4 @@
+
+[flake8]
+ignore = E231,E128,E125,E226,W504
+exclude = build,dist

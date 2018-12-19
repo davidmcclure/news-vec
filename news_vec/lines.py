@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from torch.nn.utils import rnn
 
-from .cuda import itype, ftype
+from .cuda import itype
 
 
 class LineEncoder(nn.Module):

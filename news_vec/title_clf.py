@@ -1,32 +1,17 @@
 
 
-import ujson
-import gzip
-import string
-import math
 import pickle
-import random
 import os
-# import sys
-# import re
+import torch
 
 import numpy as np
 
-from itertools import islice, chain
-from collections import Counter, defaultdict
-from glob import glob
-from tqdm import tqdm
-from boltons.iterutils import pairwise, chunked_iter
-from sklearn.model_selection import train_test_split
+from itertools import chain
+from boltons.iterutils import chunked_iter
 from sklearn import metrics
 from cached_property import cached_property
-
-import torch
-from torchtext.vocab import Vocab, Vectors
-from torch.utils.data import Dataset, DataLoader, random_split
+from torch.utils.data import DataLoader, random_split
 from torch import nn, optim
-from torch.nn import functional as F
-from torch.nn.utils import rnn
 
 from . import logger, utils
 from .cuda import itype, ftype
@@ -160,7 +145,6 @@ class Trainer:
             batch_size=self.batch_size,
         )
 
-        eval_n = 0
         for i, (lines, yt) in enumerate(loader):
 
             self.model.train()
@@ -280,7 +264,7 @@ class CorpusEncoder:
     def preds_iter(self):
         """Generate encoded lines + metadata.
         """
-        loader = BarDataLoader(
+        loader = DataLoader(
             self.corpus,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,

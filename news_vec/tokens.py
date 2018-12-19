@@ -7,7 +7,7 @@ from torch import nn
 from torchtext.vocab import Vocab, Vectors
 from torch.nn import functional as F
 
-from .cuda import itype, ftype
+from .cuda import itype
 
 
 class PretrainedTokenEmbedding(nn.Module):
