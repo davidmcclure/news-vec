@@ -34,13 +34,13 @@ class EarlyStoppingException(Exception):
 
 class Trainer:
 
-    def __init__(self, corpus, eval_every, test_size, es_wait, lr=1e-4,
-        batch_size=50, model_kwargs=None):
+    # TODO: Default eval_every to train_ds size.
+    def __init__(self, corpus, test_frac=0.1, es_wait=5, eval_every=None,
+        lr=1e-4, batch_size=50, model_kwargs=None):
 
         self.corpus = corpus
-        self.eval_every = eval_every
-        self.es_wait = es_wait
         self.batch_size = batch_size
+        self.es_wait = es_wait
 
         token_counts = self.corpus.token_counts()
         labels = self.corpus.labels()
@@ -56,16 +56,21 @@ class Trainer:
         self.loss_func = nn.NLLLoss()
 
         # Set train / val / test splits.
+
+        test_size = round(len(corpus) * test_frac)
         train_size = len(self.corpus) - (test_size * 2)
         sizes = (train_size, test_size, test_size)
 
         self.train_ds, self.val_ds, self.test_ds = \
             random_split(self.corpus, sizes)
 
+        self.eval_every = eval_every or len(self.train_ds)
+
+        # Store loss histories.
         self.train_losses, self.val_losses = [], []
 
         # Pairs trained since last eval.
-        self.n = 0
+        self.n_from_eval = 0
 
     def train(self, max_epochs=100):
         """Train for N epochs.
@@ -103,14 +108,12 @@ class Trainer:
 
             self.train_losses.append(loss.item())
 
-            self.n += len(lines)
+            self.n_from_eval += len(lines)
 
-            if self.n >= self.eval_every:
+            if self.n_from_eval >= self.eval_every:
 
                 logger.info(f'Evaluating: {epoch} | {loader.n}')
-
                 self.validate()
-                self.n = 0
 
                 if self.is_finished():
                     raise EarlyStoppingException()
@@ -148,6 +151,8 @@ class Trainer:
             logger.info('Train loss: ~%f' % recent_tl)
             logger.info('Val loss: %f' % self.val_losses[-1])
             logger.info('Val accuracy: %f' % preds.accuracy)
+
+        self.n_from_eval = 0
 
     def eval_test(self):
         return self._predict(self.test_ds)

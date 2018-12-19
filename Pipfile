@@ -27,6 +27,7 @@ maya = "*"
 textblob = "*"
 cached-property = "*"
 "flake8" = "*"
+"psycopg2-binary" = "*"
 
 [dev-packages]
 
