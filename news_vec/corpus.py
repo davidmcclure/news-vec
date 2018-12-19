@@ -5,7 +5,7 @@ import gzip
 import random
 
 from glob import glob
-from itertools import islice
+from itertools import islice, chain
 from tqdm import tqdm
 from collections import Counter, defaultdict
 from torch.utils.data import Dataset
