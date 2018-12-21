@@ -16,7 +16,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from glob import glob
 from boltons.iterutils import chunked_iter
 from tqdm import tqdm
+from collections import UserDict
 from itertools import islice
+
+from . import logger
 
 
 def read_json_gz_lines(root):
@@ -25,7 +28,6 @@ def read_json_gz_lines(root):
     Yields: dict
     """
     for path in glob('%s/*.gz' % root):
-        print(path)
         with gzip.open(path) as fh:
             for line in fh:
                 yield ujson.loads(line)
@@ -126,3 +128,43 @@ class Link(BaseModel):
     @classmethod
     def add_indexes(cls):
         cls.add_index(cls.domain)
+
+
+class Headline(UserDict):
+
+    def __repr__(self):
+
+        pattern = '{cls_name}<{token_count} tokens -> {domain}>'
+
+        return pattern.format(
+            cls_name=self.__class__.__name__,
+            token_count=len(self['clf_tokens']),
+            domain=self['domain'],
+        )
+
+
+class HeadlineCorpus:
+
+    def __init__(self, root, skim=None):
+        """Read lines.
+        """
+        logger.info('Parsing line corpus.')
+
+        rows_iter = islice(read_json_gz_lines(root), skim)
+
+        self.hls = {
+            d['article_id']: Headline(d)
+            for d in tqdm(rows_iter)
+        }
+
+    def __repr__(self):
+
+        pattern = '{cls_name}<{hl_count} headlines>'
+
+        return pattern.format(
+            cls_name=self.__class__.__name__,
+            hl_count=len(self),
+        )
+
+    def __len__(self):
+        return len(self.hls)
