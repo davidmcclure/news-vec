@@ -7,7 +7,7 @@ from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine, event
 
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -94,7 +94,7 @@ BaseModel.query = session.query_property()
 class Link(BaseModel):
 
     __tablename__ = 'link'
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     actor_id = Column(String, nullable=False, index=True)
     article_id = Column(Integer, nullable=False, index=True)
     domain = Column(String, nullable=False, index=True)
@@ -104,7 +104,7 @@ class Link(BaseModel):
 class Headline(BaseModel):
 
     __tablename__ = 'headline'
-    article_id = Column(Integer, primary_key=True)
+    article_id = Column(BigInteger, primary_key=True)
     domain = Column(String, nullable=False, index=True)
     tokens = Column(ARRAY(String), nullable=False)
     clf_tokens = Column(ARRAY(String), nullable=False)
