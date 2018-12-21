@@ -17,7 +17,7 @@ from glob import glob
 from boltons.iterutils import chunked_iter
 from tqdm import tqdm
 from collections import UserDict, UserList, Counter
-from itertools import islice
+from itertools import islice, chain
 
 from . import logger
 
@@ -159,38 +159,51 @@ class Link(BaseModel):
         """Sample N random headlines from a domain.
         """
         query = (session
-            .query(cls.article_id.distinct())
+            .query(cls.article_id.distinct(), cls.domain)
             .filter(cls.domain==domain)
             .order_by(func.random())
             .limit(n))
 
-        return [r[0] for r in query]
+        return query.all()
+
+    @classmethod
+    def sample_not_domain(cls, domain, n):
+        """Sample N random headlines *not* from a domain.
+        """
+        query = (session
+            .query(cls.article_id.distinct(), cls.domain)
+            .filter(cls.domain!=domain)
+            .order_by(func.random())
+            .limit(n))
+
+        return query.all()
 
     @classmethod
     def sample_all_vs_all(cls, n=None):
         """Sample N articles from each domain.
         """
         n = n or cls.min_domain_article_count()
-
-        pairs = []
-        for domain in cls.domains():
-            for id in cls.sample_domain(domain, n):
-                pairs.append((id, domain))
-
-        return pairs
+        pairs = [cls.sample_domain(domain, n) for domain in cls.domains()]
+        return list(chain(*pairs))
 
     @classmethod
     def sample_a_vs_b(cls, a, b, n=None):
         """Sample N articles from two domains.
         """
         n = n or cls.min_domain_article_count()
+        pairs = [cls.sample_domain(domain, n) for domain in (a, b)]
+        return list(chain(*pairs))
 
-        pairs = []
-        for domain in (a, b):
-            for id in cls.sample_domain(domain, n):
-                pairs.append((id, domain))
+    @classmethod
+    def sample_one_vs_all(cls, domain, n=None):
+        """Sample N a domain, N from all others.
+        """
+        n = n or cls.min_domain_article_count()
 
-        return pairs
+        fg = cls.sample_domain(domain, n)
+        bg = cls.sample_not_domain(domain, n)
+
+        return list(chain(fg, bg))
 
 
 class Headline(UserDict):
