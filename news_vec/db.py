@@ -91,12 +91,20 @@ BaseModel = declarative_base(cls=BaseModel)
 BaseModel.query = session.query_property()
 
 
-class Title(BaseModel):
+class Link(BaseModel):
 
-    __tablename__ = 'title'
+    __tablename__ = 'link'
+    id = Column(Integer, primary_key=True)
+    actor_id = Column(String, nullable=False, index=True)
+    article_id = Column(Integer, nullable=False, index=True)
+    domain = Column(String, nullable=False, index=True)
+    timestamp = Column(Integer, nullable=False)
+
+
+class Headline(BaseModel):
+
+    __tablename__ = 'headline'
     article_id = Column(Integer, primary_key=True)
+    domain = Column(String, nullable=False, index=True)
     tokens = Column(ARRAY(String), nullable=False)
     clf_tokens = Column(ARRAY(String), nullable=False)
-    label = Column(String, nullable=False, index=True)
-    timestamp = Column(Integer, nullable=False, index=True)
-    count = Column(Integer, nullable=False)
