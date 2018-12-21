@@ -167,14 +167,30 @@ class Link(BaseModel):
         return [r[0] for r in query]
 
     @classmethod
-    def sample_all_vs_all_iter(cls, n=None):
+    def sample_all_vs_all(cls, n=None):
         """Sample N articles from each domain.
         """
         n = n or cls.min_domain_article_count()
 
+        pairs = []
         for domain in cls.domains():
             for id in cls.sample_domain(domain, n):
-                yield (id, domain)
+                pairs.append((id, domain))
+
+        return pairs
+
+    @classmethod
+    def sample_a_vs_b(cls, a, b, n=None):
+        """Sample N articles from two domains.
+        """
+        n = n or cls.min_domain_article_count()
+
+        pairs = []
+        for domain in (a, b):
+            for id in cls.sample_domain(domain, n):
+                pairs.append((id, domain))
+
+        return pairs
 
 
 class Headline(UserDict):
