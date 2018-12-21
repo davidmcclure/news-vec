@@ -3,6 +3,7 @@
 import gzip
 import ujson
 import os
+import numpy as np
 
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, scoped_session
@@ -153,6 +154,14 @@ class Link(BaseModel):
         counts = cls.domain_article_counts()
 
         return counts.most_common()[-1][1]
+
+    @classmethod
+    def min_ts(cls):
+        return session.query(func.min(cls.timestamp)).one()[0]
+
+    @classmethod
+    def max_ts(cls):
+        return session.query(func.max(cls.timestamp)).one()[0]
 
     @classmethod
     def sample_domain(cls, domain, n):
