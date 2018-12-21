@@ -108,3 +108,4 @@ venv.bak/
 .vector_cache
 *.p
 *.db
+*.db-journal
