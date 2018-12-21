@@ -34,7 +34,6 @@ class EarlyStoppingException(Exception):
 
 class Trainer:
 
-    # TODO: Default eval_every to train_ds size.
     def __init__(self, corpus, test_frac=0.1, es_wait=5, eval_every=None,
         lr=1e-4, batch_size=50, model_kwargs=None):
 

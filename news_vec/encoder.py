@@ -58,12 +58,7 @@ class CorpusEncoder:
                 }
 
                 # Metadata + clf output.
-                data = dict(
-                    **line.__dict__,
-                    **preds,
-                    embedding=embed,
-                )
-
+                data = dict(**line, **preds, embedding=embed)
                 yield data
 
     def segments_iter(self):

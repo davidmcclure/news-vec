@@ -36,7 +36,7 @@ class Classifier(nn.Module):
     def embed(self, lines):
         """Embed lines.
         """
-        tokens = [line.tokens for line in lines]
+        tokens = [line['tokens'] for line in lines]
 
         # Line lengths.
         sizes = [len(ts) for ts in tokens]

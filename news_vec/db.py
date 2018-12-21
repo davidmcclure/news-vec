@@ -16,7 +16,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from glob import glob
 from boltons.iterutils import chunked_iter
 from tqdm import tqdm
-from collections import UserDict
+from collections import UserDict, UserList, Counter
 from itertools import islice
 
 from . import logger
@@ -129,6 +129,53 @@ class Link(BaseModel):
     def add_indexes(cls):
         cls.add_index(cls.domain)
 
+    @classmethod
+    def domains(cls):
+        """Unique domains.
+        """
+        query = session.query(cls.domain.distinct())
+        return [r[0] for r in query]
+
+    @classmethod
+    def domain_article_counts(cls):
+        """Total articles per domain.
+        """
+        query = (session
+            .query(cls.domain, func.count(cls.article_id.distinct()))
+            .group_by(cls.domain))
+
+        return Counter(dict(query))
+
+    @classmethod
+    def min_domain_article_count(cls):
+        """Count of most infrequent domain.
+        """
+        counts = cls.domain_article_counts()
+
+        return counts.most_common()[-1][1]
+
+    @classmethod
+    def sample_domain(cls, domain, n):
+        """Sample N random headlines from a domain.
+        """
+        query = (session
+            .query(cls.article_id.distinct())
+            .filter(cls.domain==domain)
+            .order_by(func.random())
+            .limit(n))
+
+        return [r[0] for r in query]
+
+    @classmethod
+    def sample_all_vs_all_iter(cls, n=None):
+        """Sample N articles from each domain.
+        """
+        n = n or cls.min_domain_article_count()
+
+        for domain in cls.domains():
+            for id in cls.sample_domain(domain, n):
+                yield (id, domain)
+
 
 class Headline(UserDict):
 
@@ -141,6 +188,35 @@ class Headline(UserDict):
             token_count=len(self['clf_tokens']),
             domain=self['domain'],
         )
+
+
+class HeadlineDataset(UserList):
+
+    def token_counts(self):
+        """Collect all token -> count.
+        """
+        logger.info('Gathering token counts.')
+
+        counts = Counter()
+        for hl, _ in tqdm(self):
+            counts.update(hl['tokens'])
+
+        return counts
+
+    def label_counts(self):
+        """Label -> count.
+        """
+        logger.info('Gathering label counts.')
+
+        counts = Counter()
+        for _, label in tqdm(self):
+            counts[label] += 1
+
+        return counts
+
+    def labels(self):
+        counts = self.label_counts()
+        return [label for label, _ in counts.most_common()]
 
 
 class HeadlineCorpus:
@@ -168,3 +244,9 @@ class HeadlineCorpus:
 
     def __len__(self):
         return len(self.hls)
+
+    def build_dataset(self, pairs):
+        """(id, label) -> (Headline, label)
+        """
+        pairs = [(self.hls[id], label) for id, label in pairs]
+        return HeadlineDataset(pairs)
