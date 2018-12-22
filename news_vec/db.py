@@ -57,10 +57,12 @@ class BaseModel:
 
         for path in glob(pattern):
 
+            logger.info(path)
+
             with open(path) as fh:
                 cursor.copy_from(fh, cls.__tablename__, sep=',')
 
-            logger.info(path)
+        session.commit()
 
     @classmethod
     def add_index(cls, *cols, **kwargs):
@@ -113,7 +115,7 @@ class Link(BaseModel):
 
     @classmethod
     def add_indexes(cls):
-        cls.add_index(cls.domain)
+        cls.add_index(cls.domain, cls.article_id)
 
     @classmethod
     def domains(cls):
@@ -153,8 +155,9 @@ class Link(BaseModel):
         """Sample N random headlines from a domain.
         """
         query = (session
-            .query(cls.article_id.distinct(), cls.domain)
+            .query(cls.article_id, cls.domain)
             .filter(cls.domain==domain)
+            .group_by(cls.article_id, cls.domain)
             .order_by(func.random())
             .limit(n))
 
@@ -173,28 +176,23 @@ class Link(BaseModel):
         return query.all()
 
     @classmethod
-    def sample_all_vs_all(cls, n=None):
+    def sample_all_vs_all(cls, n):
         """Sample N articles from each domain.
         """
-        n = n or cls.min_domain_article_count()
         pairs = [cls.sample_domain(domain, n) for domain in cls.domains()]
         return list(chain(*pairs))
 
     @classmethod
-    def sample_a_vs_b(cls, a, b, n=None):
+    def sample_a_vs_b(cls, a, b, n):
         """Sample N articles from two domains.
         """
-        n = n or cls.min_domain_article_count()
         pairs = [cls.sample_domain(domain, n) for domain in (a, b)]
         return list(chain(*pairs))
 
     @classmethod
-    def sample_one_vs_all(cls, domain, n=None):
+    def sample_one_vs_all(cls, domain):
         """Sample N a domain, N from all others.
         """
-        n = n or cls.min_domain_article_count()
-
         fg = cls.sample_domain(domain, n)
         bg = cls.sample_not_domain(domain, n)
-
         return list(chain(fg, bg))
