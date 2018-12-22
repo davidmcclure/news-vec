@@ -1,37 +1,20 @@
 
 
-import gzip
-import ujson
 import os
-import numpy as np
 
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 
-from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy import Column, Integer, BigInteger, String, func
 from sqlalchemy.schema import Index
 from sqlalchemy.ext.declarative import declarative_base
 
 from glob import glob
-from boltons.iterutils import chunked_iter
-from tqdm import tqdm
-from collections import UserDict, UserList, Counter
-from itertools import islice, chain
+from collections import Counter
+from itertools import chain
 
 from . import logger
-
-
-def read_json_gz_lines(root):
-    """Read JSON corpus.
-
-    Yields: dict
-    """
-    for path in glob('%s/*.gz' % root):
-        with gzip.open(path) as fh:
-            for line in fh:
-                yield ujson.loads(line)
 
 
 def connect_db(db_path):
@@ -77,7 +60,7 @@ class BaseModel:
             with open(path) as fh:
                 cursor.copy_from(fh, cls.__tablename__, sep=',')
 
-            print(path)
+            logger.info(path)
 
     @classmethod
     def add_index(cls, *cols, **kwargs):
@@ -215,78 +198,3 @@ class Link(BaseModel):
         bg = cls.sample_not_domain(domain, n)
 
         return list(chain(fg, bg))
-
-
-class Headline(UserDict):
-
-    def __repr__(self):
-
-        pattern = '{cls_name}<{token_count} tokens -> {domain}>'
-
-        return pattern.format(
-            cls_name=self.__class__.__name__,
-            token_count=len(self['clf_tokens']),
-            domain=self['domain'],
-        )
-
-
-class HeadlineDataset(UserList):
-
-    def token_counts(self):
-        """Collect all token -> count.
-        """
-        logger.info('Gathering token counts.')
-
-        counts = Counter()
-        for hl, _ in tqdm(self):
-            counts.update(hl['tokens'])
-
-        return counts
-
-    def label_counts(self):
-        """Label -> count.
-        """
-        logger.info('Gathering label counts.')
-
-        counts = Counter()
-        for _, label in tqdm(self):
-            counts[label] += 1
-
-        return counts
-
-    def labels(self):
-        counts = self.label_counts()
-        return [label for label, _ in counts.most_common()]
-
-
-class HeadlineCorpus:
-
-    def __init__(self, root, skim=None):
-        """Read lines.
-        """
-        logger.info('Parsing line corpus.')
-
-        rows_iter = islice(read_json_gz_lines(root), skim)
-
-        self.hls = {
-            d['article_id']: Headline(d)
-            for d in tqdm(rows_iter)
-        }
-
-    def __repr__(self):
-
-        pattern = '{cls_name}<{hl_count} headlines>'
-
-        return pattern.format(
-            cls_name=self.__class__.__name__,
-            hl_count=len(self),
-        )
-
-    def __len__(self):
-        return len(self.hls)
-
-    def build_dataset(self, pairs):
-        """(id, label) -> (Headline, label)
-        """
-        pairs = [(self.hls[id], label) for id, label in pairs]
-        return HeadlineDataset(pairs)

@@ -1,7 +1,10 @@
 
 
 import sys
+import ujson
+import gzip
 
+from glob import glob
 from torch.utils.data import DataLoader
 
 
@@ -32,6 +35,17 @@ def tensor_to_np(tensor):
 def print_replace(msg):
     sys.stdout.write(f'\r{msg}')
     sys.stdout.flush()
+
+
+def read_json_gz_lines(root):
+    """Read JSON corpus.
+
+    Yields: dict
+    """
+    for path in glob('%s/*.gz' % root):
+        with gzip.open(path) as fh:
+            for line in fh:
+                yield ujson.loads(line)
 
 
 class ProgressDataLoader(DataLoader):
