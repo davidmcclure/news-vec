@@ -11,10 +11,13 @@ from sqlalchemy.schema import Index
 from sqlalchemy.ext.declarative import declarative_base
 
 from glob import glob
+from tqdm import tqdm
 from collections import Counter
 from itertools import chain
+from boltons.iterutils import chunked_iter
 
 from . import logger
+from .utils import read_json_gz_lines
 
 
 def connect_db(db_path):
@@ -25,7 +28,7 @@ def connect_db(db_path):
 
     Returns: engine, session
     """
-    url = URL(drivername='postgresql', database='newsvec')
+    url = URL(drivername='sqlite', database=db_path)
     engine = create_engine(url)
 
     factory = sessionmaker(bind=engine)
@@ -48,19 +51,15 @@ class BaseModel:
         cls.metadata.create_all(engine, tables=[cls.__table__])
 
     @classmethod
-    def copy_csvs(cls, pattern):
-        """Load CSVs via COPY.
+    def load_spark_lines(cls, root, n=1000):
+        """Bulk-insert spark lines.
         """
         cls.reset()
 
-        cursor = session.connection().connection.cursor()
+        pages = tqdm(chunked_iter(read_json_gz_lines(root), n))
 
-        for path in glob(pattern):
-
-            logger.info(path)
-
-            with open(path) as fh:
-                cursor.copy_from(fh, cls.__tablename__, sep=',')
+        for mappings in pages:
+            session.bulk_insert_mappings(cls, mappings)
 
         session.commit()
 
@@ -108,10 +107,10 @@ class Link(BaseModel):
 
     __tablename__ = 'link'
     id = Column(BigInteger, primary_key=True)
-    actor_id = Column(String, nullable=False)
     article_id = Column(BigInteger, nullable=False)
     domain = Column(String, nullable=False)
     timestamp = Column(Integer, nullable=False)
+    fc = Column(Integer, nullable=False)
 
     @classmethod
     def add_indexes(cls):
@@ -168,8 +167,9 @@ class Link(BaseModel):
         """Sample N random headlines *not* from a domain.
         """
         query = (session
-            .query(cls.article_id.distinct(), cls.domain)
+            .query(cls.article_id, cls.domain)
             .filter(cls.domain!=domain)
+            .group_by(cls.article_id, cls.domain)
             .order_by(func.random())
             .limit(n))
 
