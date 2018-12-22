@@ -65,17 +65,19 @@ class BaseModel:
         cls.metadata.create_all(engine, tables=[cls.__table__])
 
     @classmethod
-    def load_spark_lines(cls, root, n=1000):
-        """Bulk-insert spark lines.
+    def copy_csvs(cls, pattern):
+        """Load CSVs via COPY.
         """
         cls.reset()
 
-        pages = tqdm(chunked_iter(read_json_gz_lines(root), n))
+        cursor = session.connection().connection.cursor()
 
-        for mappings in pages:
-            session.bulk_insert_mappings(cls, mappings)
+        for path in glob(pattern):
 
-        session.commit()
+            with open(path) as fh:
+                cursor.copy_from(fh, cls.__tablename__, sep=',')
+
+            print(path)
 
     @classmethod
     def add_index(cls, *cols, **kwargs):
