@@ -42,7 +42,7 @@ def connect_db(db_path):
 
     Returns: engine, session
     """
-    url = URL(drivername='sqlite', database=db_path)
+    url = URL(drivername='postgresql', database='newsvec')
     engine = create_engine(url)
 
     factory = sessionmaker(bind=engine)
@@ -122,7 +122,7 @@ class Link(BaseModel):
     __tablename__ = 'link'
     id = Column(BigInteger, primary_key=True)
     actor_id = Column(String, nullable=False)
-    article_id = Column(Integer, nullable=False)
+    article_id = Column(BigInteger, nullable=False)
     domain = Column(String, nullable=False)
     timestamp = Column(Integer, nullable=False)
 
