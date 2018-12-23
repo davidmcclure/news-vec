@@ -168,7 +168,7 @@ class TokenEmbedding(nn.Module):
         return x
 
 
-class LineEncoder(nn.Module):
+class LineEncoderLSTM(nn.Module):
 
     def __init__(self, input_size, hidden_size=1024, num_layers=2):
         """Initialize LSTM.
@@ -217,6 +217,41 @@ class LineEncoder(nn.Module):
         return x[unsort_idxs]
 
 
+class LineEncoderCNN(nn.Module):
+
+    def __init__(self, input_size):
+        """Initialize LSTM.
+        """
+        super().__init__()
+
+        self.convs = nn.ModuleList([
+            nn.Conv2d(1, 100, (w, input_size))
+            for w in (3, 4, 5)
+        ])
+
+        self.out_dim = sum([c.out_channels for c in self.convs])
+
+        self.dropout = nn.Dropout()
+
+    def forward(self, x):
+        """Convolve, max pool, linear projection.
+        """
+        x = rnn.pad_sequence(x, batch_first=True)
+
+        # 1x input channel.
+        x = x.unsqueeze(1)
+
+        # Convolve, max pool.
+        x = [torch.tanh(conv(x)).squeeze(3) for conv in self.convs]
+        x = [F.max_pool1d(c, c.size(2)).squeeze(2) for c in x]
+
+        # Cat filter maps.
+        x = torch.cat(x, 1)
+        x = self.dropout(x)
+
+        return x
+
+
 class Classifier(nn.Module):
 
     @classmethod
@@ -227,7 +262,7 @@ class Classifier(nn.Module):
         labels = ds.labels()
         return cls(labels, token_counts, *args, **kwargs)
 
-    def __init__(self, labels, token_counts, embed_dim=512, lstm_kwargs=None):
+    def __init__(self, labels, token_counts, embed_dim=512, enc_kwargs=None):
         """Initialize encoders + clf.
         """
         super().__init__()
@@ -238,8 +273,8 @@ class Classifier(nn.Module):
 
         self.embed_tokens = TokenEmbedding(token_counts)
 
-        self.embed_lines = LineEncoder(self.embed_tokens.out_dim,
-            **(lstm_kwargs or {}))
+        self.embed_lines = LineEncoderCNN(self.embed_tokens.out_dim,
+            **(enc_kwargs or {}))
 
         self.merge = nn.Linear(self.embed_lines.out_dim, embed_dim)
 

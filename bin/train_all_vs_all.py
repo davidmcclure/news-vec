@@ -36,20 +36,14 @@ def freeze_dataset(link_root, headline_root, out_path, skim):
 @cli.command()
 @click.argument('ds_path', type=click.Path())
 @click.argument('pred_root', type=click.Path())
-@click.option('--lstm_hidden_size', type=int, default=1024)
-@click.option('--embed_dim', type=int, default=512)
 @click.option('--eval_every', type=int, default=100000)
 @click.option('--dump_preds', is_flag=True)
-def train(ds_path, pred_root, lstm_hidden_size, embed_dim,
-    eval_every, dump_preds):
+def train(ds_path, pred_root, eval_every, dump_preds):
     """Train all-vs-all.
     """
     dataset = HeadlineDataset.load(ds_path)
 
-    lstm_kwargs = dict(hidden_size=lstm_hidden_size)
-
-    model = Classifier.from_dataset(dataset,
-        lstm_kwargs=lstm_kwargs, embed_dim=embed_dim)
+    model = Classifier.from_dataset(dataset)
 
     trainer = Trainer(model, dataset, eval_every=eval_every)
     trainer.train()
