@@ -35,11 +35,13 @@ def freeze_dataset(link_root, headline_root, out_path, skim):
 
 @cli.command()
 @click.argument('ds_path', type=click.Path())
-@click.argument('enc_root', type=click.Path())
+@click.argument('pred_root', type=click.Path())
 @click.option('--lstm_hidden_size', type=int, default=1024)
 @click.option('--embed_dim', type=int, default=512)
 @click.option('--eval_every', type=int, default=100000)
-def train(ds_path, enc_root, lstm_hidden_size, embed_dim, eval_every):
+@click.option('--dump_preds', is_flag=True)
+def train(ds_path, pred_root, lstm_hidden_size, embed_dim,
+    eval_every, dump_preds):
     """Train all-vs-all.
     """
     dataset = HeadlineDataset.load(ds_path)
@@ -55,8 +57,9 @@ def train(ds_path, enc_root, lstm_hidden_size, embed_dim, eval_every):
     preds = trainer.eval_test()
     logger.info('Test accuracy: %f' % preds.accuracy)
 
-    encoder = CorpusEncoder(trainer.train_ds, model)
-    encoder.write_fs(enc_root)
+    if dump_preds:
+        encoder = CorpusEncoder(dataset.train, model)
+        encoder.write_fs(pred_root)
 
 
 if __name__ == '__main__':
