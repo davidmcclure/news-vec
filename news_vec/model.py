@@ -169,6 +169,17 @@ class TokenEmbedding(nn.Module):
         return x
 
 
+class LineEncoderCBOW(nn.Module):
+
+    def __init__(self, input_size):
+        super().__init__()
+        self.out_dim = input_size
+        self.dropout = nn.Dropout()
+
+    def forward(self, x):
+        return torch.stack([xi.mean(0) for xi in x])
+
+
 class LineEncoderLSTM(nn.Module):
 
     def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
@@ -281,7 +292,10 @@ class Classifier(nn.Module):
 
         # TODO: Better way to handle this?
 
-        if line_enc == 'lstm':
+        if line_enc == 'cbow':
+            self.encode_lines = LineEncoderCBOW(self.embed_tokens.out_dim)
+
+        elif line_enc == 'lstm':
             self.encode_lines = LineEncoderLSTM(self.embed_tokens.out_dim)
 
         elif line_enc == 'cnn':
