@@ -50,16 +50,8 @@ class Trainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.loss_func = nn.NLLLoss()
 
-        # Set train / val / test splits.
-        test_size = round(len(corpus) * test_frac)
-        train_size = len(self.corpus) - (test_size * 2)
-        sizes = (train_size, test_size, test_size)
-
-        self.train_ds, self.val_ds, self.test_ds = \
-            random_split(self.corpus, sizes)
-
         # By default, eval after each epoch.
-        self.eval_every = eval_every or len(self.train_ds)
+        self.eval_every = eval_every or len(self.corpus.train)
 
         # Store loss histories.
         self.train_losses, self.val_losses = [], []
@@ -84,7 +76,7 @@ class Trainer:
         logger.info('Epoch %d' % epoch)
 
         loader = ProgressDataLoader(
-            self.train_ds,
+            self.corpus.train,
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )
@@ -136,7 +128,7 @@ class Trainer:
 
     def validate(self, log=True):
 
-        preds = self._predict(self.val_ds)
+        preds = self._predict(self.corpus.val)
 
         loss = self.loss_func(preds.yp, preds.yt)
         self.val_losses.append(loss.item())
@@ -150,7 +142,7 @@ class Trainer:
         self.n_from_eval = 0
 
     def eval_test(self):
-        return self._predict(self.test_ds)
+        return self._predict(self.corpus.test)
 
     def is_finished(self):
         """Has val loss stalled?

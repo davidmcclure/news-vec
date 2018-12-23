@@ -7,6 +7,9 @@ import random
 from cached_property import cached_property
 from collections import Counter, UserList, UserDict
 from tqdm import tqdm
+from itertools import chain
+
+from torch.utils.data import random_split
 
 from .utils import read_json_gz_lines
 from . import logger
@@ -32,17 +35,37 @@ class HeadlineDataset(UserList):
         with open(path, 'rb') as fh:
             return pickle.load(fh)
 
+    def __init__(self, pairs, test_frac=0.1):
+        """Set train/val/test splits.
+        """
+        test_size = round(len(pairs) * test_frac)
+        train_size = len(pairs) - (test_size * 2)
+
+        sizes = (train_size, test_size, test_size)
+        self.train, self.val, self.test = random_split(pairs, sizes)
+
+    def __iter__(self):
+        return chain(self.train, self.val, self.test)
+
     def __repr__(self):
 
-        pattern = '{cls_name}<{size} pairs>'
+        pattern = '{cls_name}<{train_size}/{val_size}/{test_size}>'
 
         return pattern.format(
             cls_name=self.__class__.__name__,
-            size=len(self),
+            train_size=len(self.train),
+            val_size=len(self.val),
+            test_size=len(self.test),
         )
 
-    def skim(self, n):
-        self.data = random.sample(self.data, n)
+    def skim(self, n, *args, **kwargs):
+        """Downsample to N pairs.
+
+        Returns: cls
+        """
+        pairs = random.sample(list(iter(self)), n)
+
+        return self.__class__(pairs, *args, **kwargs)
 
     def token_counts(self):
         """Collect all token -> count.
@@ -51,7 +74,7 @@ class HeadlineDataset(UserList):
 
         counts = Counter()
         for hl, _ in tqdm(self):
-            counts.update(hl['tokens'])
+            counts.update(hl['clf_tokens'])
 
         return counts
 
