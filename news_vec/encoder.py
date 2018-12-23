@@ -72,7 +72,7 @@ class CorpusEncoder:
     def write_fs(self, root):
         """Flush to local filesystem.
         """
-        shutil.rmtree(root)
+        shutil.rmtree(root, ignore_errors=True)
         os.makedirs(root)
 
         for fname, data in self.segments_iter():
