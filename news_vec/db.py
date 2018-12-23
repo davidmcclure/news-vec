@@ -13,7 +13,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from glob import glob
 from tqdm import tqdm
 from collections import Counter
-from itertools import chain
+from itertools import chain, islice
+from cached_property import cached_property
 from boltons.iterutils import chunked_iter
 
 from . import logger
@@ -51,12 +52,14 @@ class BaseModel:
         cls.metadata.create_all(engine, tables=[cls.__table__])
 
     @classmethod
-    def load_spark_lines(cls, root, n=1000):
+    def load_spark_lines(cls, root, page_size=1000, skim=None):
         """Bulk-insert spark lines.
         """
         cls.reset()
 
-        pages = tqdm(chunked_iter(read_json_gz_lines(root), n))
+        rows = islice(read_json_gz_lines(root), skim)
+
+        pages = tqdm(chunked_iter(rows, page_size))
 
         for mappings in pages:
             session.bulk_insert_mappings(cls, mappings)
@@ -116,83 +119,101 @@ class Link(BaseModel):
     def add_indexes(cls):
         cls.add_index(cls.domain, cls.article_id)
 
-    @classmethod
-    def domains(cls):
+
+class ArticleSampler:
+
+    @cached_property
+    def domains(self):
         """Unique domains.
         """
-        query = session.query(cls.domain.distinct())
-        return [r[0] for r in query]
+        query = session.query(Link.domain.distinct())
+        return set([r[0] for r in query])
 
-    @classmethod
-    def domain_article_counts(cls):
-        """Total articles per domain.
+    def sample_ava(self, min_imp):
+        """All vs all.
         """
-        query = (session
-            .query(cls.domain, func.count(cls.article_id.distinct()))
-            .group_by(cls.domain))
+        articles = (session
+            .query(Link.article_id, Link.domain)
+            .group_by(Link.article_id)
+            .having(func.sum(Link.fc) > min_imp))
 
-        return Counter(dict(query))
+        return articles.all()
 
-    @classmethod
-    def min_domain_article_count(cls):
-        """Count of most infrequent domain.
-        """
-        counts = cls.domain_article_counts()
+    # def domain_counts(self, min_imp):
+    #     """Total articles per domain.
+    #     """
+    #     articles = (session
+    #         .query(Link.domain, Link.article_id)
+    #         .group_by(Link.article_id)
+    #         .having(func.sum(Link.fc) > min_imp)
+    #         .subquery())
+    #
+    #     query = (session
+    #         .query(articles.c.domain, func.count(articles.c.domain))
+    #         .group_by(articles.c.domain))
+    #
+    #     return Counter(dict(query))
 
-        return counts.most_common()[-1][1]
+    # @classmethod
+    # def min_domain_article_count(cls):
+    #     """Count of most infrequent domain.
+    #     """
+    #     counts = cls.domain_article_counts()
+    #
+    #     return counts.most_common()[-1][1]
 
-    @classmethod
-    def min_ts(cls):
-        return session.query(func.min(cls.timestamp)).one()[0]
-
-    @classmethod
-    def max_ts(cls):
-        return session.query(func.max(cls.timestamp)).one()[0]
-
-    @classmethod
-    def sample_domain(cls, domain, n):
-        """Sample N random headlines from a domain.
-        """
-        query = (session
-            .query(cls.article_id, cls.domain)
-            .filter(cls.domain==domain)
-            .group_by(cls.article_id, cls.domain)
-            .order_by(func.random())
-            .limit(n))
-
-        return query.all()
-
-    @classmethod
-    def sample_not_domain(cls, domain, n):
-        """Sample N random headlines *not* from a domain.
-        """
-        query = (session
-            .query(cls.article_id, cls.domain)
-            .filter(cls.domain!=domain)
-            .group_by(cls.article_id, cls.domain)
-            .order_by(func.random())
-            .limit(n))
-
-        return query.all()
-
-    @classmethod
-    def sample_all_vs_all(cls, n):
-        """Sample N articles from each domain.
-        """
-        pairs = [cls.sample_domain(domain, n) for domain in cls.domains()]
-        return list(chain(*pairs))
-
-    @classmethod
-    def sample_a_vs_b(cls, a, b, n):
-        """Sample N articles from two domains.
-        """
-        pairs = [cls.sample_domain(domain, n) for domain in (a, b)]
-        return list(chain(*pairs))
-
-    @classmethod
-    def sample_one_vs_all(cls, domain):
-        """Sample N a domain, N from all others.
-        """
-        fg = cls.sample_domain(domain, n)
-        bg = cls.sample_not_domain(domain, n)
-        return list(chain(fg, bg))
+    # @cached_property
+    # def min_ts(self):
+    #     return session.query(func.min(Link.timestamp)).one()[0]
+    #
+    # @cached_property
+    # def max_ts(self):
+    #     return session.query(func.max(Link.timestamp)).one()[0]
+    #
+    # @classmethod
+    # def sample_domain(cls, domain, n):
+    #     """Sample N random headlines from a domain.
+    #     """
+    #     query = (session
+    #         .query(cls.article_id, cls.domain)
+    #         .filter(cls.domain==domain)
+    #         .group_by(cls.article_id, cls.domain)
+    #         .order_by(func.random())
+    #         .limit(n))
+    #
+    #     return query.all()
+    #
+    # @classmethod
+    # def sample_not_domain(cls, domain, n):
+    #     """Sample N random headlines *not* from a domain.
+    #     """
+    #     query = (session
+    #         .query(cls.article_id, cls.domain)
+    #         .filter(cls.domain!=domain)
+    #         .group_by(cls.article_id, cls.domain)
+    #         .order_by(func.random())
+    #         .limit(n))
+    #
+    #     return query.all()
+    #
+    # @classmethod
+    # def sample_all_vs_all(cls, n):
+    #     """Sample N articles from each domain.
+    #     """
+    #     pairs = [cls.sample_domain(domain, n) for domain in cls.domains()]
+    #     return list(chain(*pairs))
+    #
+    # @classmethod
+    # def sample_a_vs_b(cls, a, b, n):
+    #     """Sample N articles from two domains.
+    #     """
+    #     pairs = [cls.sample_domain(domain, n) for domain in (a, b)]
+    #     return list(chain(*pairs))
+    #
+    # @classmethod
+    # def sample_one_vs_all(cls, domain):
+    #     """Sample N a domain, N from all others.
+    #     """
+    #     fg = cls.sample_domain(domain, n)
+    #     bg = cls.sample_not_domain(domain, n)
+    #     return list(chain(fg, bg))
