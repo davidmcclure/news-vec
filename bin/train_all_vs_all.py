@@ -45,6 +45,7 @@ def train(ds_path, line_enc, eval_every, es_wait, pred_root):
     dataset = HeadlineDataset.load(ds_path)
 
     model = Classifier.from_dataset(dataset, line_enc=line_enc)
+    print(model)
 
     trainer = Trainer(model, dataset, eval_every=eval_every, es_wait=es_wait)
     trainer.train()

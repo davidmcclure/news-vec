@@ -11,6 +11,7 @@ from torch.nn import functional as F
 from itertools import chain
 
 from . import utils
+from . import settings
 from .cuda import itype
 
 
@@ -170,7 +171,8 @@ class TokenEmbedding(nn.Module):
 
 class LineEncoderLSTM(nn.Module):
 
-    def __init__(self, input_size, hidden_size=1024, num_layers=2):
+    def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
+        num_layers=settings.LSTM_NUM_LAYERS):
         """Initialize LSTM.
         """
         super().__init__()
@@ -221,14 +223,15 @@ class LineEncoderCNN(nn.Module):
 
     # https://www.aclweb.org/anthology/D14-1181
 
-    def __init__(self, input_size):
+    def __init__(self, input_size, filter_size=settings.CNN_FILTER_SIZE,
+        filter_widths=settings.CNN_FILTER_WIDTHS):
         """Initialize LSTM.
         """
         super().__init__()
 
         self.convs = nn.ModuleList([
-            nn.Conv2d(1, 100, (w, input_size))
-            for w in (3, 4, 5)
+            nn.Conv2d(1, filter_size, (w, input_size))
+            for w in filter_widths
         ])
 
         self.out_dim = sum([c.out_channels for c in self.convs])
@@ -264,7 +267,8 @@ class Classifier(nn.Module):
         labels = ds.labels()
         return cls(labels, token_counts, *args, **kwargs)
 
-    def __init__(self, labels, token_counts, line_enc, embed_dim=512):
+    def __init__(self, labels, token_counts, line_enc,
+        embed_dim=settings.CLF_EMBED_DIM):
         """Initialize encoders + clf.
         """
         super().__init__()
