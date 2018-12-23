@@ -1,6 +1,7 @@
 
 
 import os
+import shutil
 import pickle
 
 from boltons.iterutils import chunked_iter
@@ -13,8 +14,6 @@ def write_fs(path, data):
     """Dump data to disk.
     """
     logger.info('Flushing to disk: %s' % path)
-
-    os.makedirs(os.path.dirname(path), exist_ok=True)
 
     with open(path, 'wb') as fh:
         fh.write(data)
@@ -73,6 +72,9 @@ class CorpusEncoder:
     def write_fs(self, root):
         """Flush to local filesystem.
         """
+        shutil.rmtree(root)
+        os.makedirs(root)
+
         for fname, data in self.segments_iter():
             path = os.path.join(root, fname)
             write_fs(path, data)

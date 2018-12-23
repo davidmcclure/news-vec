@@ -1,6 +1,8 @@
 
 
 import pandas as pd
+import pickle
+import random
 
 from cached_property import cached_property
 from collections import Counter, UserList, UserDict
@@ -25,6 +27,11 @@ class Headline(UserDict):
 
 class HeadlineDataset(UserList):
 
+    @classmethod
+    def load(cls, path):
+        with open(path, 'rb') as fh:
+            return pickle.load(fh)
+
     def __repr__(self):
 
         pattern = '{cls_name}<{size} pairs>'
@@ -33,6 +40,9 @@ class HeadlineDataset(UserList):
             cls_name=self.__class__.__name__,
             size=len(self),
         )
+
+    def skim(self, n):
+        self.data = random.sample(self.data, n)
 
     def token_counts(self):
         """Collect all token -> count.
@@ -59,6 +69,10 @@ class HeadlineDataset(UserList):
     def labels(self):
         counts = self.label_counts()
         return [label for label, _ in counts.most_common()]
+
+    def save(self, path):
+        with open(path, 'wb') as fh:
+            pickle.dump(self, fh)
 
 
 class Corpus:
