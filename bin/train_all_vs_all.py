@@ -19,7 +19,7 @@ def cli():
 @click.argument('link_root', type=click.Path())
 @click.argument('headline_root', type=click.Path())
 @click.argument('out_path', type=click.Path())
-@click.option('--skim', type=int, default=None)
+@click.option('--skim', type=int)
 def freeze_dataset(link_root, headline_root, out_path, skim):
     """Bake off a fixed benchmarking dataset.
     """
@@ -35,10 +35,9 @@ def freeze_dataset(link_root, headline_root, out_path, skim):
 
 @cli.command()
 @click.argument('ds_path', type=click.Path())
-@click.argument('pred_root', type=click.Path())
 @click.option('--eval_every', type=int, default=100000)
-@click.option('--dump_preds', is_flag=True)
-def train(ds_path, pred_root, eval_every, dump_preds):
+@click.option('--pred_root', type=click.Path())
+def train(ds_path, eval_every, pred_root):
     """Train all-vs-all.
     """
     dataset = HeadlineDataset.load(ds_path)
@@ -51,7 +50,7 @@ def train(ds_path, pred_root, eval_every, dump_preds):
     preds = trainer.eval_test()
     logger.info('Test accuracy: %f' % preds.accuracy)
 
-    if dump_preds:
+    if pred_root:
         encoder = CorpusEncoder(dataset.train, model)
         encoder.write_fs(pred_root)
 
