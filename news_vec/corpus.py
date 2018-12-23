@@ -1,78 +1,13 @@
 
 
-import numpy as np
+import pandas as pd
 
-from itertools import islice
-from tqdm import tqdm
-from collections import Counter, UserDict, UserList, defaultdict
-from boltons.iterutils import pairwise
 from cached_property import cached_property
+from collections import Counter, UserList, UserDict
+from tqdm import tqdm
 
-from . import logger
 from .utils import read_json_gz_lines
-
-
-class LinkCorpus:
-
-    def __init__(self, root, n_ts_buckets=10):
-        """Read lines.
-        """
-        self.n_ts_buckets = 10
-
-        logger.info('Parsing line corpus.')
-
-        rows_iter = read_json_gz_lines(root)
-        self.rows = list(tqdm(rows_iter))
-
-    def __iter__(self):
-        return iter(self.rows)
-
-    @cached_property
-    def min_ts(self):
-        return min(r['timestamp'] for r in self)
-
-    @cached_property
-    def max_ts(self):
-        return max(r['timestamp'] for r in self)
-
-    @cached_property
-    def ts_buckets(self):
-        """Split out N temporal buckets.
-        """
-        buckets = np.linspace(self.min_ts, self.max_ts,
-            self.n_ts_buckets, dtype='int')
-
-        return pairwise(buckets)
-
-    @cached_property
-    def idx(self):
-        """domain -> article id -> ts bucket -> impressions.
-        """
-        idx = defaultdict(lambda: defaultdict(Counter))
-
-        for r in tqdm(self):
-            for i, (ts1, ts2) in enumerate(self.ts_buckets):
-                if ts1 <= r['timestamp'] <= ts2:
-                    idx[r['domain']][r['article_id']][i] += r['fc']
-
-        return idx
-
-    def articles_by_domain_iter(self, domain, min_imp):
-        """Generate articles from a domain.
-        """
-        for aid, counts in self.idx[domain].items():
-            if sum(counts.values()) > min_imp:
-                yield aid
-
-    def min_domain_count(self, min_imp):
-        """Number of articles in most infrequent domain.
-        """
-        counts = []
-        for d in self.idx:
-            articles = self.articles_by_domain_iter(d, min_imp)
-            counts.append(len(list(articles)))
-
-        return min(counts)
+from . import logger
 
 
 class Headline(UserDict):
@@ -89,6 +24,15 @@ class Headline(UserDict):
 
 
 class HeadlineDataset(UserList):
+
+    def __repr__(self):
+
+        pattern = '{cls_name}<{size} pairs>'
+
+        return pattern.format(
+            cls_name=self.__class__.__name__,
+            size=len(self),
+        )
 
     def token_counts(self):
         """Collect all token -> count.
@@ -117,34 +61,71 @@ class HeadlineDataset(UserList):
         return [label for label, _ in counts.most_common()]
 
 
-class HeadlineCorpus:
+class Corpus:
 
-    def __init__(self, root, skim=None):
-        """Read lines.
+    def __init__(self, links_root, headlines_root):
+        """Read links df, article index.
         """
-        logger.info('Parsing line corpus.')
+        logger.info('Reading links.')
 
-        rows_iter = islice(read_json_gz_lines(root), skim)
+        rows = list(tqdm(read_json_gz_lines(links_root)))
+        self.links = pd.DataFrame(rows)
 
-        self.hls = {
-            d['article_id']: Headline(d)
-            for d in tqdm(rows_iter)
+        logger.info('Reading headlines.')
+
+        self.headlines = {
+            row['article_id']: Headline(row)
+            for row in tqdm(read_json_gz_lines(headlines_root))
         }
 
     def __repr__(self):
 
-        pattern = '{cls_name}<{hl_count} headlines>'
+        pattern = '{cls_name}<{link_count} links, {hl_count} headlines>'
 
         return pattern.format(
             cls_name=self.__class__.__name__,
-            hl_count=len(self),
+            link_count=len(self.links),
+            hl_count=len(self.headlines),
         )
 
-    def __len__(self):
-        return len(self.hls)
+    def make_dataset(self, df):
+        """Index out a list of (Headline, domain) pairs.
 
-    def build_dataset(self, pairs):
-        """(id, label) -> (Headline, label)
+        Args:
+            df (DataFrame with 'article_id' and 'domain')
         """
-        pairs = [(self.hls[id], label) for id, label in pairs]
-        return HeadlineDataset(pairs)
+        pairs = df[['article_id', 'domain']].values.tolist()
+
+        return HeadlineDataset([
+            (self.headlines[aid], domain)
+            for aid, domain in pairs
+        ])
+
+    @cached_property
+    def unique_articles(self):
+        return self.links[['domain', 'article_id']].drop_duplicates()
+
+    @cached_property
+    def min_domain_count(self):
+        """Smallest number of unique articles per domain.
+        """
+        return self.unique_articles.groupby('domain').size().min()
+
+    def sample_all_vs_all(self):
+        """Sample evenly from all domains.
+        """
+        rows = (self.unique_articles
+            .groupby('domain')
+            .apply(lambda x: x.sample(self.min_domain_count)))
+
+        return self.make_dataset(rows)
+
+    def sample_a_vs_b(self, a, b):
+        """Sample evenly from two domains.
+        """
+        rows = (self.unique_articles
+            [self.unique_articles.domain.isin([a, b])]
+            .groupby('domain')
+            .apply(lambda x: x.sample(self.min_domain_count)))
+
+        return self.make_dataset(rows)
