@@ -219,6 +219,14 @@ class LineEncoder(nn.Module):
 
 class Classifier(nn.Module):
 
+    @classmethod
+    def from_dataset(cls, ds, *args, **kwargs):
+        """Build from HeadlineDataset.
+        """
+        token_counts = ds.token_counts()
+        labels = ds.labels()
+        return cls(labels, token_counts, *args, **kwargs)
+
     def __init__(self, labels, token_counts, embed_dim=512, lstm_kwargs=None):
         """Initialize encoders + clf.
         """

@@ -34,28 +34,23 @@ class EarlyStoppingException(Exception):
 
 class Trainer:
 
-    def __init__(self, corpus, test_frac=0.1, es_wait=5, eval_every=None,
+    def __init__(self, model, corpus, test_frac=0.1, es_wait=5, eval_every=None,
         lr=1e-4, batch_size=50, model_kwargs=None):
+
+        self.model = model
+
+        if torch.cuda.is_available():
+            self.model.cuda()
 
         self.corpus = corpus
         self.batch_size = batch_size
         self.es_wait = es_wait
-
-        token_counts = self.corpus.token_counts()
-        labels = self.corpus.labels()
-
-        # Initialize model.
-        self.model = Classifier(labels, token_counts, **(model_kwargs or {}))
-
-        if torch.cuda.is_available():
-            self.model.cuda()
 
         # Initialize optimizer + loss.
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
         self.loss_func = nn.NLLLoss()
 
         # Set train / val / test splits.
-
         test_size = round(len(corpus) * test_frac)
         train_size = len(self.corpus) - (test_size * 2)
         sizes = (train_size, test_size, test_size)
@@ -63,6 +58,7 @@ class Trainer:
         self.train_ds, self.val_ds, self.test_ds = \
             random_split(self.corpus, sizes)
 
+        # By default, eval after each epoch.
         self.eval_every = eval_every or len(self.train_ds)
 
         # Store loss histories.
