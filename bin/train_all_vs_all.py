@@ -7,6 +7,8 @@ from news_vec.corpus import Corpus, HeadlineDataset
 from news_vec.trainer import Trainer
 from news_vec.encoder import CorpusEncoder
 
+from news_vec import logger
+
 
 @click.group()
 def cli():
@@ -47,6 +49,9 @@ def train(ds_path, enc_root, lstm_hidden_size, embed_dim, eval_every, skim):
 
     trainer = Trainer(model, dataset, eval_every=eval_every)
     trainer.train()
+
+    preds = trainer.eval_test()
+    logger.info('Test accuracy: %f' % preds.accuracy)
 
     encoder = CorpusEncoder(trainer.train_ds, model)
     encoder.write_fs(enc_root)
