@@ -46,7 +46,7 @@ def train(ds_path, enc_root, lstm_hidden_size, embed_dim, eval_every, skim):
         lstm_kwargs=lstm_kwargs, embed_dim=embed_dim)
 
     trainer = Trainer(model, dataset, eval_every=eval_every)
-    # trainer.train()
+    trainer.train()
 
     encoder = CorpusEncoder(trainer.train_ds, model)
     encoder.write_fs(enc_root)
