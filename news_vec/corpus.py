@@ -63,19 +63,19 @@ class HeadlineDataset(UserList):
 
 class Corpus:
 
-    def __init__(self, links_root, headlines_root):
+    def __init__(self, link_root, headline_root):
         """Read links df, article index.
         """
         logger.info('Reading links.')
 
-        rows = list(tqdm(read_json_gz_lines(links_root)))
+        rows = list(tqdm(read_json_gz_lines(link_root)))
         self.links = pd.DataFrame(rows)
 
         logger.info('Reading headlines.')
 
         self.headlines = {
             row['article_id']: Headline(row)
-            for row in tqdm(read_json_gz_lines(headlines_root))
+            for row in tqdm(read_json_gz_lines(headline_root))
         }
 
     def __repr__(self):
