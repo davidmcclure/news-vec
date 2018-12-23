@@ -219,6 +219,8 @@ class LineEncoderLSTM(nn.Module):
 
 class LineEncoderCNN(nn.Module):
 
+    # https://www.aclweb.org/anthology/D14-1181
+
     def __init__(self, input_size):
         """Initialize LSTM.
         """
@@ -262,7 +264,7 @@ class Classifier(nn.Module):
         labels = ds.labels()
         return cls(labels, token_counts, *args, **kwargs)
 
-    def __init__(self, labels, token_counts, embed_dim=512, enc_kwargs=None):
+    def __init__(self, labels, token_counts, line_enc, embed_dim=512):
         """Initialize encoders + clf.
         """
         super().__init__()
@@ -273,10 +275,15 @@ class Classifier(nn.Module):
 
         self.embed_tokens = TokenEmbedding(token_counts)
 
-        self.embed_lines = LineEncoderCNN(self.embed_tokens.out_dim,
-            **(enc_kwargs or {}))
+        # TODO: Better way to handle this?
 
-        self.merge = nn.Linear(self.embed_lines.out_dim, embed_dim)
+        if line_enc == 'lstm':
+            self.encode_lines = LineEncoderLSTM(self.embed_tokens.out_dim)
+
+        elif line_enc == 'cnn':
+            self.encode_lines = LineEncoderCNN(self.embed_tokens.out_dim)
+
+        self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 
         self.predict = nn.Sequential(
             nn.Linear(embed_dim, len(labels)),
@@ -296,7 +303,7 @@ class Classifier(nn.Module):
         x = utils.group_by_sizes(x, sizes)
 
         # Embed lines.
-        x = self.embed_lines(x)
+        x = self.encode_lines(x)
 
         return self.merge(x)
 
