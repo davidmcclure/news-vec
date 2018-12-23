@@ -177,7 +177,9 @@ class LineEncoderCBOW(nn.Module):
         self.dropout = nn.Dropout()
 
     def forward(self, x):
-        return torch.stack([xi.mean(0) for xi in x])
+        x = torch.stack([xi.mean(0) for xi in x])
+        x = self.dropout(x)
+        return x
 
 
 class LineEncoderLSTM(nn.Module):
