@@ -305,8 +305,7 @@ class Attention(nn.Module):
 class LineEncoderLSTMAttn(nn.Module):
 
     def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
-        num_layers=settings.LSTM_NUM_LAYERS,
-        attn_hidden_size=settings.ATTN_HIDDEN_SIZE):
+        num_layers=settings.LSTM_NUM_LAYERS):
         """Initialize LSTM.
         """
         super().__init__()
@@ -359,6 +358,22 @@ class LineEncoderLSTMAttn(nn.Module):
         return x[unsort_idxs]
 
 
+class LineEncoderHybrid(nn.Module):
+
+    def __init__(self, input_size):
+        """LSTM + CNN.
+        """
+        super().__init__()
+        self.lstm = LineEncoderLSTMAttn(input_size)
+        self.cnn = LineEncoderCNN(input_size)
+        self.out_dim = self.lstm.out_dim + self.cnn.out_dim
+
+    def forward(self, x):
+        x_lstm = self.lstm(x)
+        x_cnn = self.cnn(x)
+        return torch.cat([x_lstm, x_cnn], 1)
+
+
 class Classifier(nn.Module):
 
     @classmethod
@@ -394,6 +409,9 @@ class Classifier(nn.Module):
 
         elif line_enc == 'lstm-attn':
             self.encode_lines = LineEncoderLSTMAttn(self.embed_tokens.out_dim)
+
+        elif line_enc == 'hybrid':
+            self.encode_lines = LineEncoderHybrid(self.embed_tokens.out_dim)
 
         self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 
