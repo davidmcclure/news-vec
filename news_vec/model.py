@@ -31,9 +31,7 @@ class PretrainedTokenEmbedding(nn.Module):
 
         self.embed = nn.Embedding.from_pretrained(self.vocab.vectors, freeze)
 
-    @property
-    def out_dim(self):
-        return self.embed.weight.shape[1]
+        self.out_dim = self.embed.weight.shape[1]
 
     def forward(self, tokens):
         """Map to token embeddings.
@@ -61,8 +59,6 @@ class CharEmbedding(nn.Embedding):
         self._ctoi = {s: i+2 for i, s in enumerate(self.vocab)}
 
         super().__init__(len(self.vocab)+2, embed_dim)
-
-        # TODO: Zero UNK + PAD.
 
     def ctoi(self, c):
         return self._ctoi.get(c, 1)
@@ -117,9 +113,7 @@ class CharCNN(nn.Module):
 
         self.out = nn.Linear(conv_dims, out_dim)
 
-    @property
-    def out_dim(self):
-        return self.out.out_features
+        self.out_dim = out_dim
 
     def forward(self, tokens):
         """Convolve, max pool, linear projection.
@@ -145,13 +139,12 @@ class TokenEmbedding(nn.Module):
         """Initialize token + char embeddings
         """
         super().__init__()
+
         self.embed_t = PretrainedTokenEmbedding(token_counts)
         self.embed_c = CharCNN()
         self.dropout = nn.Dropout()
 
-    @property
-    def out_dim(self):
-        return self.embed_t.out_dim + self.embed_c.out_dim
+        self.out_dim = self.embed_t.out_dim + self.embed_c.out_dim
 
     def forward(self, tokens):
         """Map to token embeddings, cat with character convolutions.
@@ -195,9 +188,7 @@ class LineEncoderLSTM(nn.Module):
             bidirectional=True,
         )
 
-    @property
-    def out_dim(self):
-        return self.lstm.hidden_size * 2
+        self.out_dim = self.lstm.hidden_size * 2
 
     def forward(self, x):
         """Sort, pack, encode, reorder.
@@ -351,59 +342,6 @@ class LineEncoderLSTMAttn(nn.Module):
         return x[unsort_idxs]
 
 
-class LineEncoderLSTMCNN(nn.Module):
-
-    def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
-        num_layers=settings.LSTM_NUM_LAYERS):
-        """Initialize LSTM + CNN.
-        """
-        super().__init__()
-
-        self.lstm = nn.LSTM(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            num_layers=num_layers,
-            batch_first=True,
-            bidirectional=True,
-        )
-
-        self.cnn = TokenCNN(hidden_size*2)
-
-    @property
-    def out_dim(self):
-        return (self.lstm.hidden_size * 2) + self.cnn.out_dim
-
-    def forward(self, x):
-        """Sort, pack, encode, reorder.
-
-        Args:
-            x (list<Tensor>): Variable-length embedding tensors.
-        """
-        sizes = list(map(len, x))
-
-        # Indexes to sort descending.
-        sort_idxs = np.argsort(sizes)[::-1]
-
-        # Indexes to restore original order.
-        unsort_idxs = torch.from_numpy(np.argsort(sort_idxs)).type(itype)
-
-        # Sort by size descending.
-        x = [x[i] for i in sort_idxs]
-
-        # Pad + pack, LSTM.
-        x = rnn.pack_sequence(x)
-        states, (hn, _) = self.lstm(x)
-
-        # CNN over LSTM states.
-        states, _ = rnn.pad_packed_sequence(states, batch_first=True)
-        states_conv = self.cnn(states)
-
-        # Cat forward + backward hidden layers.
-        x = torch.cat([hn[0,:,:], hn[1,:,:], states_conv], dim=1)
-
-        return x[unsort_idxs]
-
-
 class Classifier(nn.Module):
 
     @classmethod
@@ -439,9 +377,6 @@ class Classifier(nn.Module):
 
         elif line_enc == 'lstm-attn':
             self.encode_lines = LineEncoderLSTMAttn(self.embed_tokens.out_dim)
-
-        elif line_enc == 'lstm-cnn':
-            self.encode_lines = LineEncoderLSTMCNN(self.embed_tokens.out_dim)
 
         self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 
