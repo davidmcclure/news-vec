@@ -270,11 +270,43 @@ class LineEncoderCNN(nn.Module):
         return x
 
 
+class Attention(nn.Module):
+
+    def __init__(self, input_size, hidden_size=settings.ATTN_HIDDEN_SIZE):
+
+        super().__init__()
+
+        self.score = nn.Sequential(
+            nn.Linear(input_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, 1),
+        )
+
+    def forward(self, states, sizes):
+        """Score states, regroup by seq, linearly combine states.
+        """
+        states = [t[:size] for t, size in zip(states, sizes)]
+
+        attn = self.score(torch.cat(states))
+
+        attn = [
+            F.softmax(scores.squeeze(), dim=0)
+            for scores in utils.group_by_sizes(attn, sizes)
+        ]
+
+        states_attn = torch.stack([
+            torch.sum(si * ai.view(-1, 1), 0)
+            for si, ai in zip(states, attn)
+        ])
+
+        return states_attn
+
+
 class LineEncoderLSTMAttn(nn.Module):
 
     def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
         num_layers=settings.LSTM_NUM_LAYERS,
-        attn_hidden_size=settings.LSTM_ATTN_HIDDEN_SIZE):
+        attn_hidden_size=settings.ATTN_HIDDEN_SIZE):
         """Initialize LSTM.
         """
         super().__init__()
@@ -287,11 +319,7 @@ class LineEncoderLSTMAttn(nn.Module):
             bidirectional=True,
         )
 
-        self.attn = nn.Sequential(
-            nn.Linear(hidden_size*2, attn_hidden_size),
-            nn.ReLU(),
-            nn.Linear(attn_hidden_size, 1),
-        )
+        self.attn = Attention(hidden_size*2)
 
         self.dropout = nn.Dropout()
 
@@ -320,22 +348,9 @@ class LineEncoderLSTMAttn(nn.Module):
         x = rnn.pack_sequence(x)
         states, (hn, _) = self.lstm(x)
 
-        # TODO: Attention module.
-
+        # Attend over LSTM states.
         states, sizes = rnn.pad_packed_sequence(states, batch_first=True)
-        states = [t[:size] for t, size in zip(states, sizes)]
-
-        attn = self.attn(torch.cat(states))
-
-        attn = [
-            F.softmax(scores.squeeze(), dim=0)
-            for scores in utils.group_by_sizes(attn, sizes)
-        ]
-
-        states_attn = torch.stack([
-            torch.sum(si * ai.view(-1, 1), 0)
-            for si, ai in zip(states, attn)
-        ])
+        states_attn = self.attn(states, sizes)
 
         # Cat forward + backward hidden layers.
         x = torch.cat([hn[0,:,:], hn[1,:,:], states_attn], dim=1)
