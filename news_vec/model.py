@@ -178,9 +178,11 @@ class TokenCNN(nn.Module):
 
         self.out_dim = sum([c.out_channels for c in self.convs])
 
-    def forward(self, x):
+    def forward(self, xs):
         """Convolve, max pool, linear projection.
         """
+        x = rnn.pad_sequence(xs, batch_first=True)
+
         # 1x input channel.
         x = x.unsqueeze(1)
 
@@ -212,17 +214,17 @@ class TokenLSTM(nn.Module):
 
         self.out_dim = self.lstm.hidden_size * 2
 
-    def forward(self, x):
+    def forward(self, xs):
         """Sort, pack, encode, reorder.
 
         Args:
-            x (list<Tensor>): Variable-length embedding tensors.
+            xs (list<Tensor>): Variable-length embedding tensors.
 
         Returns:
             x (Tensor)
             states (list<Tensor): LSTM states per input.
         """
-        sizes = list(map(len, x))
+        sizes = list(map(len, xs))
 
         # Indexes to sort descending.
         sort_idxs = np.argsort(sizes)[::-1]
@@ -231,10 +233,10 @@ class TokenLSTM(nn.Module):
         unsort_idxs = torch.from_numpy(np.argsort(sort_idxs)).type(itype)
 
         # Sort by size descending.
-        x = [x[i] for i in sort_idxs]
+        xs = [xs[i] for i in sort_idxs]
 
         # Pad + pack, LSTM.
-        x = rnn.pack_sequence(x)
+        x = rnn.pack_sequence(xs)
         states, (hn, _) = self.lstm(x)
 
         # Unpack + unpad states.
@@ -254,8 +256,8 @@ class LineEncoderCBOW(nn.Module):
         super().__init__()
         self.out_dim = input_size
 
-    def forward(self, x):
-        x = torch.stack([xi.mean(0) for xi in x])
+    def forward(self, xs):
+        x = torch.stack([xi.mean(0) for xi in xs])
         return x
 
 
@@ -266,16 +268,9 @@ class LineEncoderLSTM(nn.Module):
         self.lstm = TokenLSTM(input_size)
         self.out_dim = self.lstm.out_dim
 
-    def forward(self, x):
-        x, _ = self.lstm(x)
+    def forward(self, xs):
+        x, _ = self.lstm(xs)
         return x
-
-
-class LineEncoderCNN(TokenCNN):
-
-    def forward(self, x):
-        x = rnn.pad_sequence(x, batch_first=True)
-        return super().forward(x)
 
 
 class Attention(nn.Module):
@@ -312,7 +307,7 @@ class Attention(nn.Module):
         return states_attn
 
 
-class LineEncoderLSTMAttn(nn.Module):
+class LineEncoderLSTM_Attn(nn.Module):
 
     def __init__(self, input_size):
         """Initialize LSTM + attention.
@@ -333,6 +328,31 @@ class LineEncoderLSTMAttn(nn.Module):
 
         # Tops + state attn.
         x = torch.cat([x, states_attn], dim=1)
+
+        return x
+
+
+class LineEncoderLSTM_CNN(nn.Module):
+
+    def __init__(self, input_size):
+        """Initialize LSTM + attention.
+        """
+        super().__init__()
+        self.lstm = TokenLSTM(input_size)
+        self.cnn = TokenCNN(self.lstm.out_dim)
+        self.out_dim = self.lstm.out_dim + self.cnn.out_dim
+
+    def forward(self, x):
+        """Sort, pack, encode, reorder.
+
+        Args:
+            x (list<Tensor>): Variable-length embedding tensors.
+        """
+        x, states = self.lstm(x)
+        states_conv = self.cnn(states)
+
+        # Tops + convs over states.
+        x = torch.cat([x, states_conv], dim=1)
 
         return x
 
@@ -358,20 +378,24 @@ class Classifier(nn.Module):
         self.ltoi = {label: i for i, label in enumerate(labels)}
 
         self.embed_tokens = TokenEmbedding(token_counts)
+        token_dim =self.embed_tokens.out_dim
 
         # TODO: Better way to handle this?
 
         if line_enc == 'cbow':
-            self.encode_lines = LineEncoderCBOW(self.embed_tokens.out_dim)
+            self.encode_lines = LineEncoderCBOW(token_dim)
 
         elif line_enc == 'lstm':
-            self.encode_lines = LineEncoderLSTM(self.embed_tokens.out_dim)
+            self.encode_lines = LineEncoderLSTM(token_dim)
 
         elif line_enc == 'cnn':
-            self.encode_lines = LineEncoderCNN(self.embed_tokens.out_dim)
+            self.encode_lines = TokenCNN(token_dim)
 
         elif line_enc == 'lstm-attn':
-            self.encode_lines = LineEncoderLSTMAttn(self.embed_tokens.out_dim)
+            self.encode_lines = LineEncoderLSTM_Attn(token_dim)
+
+        elif line_enc == 'lstm-cnn':
+            self.encode_lines = LineEncoderLSTM_CNN(token_dim)
 
         self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 

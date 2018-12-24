@@ -2,8 +2,8 @@
 
 import click
 
+from news_vec.model import Classifier
 from news_vec.corpus import Corpus, HeadlineDataset
-from news_vec.model import Classifier, LineEncoderCNN, LineEncoderLSTM
 from news_vec.trainer import Trainer
 from news_vec.encoder import CorpusEncoder
 
