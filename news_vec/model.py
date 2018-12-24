@@ -117,8 +117,6 @@ class CharCNN(nn.Module):
 
         self.out = nn.Linear(conv_dims, out_dim)
 
-        self.dropout = nn.Dropout()
-
     @property
     def out_dim(self):
         return self.out.out_features
@@ -137,7 +135,6 @@ class CharCNN(nn.Module):
 
         # Cat filter maps.
         x = torch.cat(x, 1)
-        x = self.dropout(x)
 
         return self.out(x)
 
@@ -148,9 +145,9 @@ class TokenEmbedding(nn.Module):
         """Initialize token + char embeddings
         """
         super().__init__()
-
         self.embed_t = PretrainedTokenEmbedding(token_counts)
         self.embed_c = CharCNN()
+        self.dropout = nn.Dropout()
 
     @property
     def out_dim(self):
@@ -166,6 +163,8 @@ class TokenEmbedding(nn.Module):
         xc = self.embed_c(tokens)
         x = torch.cat([xt, xc], dim=1)
 
+        x = self.dropout(x)
+
         return x
 
 
@@ -174,11 +173,9 @@ class LineEncoderCBOW(nn.Module):
     def __init__(self, input_size):
         super().__init__()
         self.out_dim = input_size
-        self.dropout = nn.Dropout()
 
     def forward(self, x):
         x = torch.stack([xi.mean(0) for xi in x])
-        x = self.dropout(x)
         return x
 
 
@@ -197,8 +194,6 @@ class LineEncoderLSTM(nn.Module):
             batch_first=True,
             bidirectional=True,
         )
-
-        self.dropout = nn.Dropout()
 
     @property
     def out_dim(self):
@@ -227,7 +222,6 @@ class LineEncoderLSTM(nn.Module):
 
         # Cat forward + backward hidden layers.
         x = torch.cat([hn[0,:,:], hn[1,:,:]], dim=1)
-        x = self.dropout(x)
 
         return x[unsort_idxs]
 
@@ -249,8 +243,6 @@ class LineEncoderCNN(nn.Module):
 
         self.out_dim = sum([c.out_channels for c in self.convs])
 
-        self.dropout = nn.Dropout()
-
     def forward(self, x):
         """Convolve, max pool, linear projection.
         """
@@ -265,7 +257,6 @@ class LineEncoderCNN(nn.Module):
 
         # Cat filter maps.
         x = torch.cat(x, 1)
-        x = self.dropout(x)
 
         return x
 
@@ -320,8 +311,6 @@ class LineEncoderLSTMAttn(nn.Module):
 
         self.attn = Attention(hidden_size*2)
 
-        self.dropout = nn.Dropout()
-
     @property
     def out_dim(self):
         return self.lstm.hidden_size * 4
@@ -353,7 +342,6 @@ class LineEncoderLSTMAttn(nn.Module):
 
         # Cat forward + backward hidden layers.
         x = torch.cat([hn[0,:,:], hn[1,:,:], states_attn], dim=1)
-        x = self.dropout(x)
 
         return x[unsort_idxs]
 
@@ -415,6 +403,8 @@ class Classifier(nn.Module):
 
         self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 
+        self.dropout = nn.Dropout()
+
         self.predict = nn.Sequential(
             nn.Linear(embed_dim, len(labels)),
             nn.LogSoftmax(1),
@@ -435,7 +425,11 @@ class Classifier(nn.Module):
         # Embed lines.
         x = self.encode_lines(x)
 
-        return self.merge(x)
+        # Blend encoder outputs, dropout.
+        x = self.merge(x)
+        x = self.dropout(x)
+
+        return x
 
     def forward(self, lines):
         return self.predict(self.embed(lines))
