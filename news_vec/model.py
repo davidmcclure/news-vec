@@ -161,18 +161,40 @@ class TokenEmbedding(nn.Module):
         return x
 
 
-class LineEncoderCBOW(nn.Module):
+class TokenCNN(nn.Module):
 
-    def __init__(self, input_size):
+    # https://www.aclweb.org/anthology/D14-1181
+
+    def __init__(self, input_size, filter_size=settings.CNN_FILTER_SIZE,
+        filter_widths=settings.CNN_FILTER_WIDTHS):
+        """Initialize convolutions.
+        """
         super().__init__()
-        self.out_dim = input_size
+
+        self.convs = nn.ModuleList([
+            nn.Conv2d(1, filter_size, (w, input_size))
+            for w in filter_widths
+        ])
+
+        self.out_dim = sum([c.out_channels for c in self.convs])
 
     def forward(self, x):
-        x = torch.stack([xi.mean(0) for xi in x])
+        """Convolve, max pool, linear projection.
+        """
+        # 1x input channel.
+        x = x.unsqueeze(1)
+
+        # Convolve, max pool.
+        x = [torch.tanh(conv(x)).squeeze(3) for conv in self.convs]
+        x = [F.max_pool1d(c, c.size(2)).squeeze(2) for c in x]
+
+        # Cat filter maps.
+        x = torch.cat(x, 1)
+
         return x
 
 
-class LineEncoderLSTM(nn.Module):
+class TokenLSTM(nn.Module):
 
     def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
         num_layers=settings.LSTM_NUM_LAYERS):
@@ -209,44 +231,39 @@ class LineEncoderLSTM(nn.Module):
 
         # Pad + pack, LSTM.
         x = rnn.pack_sequence(x)
-        _, (hn, _) = self.lstm(x)
+        states, (hn, _) = self.lstm(x)
+
+        # Unpack + unpad states.
+        states, _ = rnn.pad_packed_sequence(states, batch_first=True)
+        states = [t[:size] for t, size in zip(states[unsort_idxs], sizes)]
 
         # Cat forward + backward hidden layers.
         x = torch.cat([hn[0,:,:], hn[1,:,:]], dim=1)
+        x = x[unsort_idxs]
 
-        return x[unsort_idxs]
+        return x, states
 
 
-class TokenCNN(nn.Module):
+class LineEncoderCBOW(nn.Module):
 
-    # https://www.aclweb.org/anthology/D14-1181
-
-    def __init__(self, input_size, filter_size=settings.CNN_FILTER_SIZE,
-        filter_widths=settings.CNN_FILTER_WIDTHS):
-        """Initialize convolutions.
-        """
+    def __init__(self, input_size):
         super().__init__()
-
-        self.convs = nn.ModuleList([
-            nn.Conv2d(1, filter_size, (w, input_size))
-            for w in filter_widths
-        ])
-
-        self.out_dim = sum([c.out_channels for c in self.convs])
+        self.out_dim = input_size
 
     def forward(self, x):
-        """Convolve, max pool, linear projection.
-        """
-        # 1x input channel.
-        x = x.unsqueeze(1)
+        x = torch.stack([xi.mean(0) for xi in x])
+        return x
 
-        # Convolve, max pool.
-        x = [torch.tanh(conv(x)).squeeze(3) for conv in self.convs]
-        x = [F.max_pool1d(c, c.size(2)).squeeze(2) for c in x]
 
-        # Cat filter maps.
-        x = torch.cat(x, 1)
+class LineEncoderLSTM(nn.Module):
 
+    def __init__(self, input_size):
+        super().__init__()
+        self.lstm = TokenLSTM(input_size)
+        self.out_dim = self.lstm.out_dim
+
+    def forward(self, x):
+        x, _ = self.lstm(x)
         return x
 
 
