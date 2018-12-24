@@ -226,13 +226,13 @@ class LineEncoderLSTM(nn.Module):
         return x[unsort_idxs]
 
 
-class LineEncoderCNN(nn.Module):
+class TokenCNN(nn.Module):
 
     # https://www.aclweb.org/anthology/D14-1181
 
     def __init__(self, input_size, filter_size=settings.CNN_FILTER_SIZE,
         filter_widths=settings.CNN_FILTER_WIDTHS):
-        """Initialize LSTM.
+        """Initialize convolutions.
         """
         super().__init__()
 
@@ -246,8 +246,6 @@ class LineEncoderCNN(nn.Module):
     def forward(self, x):
         """Convolve, max pool, linear projection.
         """
-        x = rnn.pad_sequence(x, batch_first=True)
-
         # 1x input channel.
         x = x.unsqueeze(1)
 
@@ -259,6 +257,13 @@ class LineEncoderCNN(nn.Module):
         x = torch.cat(x, 1)
 
         return x
+
+
+class LineEncoderCNN(TokenCNN):
+
+    def forward(self, x):
+        x = rnn.pad_sequence(x, batch_first=True)
+        return super().forward(x)
 
 
 class Attention(nn.Module):
@@ -346,20 +351,57 @@ class LineEncoderLSTMAttn(nn.Module):
         return x[unsort_idxs]
 
 
-class LineEncoderHybrid(nn.Module):
+class LineEncoderLSTMCNN(nn.Module):
 
-    def __init__(self, input_size):
-        """LSTM + CNN.
+    def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
+        num_layers=settings.LSTM_NUM_LAYERS):
+        """Initialize LSTM + CNN.
         """
         super().__init__()
-        self.lstm = LineEncoderLSTMAttn(input_size)
-        self.cnn = LineEncoderCNN(input_size)
-        self.out_dim = self.lstm.out_dim + self.cnn.out_dim
+
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True,
+        )
+
+        self.cnn = TokenCNN(hidden_size*2)
+
+    @property
+    def out_dim(self):
+        return (self.lstm.hidden_size * 2) + self.cnn.out_dim
 
     def forward(self, x):
-        x_lstm = self.lstm(x)
-        x_cnn = self.cnn(x)
-        return torch.cat([x_lstm, x_cnn], 1)
+        """Sort, pack, encode, reorder.
+
+        Args:
+            x (list<Tensor>): Variable-length embedding tensors.
+        """
+        sizes = list(map(len, x))
+
+        # Indexes to sort descending.
+        sort_idxs = np.argsort(sizes)[::-1]
+
+        # Indexes to restore original order.
+        unsort_idxs = torch.from_numpy(np.argsort(sort_idxs)).type(itype)
+
+        # Sort by size descending.
+        x = [x[i] for i in sort_idxs]
+
+        # Pad + pack, LSTM.
+        x = rnn.pack_sequence(x)
+        states, (hn, _) = self.lstm(x)
+
+        # CNN over LSTM states.
+        states, _ = rnn.pad_packed_sequence(states, batch_first=True)
+        states_conv = self.cnn(states)
+
+        # Cat forward + backward hidden layers.
+        x = torch.cat([hn[0,:,:], hn[1,:,:], states_conv], dim=1)
+
+        return x[unsort_idxs]
 
 
 class Classifier(nn.Module):
@@ -398,8 +440,8 @@ class Classifier(nn.Module):
         elif line_enc == 'lstm-attn':
             self.encode_lines = LineEncoderLSTMAttn(self.embed_tokens.out_dim)
 
-        elif line_enc == 'hybrid':
-            self.encode_lines = LineEncoderHybrid(self.embed_tokens.out_dim)
+        elif line_enc == 'lstm-cnn':
+            self.encode_lines = LineEncoderLSTMCNN(self.embed_tokens.out_dim)
 
         self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 
