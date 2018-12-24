@@ -270,6 +270,80 @@ class LineEncoderCNN(nn.Module):
         return x
 
 
+class LineEncoderLSTMAttn(nn.Module):
+
+    def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
+        num_layers=settings.LSTM_NUM_LAYERS,
+        attn_hidden_size=settings.LSTM_ATTN_HIDDEN_SIZE):
+        """Initialize LSTM.
+        """
+        super().__init__()
+
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True,
+            bidirectional=True,
+        )
+
+        self.attn = nn.Sequential(
+            nn.Linear(hidden_size*2, attn_hidden_size),
+            nn.ReLU(),
+            nn.Linear(attn_hidden_size, 1),
+        )
+
+        self.dropout = nn.Dropout()
+
+    @property
+    def out_dim(self):
+        return self.lstm.hidden_size * 4
+
+    def forward(self, x):
+        """Sort, pack, encode, reorder.
+
+        Args:
+            x (list<Tensor>): Variable-length embedding tensors.
+        """
+        sizes = list(map(len, x))
+
+        # Indexes to sort descending.
+        sort_idxs = np.argsort(sizes)[::-1]
+
+        # Indexes to restore original order.
+        unsort_idxs = torch.from_numpy(np.argsort(sort_idxs)).type(itype)
+
+        # Sort by size descending.
+        x = [x[i] for i in sort_idxs]
+
+        # Pad + pack, LSTM.
+        x = rnn.pack_sequence(x)
+        states, (hn, _) = self.lstm(x)
+
+        # TODO: Attention module.
+
+        states, sizes = rnn.pad_packed_sequence(states, batch_first=True)
+        states = [t[:size] for t, size in zip(states, sizes)]
+
+        attn = self.attn(torch.cat(states))
+
+        attn = [
+            F.softmax(scores.squeeze(), dim=0)
+            for scores in utils.group_by_sizes(attn, sizes)
+        ]
+
+        states_attn = torch.stack([
+            torch.sum(si * ai.view(-1, 1), 0)
+            for si, ai in zip(states, attn)
+        ])
+
+        # Cat forward + backward hidden layers.
+        x = torch.cat([hn[0,:,:], hn[1,:,:], states_attn], dim=1)
+        x = self.dropout(x)
+
+        return x[unsort_idxs]
+
+
 class Classifier(nn.Module):
 
     @classmethod
@@ -302,6 +376,9 @@ class Classifier(nn.Module):
 
         elif line_enc == 'cnn':
             self.encode_lines = LineEncoderCNN(self.embed_tokens.out_dim)
+
+        elif line_enc == 'lstm-attn':
+            self.encode_lines = LineEncoderLSTMAttn(self.embed_tokens.out_dim)
 
         self.merge = nn.Linear(self.encode_lines.out_dim, embed_dim)
 
