@@ -217,6 +217,10 @@ class TokenLSTM(nn.Module):
 
         Args:
             x (list<Tensor>): Variable-length embedding tensors.
+
+        Returns:
+            x (Tensor)
+            states (list<Tensor): LSTM states per input.
         """
         sizes = list(map(len, x))
 
@@ -286,10 +290,12 @@ class Attention(nn.Module):
             nn.Linear(hidden_size, 1),
         )
 
-    def forward(self, states, sizes):
+        self.out_dim = input_size
+
+    def forward(self, states):
         """Score states, regroup by seq, linearly combine states.
         """
-        states = [t[:size] for t, size in zip(states, sizes)]
+        sizes = list(map(len, states))
 
         attn = self.score(torch.cat(states))
 
@@ -308,25 +314,13 @@ class Attention(nn.Module):
 
 class LineEncoderLSTMAttn(nn.Module):
 
-    def __init__(self, input_size, hidden_size=settings.LSTM_HIDDEN_SIZE,
-        num_layers=settings.LSTM_NUM_LAYERS):
-        """Initialize LSTM.
+    def __init__(self, input_size):
+        """Initialize LSTM + attention.
         """
         super().__init__()
-
-        self.lstm = nn.LSTM(
-            input_size=input_size,
-            hidden_size=hidden_size,
-            num_layers=num_layers,
-            batch_first=True,
-            bidirectional=True,
-        )
-
-        self.attn = Attention(hidden_size*2)
-
-    @property
-    def out_dim(self):
-        return self.lstm.hidden_size * 4
+        self.lstm = TokenLSTM(input_size)
+        self.attn = Attention(self.lstm.out_dim)
+        self.out_dim = self.lstm.out_dim + self.attn.out_dim
 
     def forward(self, x):
         """Sort, pack, encode, reorder.
@@ -334,29 +328,13 @@ class LineEncoderLSTMAttn(nn.Module):
         Args:
             x (list<Tensor>): Variable-length embedding tensors.
         """
-        sizes = list(map(len, x))
+        x, states = self.lstm(x)
+        states_attn = self.attn(states)
 
-        # Indexes to sort descending.
-        sort_idxs = np.argsort(sizes)[::-1]
+        # Tops + state attn.
+        x = torch.cat([x, states_attn], dim=1)
 
-        # Indexes to restore original order.
-        unsort_idxs = torch.from_numpy(np.argsort(sort_idxs)).type(itype)
-
-        # Sort by size descending.
-        x = [x[i] for i in sort_idxs]
-
-        # Pad + pack, LSTM.
-        x = rnn.pack_sequence(x)
-        states, (hn, _) = self.lstm(x)
-
-        # Attend over LSTM states.
-        states, sizes = rnn.pad_packed_sequence(states, batch_first=True)
-        states_attn = self.attn(states, sizes)
-
-        # Cat forward + backward hidden layers.
-        x = torch.cat([hn[0,:,:], hn[1,:,:], states_attn], dim=1)
-
-        return x[unsort_idxs]
+        return x
 
 
 class Classifier(nn.Module):
