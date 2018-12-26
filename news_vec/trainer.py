@@ -34,8 +34,8 @@ class EarlyStoppingException(Exception):
 
 class Trainer:
 
-    def __init__(self, model, corpus, test_frac=0.1, es_wait=5, eval_every=None,
-        lr=1e-4, batch_size=50, model_kwargs=None):
+    def __init__(self, model, corpus, es_wait=5, eval_every=None,
+        lr=1e-4, batch_size=50):
 
         self.model = model
 
