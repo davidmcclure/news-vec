@@ -8,7 +8,7 @@ from cached_property import cached_property
 from torch import nn, optim
 from torch.utils.data import random_split
 
-from . import logger
+from . import logger, settings
 from .cuda import itype, ftype
 from .utils import ProgressDataLoader
 from .model import Classifier
@@ -34,8 +34,9 @@ class EarlyStoppingException(Exception):
 
 class Trainer:
 
-    def __init__(self, model, corpus, es_wait=5, eval_every=None,
-        lr=1e-4, batch_size=50):
+    def __init__(self, model, corpus, batch_size=settings.BATCH_SIZE,
+        lr=settings.LR, eval_every=settings.EVAL_EVERY,
+        es_wait=settings.ES_WAIT):
 
         self.model = model
 
