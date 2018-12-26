@@ -58,6 +58,16 @@ class HeadlineDataset(UserList):
             test_size=len(self.test),
         )
 
+    def to_df(self):
+        """Convert to DataFrame.
+        """
+        rows = []
+        for split in ('train', 'val', 'test'):
+            for hl, domain in getattr(self, split):
+                rows.append((hl['clf_tokens'], domain, split))
+
+        return pd.DataFrame(rows, columns=('tokens', 'domain', 'split'))
+
     def skim(self, n, *args, **kwargs):
         """Downsample to N pairs.
 
