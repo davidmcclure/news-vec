@@ -60,9 +60,19 @@ class Trainer:
         # Pairs trained since last eval.
         self.n_from_eval = 0
 
+    def log_config(self):
+
+        keys = ('model', 'loss_func', 'optimizer', 'batch_size',
+            'es_wait', 'eval_every')
+
+        for key in keys:
+            logger.info(f'CONFIG | {key}: \n{str(getattr(self, key))}')
+
     def train(self, max_epochs=100):
         """Train for N epochs.
         """
+        self.log_config()
+
         for epoch in range(max_epochs):
 
             # Listen for early stopping exception.
