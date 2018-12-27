@@ -50,7 +50,7 @@ def train(ds_path, line_enc, pred_root):
     logger.info('Test accuracy: %f' % preds.accuracy)
 
     if pred_root:
-        encoder = CorpusEncoder(dataset.train, model)
+        encoder = CorpusEncoder(dataset, model)
         encoder.write_fs(pred_root)
 
 

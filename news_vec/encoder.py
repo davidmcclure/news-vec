@@ -21,10 +21,10 @@ def write_fs(path, data):
 
 class CorpusEncoder:
 
-    def __init__(self, corpus, model, segment_size=1000, batch_size=100):
+    def __init__(self, ds, model, segment_size=1000, batch_size=100):
         """Wrap corpus + model.
         """
-        self.corpus = corpus
+        self.ds = ds
 
         self.model = model
         self.model.eval()
@@ -36,7 +36,7 @@ class CorpusEncoder:
         """Generate encoded lines + metadata.
         """
         loader = ProgressDataLoader(
-            self.corpus,
+            list(iter(self.ds)),
             collate_fn=self.model.collate_batch,
             batch_size=self.batch_size,
         )

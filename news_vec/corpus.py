@@ -34,11 +34,14 @@ class HeadlineDataset(UserList):
         test_size = round(len(pairs) * test_frac)
         train_size = len(pairs) - (test_size * 2)
 
+        # Set train/val/test.
         sizes = (train_size, test_size, test_size)
         self.train, self.val, self.test = random_split(pairs, sizes)
 
-    def __iter__(self):
-        return chain(self.train, self.val, self.test)
+        # Zip splits onto headlines.
+        for split in ('train', 'val', 'test'):
+            for hl, _ in getattr(self, split):
+                hl['split'] = split
 
     def __repr__(self):
 
@@ -50,6 +53,9 @@ class HeadlineDataset(UserList):
             val_size=len(self.val),
             test_size=len(self.test),
         )
+
+    def __iter__(self):
+        return chain(self.train, self.val, self.test)
 
     def skim(self, n, *args, **kwargs):
         """Downsample to N pairs.
