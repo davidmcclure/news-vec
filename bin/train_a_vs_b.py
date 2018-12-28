@@ -2,44 +2,30 @@
 
 import click
 
-from news_vec.model import Classifier
 from news_vec.corpus import Corpus, HeadlineDataset
-from news_vec.trainer import Trainer
+from news_vec.model import Classifier
 from news_vec.encoder import CorpusEncoder
+from news_vec.trainer import Trainer
 
 from news_vec import logger
 
 
-@click.group()
-def cli():
-    pass
-
-
-@cli.command()
+@click.command()
 @click.argument('headline_root', type=click.Path())
-@click.argument('out_path', type=click.Path())
+@click.argument('d1', type=str)
+@click.argument('d2', type=str)
+@click.option('--line_enc', type=str, default='lstm-attn')
 @click.option('--skim', type=int)
-def freeze_dataset(headline_root, out_path, skim):
+@click.option('--pred_root', type=click.Path())
+def main(headline_root, d1, d2, pred_root, skim, line_enc):
     """Bake off a fixed benchmarking dataset.
     """
     corpus = Corpus(headline_root)
 
-    dataset = HeadlineDataset.from_df(corpus.sample_all_vs_all())
+    dataset = HeadlineDataset.from_df(corpus.sample_ab(d1, d2))
 
     if skim:
         dataset = dataset.skim(skim)
-
-    dataset.save(out_path)
-
-
-@cli.command()
-@click.argument('ds_path', type=click.Path())
-@click.option('--line_enc', type=str, default='lstm-attn')
-@click.option('--pred_root', type=click.Path())
-def train(ds_path, line_enc, pred_root):
-    """Train all-vs-all.
-    """
-    dataset = HeadlineDataset.load(ds_path)
 
     model = Classifier.from_dataset(dataset, line_enc=line_enc)
 
@@ -55,4 +41,4 @@ def train(ds_path, line_enc, pred_root):
 
 
 if __name__ == '__main__':
-    cli()
+    main()
