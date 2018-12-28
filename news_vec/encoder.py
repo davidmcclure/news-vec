@@ -4,7 +4,13 @@ import os
 import shutil
 import pickle
 
+import pandas as pd
+import numpy as np
+
+from collections import OrderedDict
 from boltons.iterutils import chunked_iter
+from tqdm import tqdm
+from glob import glob
 
 from . import logger
 from .utils import ProgressDataLoader, tensor_to_np
@@ -78,3 +84,24 @@ class CorpusEncoder:
         for fname, data in self.segments_iter():
             path = os.path.join(root, fname)
             write_fs(path, data)
+
+
+def read_preds(root):
+    """Read line metadata + embeddings.
+    """
+    df_rows, embeds = [], []
+
+    for path in tqdm(glob(f'{root}*.p')):
+        with open(path, 'rb') as fh:
+            for row in pickle.load(fh):
+
+                embeds.append(row.pop('embedding'))
+
+                # Join tokens.
+                title = ' '.join(row.pop('tokens'))
+                df_rows.append(OrderedDict(title=title, **row))
+
+    df = pd.DataFrame(df_rows)
+    embeds = np.stack(embeds)
+
+    return df, embeds
