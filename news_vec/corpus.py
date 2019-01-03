@@ -117,31 +117,20 @@ class Corpus:
 
     @cached_property
     def min_db_count(self):
-        return self.df.groupby(['domain', 'ts_bucket']).size().min()
+        return self.df.groupby(['domain', 'window']).size().min()
 
     def sample_all_vs_all(self):
         return (self.df
-            .groupby(['domain', 'ts_bucket'])
+            .groupby(['domain', 'window'])
             .apply(lambda x: x.sample(self.min_db_count)))
 
     @lru_cache(None)
     def filter_ab(self, d1, d2):
         return (self.df
             [self.df.domain.isin([d1, d2])]
-            .groupby(['domain', 'ts_bucket']))
+            .groupby(['domain', 'window']))
 
     def sample_ab(self, d1, d2):
         return (self
             .filter_ab(d1, d2)
-            .apply(lambda x: x.sample(self.min_db_count)))
-
-    @lru_cache(None)
-    def filter_ab_ts(self, d1, d2, bucket):
-        return (self.df
-            [self.df.domain.isin([d1, d2])&(self.df.ts_bucket==bucket)]
-            .groupby('domain'))
-
-    def sample_ab_ts(self, d1, d2, bucket):
-        return (self
-            .filter_ab_ts(d1, d2, bucket)
             .apply(lambda x: x.sample(self.min_db_count)))
