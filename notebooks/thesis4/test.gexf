@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='utf-8'?>
+<gexf version="1.2" xmlns="http://www.gexf.net/1.2draft" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema-instance">
+  <graph defaultedgetype="undirected" mode="static" name="">
+    <meta>
+      <creator>NetworkX 2.2</creator>
+      <lastmodified>07/01/2019</lastmodified>
+    </meta>
+    <nodes>
+      <node id="bloomberg.com" label="bloomberg.com" />
+      <node id="buzzfeed.com" label="buzzfeed.com" />
+      <node id="cnn.com" label="cnn.com" />
+      <node id="huffingtonpost.com" label="huffingtonpost.com" />
+      <node id="foxnews.com" label="foxnews.com" />
+      <node id="apnews.com" label="apnews.com" />
+      <node id="dailycaller.com" label="dailycaller.com" />
+      <node id="msnbc.com" label="msnbc.com" />
+      <node id="washingtonpost.com" label="washingtonpost.com" />
+      <node id="npr.org" label="npr.org" />
+      <node id="wsj.com" label="wsj.com" />
+      <node id="dailykos.com" label="dailykos.com" />
+      <node id="nytimes.com" label="nytimes.com" />
+      <node id="breitbart.com" label="breitbart.com" />
+      <node id="thehill.com" label="thehill.com" />
+    </nodes>
+    <edges>
+      <edge id="0" source="bloomberg.com" target="buzzfeed.com" weight="3.502704951468207" />
+      <edge id="1" source="bloomberg.com" target="apnews.com" weight="5.261717085832413" />
+      <edge id="2" source="bloomberg.com" target="dailycaller.com" weight="4.1157559291737105" />
+      <edge id="3" source="bloomberg.com" target="breitbart.com" weight="5.364407465845838" />
+      <edge id="4" source="bloomberg.com" target="dailykos.com" weight="6.0450718793809965" />
+      <edge id="5" source="bloomberg.com" target="wsj.com" weight="5.6328317157745" />
+      <edge id="6" source="bloomberg.com" target="msnbc.com" weight="4.995533417539764" />
+      <edge id="7" source="bloomberg.com" target="foxnews.com" weight="3.1421456184110803" />
+      <edge id="8" source="bloomberg.com" target="cnn.com" weight="5.084430068536598" />
+      <edge id="9" source="bloomberg.com" target="washingtonpost.com" weight="5.330454494457394" />
+      <edge id="10" source="bloomberg.com" target="nytimes.com" weight="5.343594113909155" />
+      <edge id="11" source="bloomberg.com" target="thehill.com" weight="6.142613372263349" />
+      <edge id="12" source="bloomberg.com" target="huffingtonpost.com" weight="4.8187753318257736" />
+      <edge id="13" source="bloomberg.com" target="npr.org" weight="5.236994333143791" />
+      <edge id="14" source="buzzfeed.com" target="foxnews.com" weight="1.9536067326034026" />
+      <edge id="15" source="buzzfeed.com" target="npr.org" weight="3.3151618815014072" />
+      <edge id="16" source="buzzfeed.com" target="huffingtonpost.com" weight="0.9999999999999996" />
+      <edge id="17" source="buzzfeed.com" target="washingtonpost.com" weight="3.3514762168872467" />
+      <edge id="18" source="buzzfeed.com" target="dailycaller.com" weight="3.3011279202091037" />
+      <edge id="19" source="buzzfeed.com" target="breitbart.com" weight="2.755533258908607" />
+      <edge id="20" source="buzzfeed.com" target="msnbc.com" weight="4.032168371562628" />
+      <edge id="21" source="buzzfeed.com" target="nytimes.com" weight="4.3477900464189645" />
+      <edge id="22" source="buzzfeed.com" target="thehill.com" weight="4.347678914554236" />
+      <edge id="23" source="buzzfeed.com" target="dailykos.com" weight="5.100554017506579" />
+      <edge id="24" source="buzzfeed.com" target="wsj.com" weight="3.6740534723025493" />
+      <edge id="25" source="buzzfeed.com" target="cnn.com" weight="4.04590000970453" />
+      <edge id="26" source="buzzfeed.com" target="apnews.com" weight="2.7408955352469766" />
+      <edge id="27" source="cnn.com" target="huffingtonpost.com" weight="8.763686902102453" />
+      <edge id="28" source="cnn.com" target="breitbart.com" weight="4.708162342440179" />
+      <edge id="29" source="cnn.com" target="foxnews.com" weight="2.512620205407825" />
+      <edge id="30" source="cnn.com" target="dailykos.com" weight="8.644922965732349" />
+      <edge id="31" source="cnn.com" target="nytimes.com" weight="6.449625335294449" />
+      <edge id="32" source="cnn.com" target="washingtonpost.com" weight="7.2006103779949395" />
+      <edge id="33" source="cnn.com" target="npr.org" weight="6.543210468689704" />
+      <edge id="34" source="cnn.com" target="msnbc.com" weight="6.070294459055997" />
+      <edge id="35" source="cnn.com" target="apnews.com" weight="4.031088007986148" />
+      <edge id="36" source="cnn.com" target="dailycaller.com" weight="5.094455334101864" />
+      <edge id="37" source="cnn.com" target="wsj.com" weight="4.161255658797432" />
+      <edge id="38" source="cnn.com" target="thehill.com" weight="7.145878429758465" />
+      <edge id="39" source="huffingtonpost.com" target="dailycaller.com" weight="7.3913311421096575" />
+      <edge id="40" source="huffingtonpost.com" target="npr.org" weight="5.138430351369604" />
+      <edge id="41" source="huffingtonpost.com" target="apnews.com" weight="7.236920412389432" />
+      <edge id="42" source="huffingtonpost.com" target="washingtonpost.com" weight="5.459958478578214" />
+      <edge id="43" source="huffingtonpost.com" target="thehill.com" weight="10.0" />
+      <edge id="44" source="huffingtonpost.com" target="nytimes.com" weight="4.917065788318497" />
+      <edge id="45" source="huffingtonpost.com" target="foxnews.com" weight="6.204335162493075" />
+      <edge id="46" source="huffingtonpost.com" target="msnbc.com" weight="6.9374622137654" />
+      <edge id="47" source="huffingtonpost.com" target="dailykos.com" weight="9.13635080245777" />
+      <edge id="48" source="huffingtonpost.com" target="breitbart.com" weight="6.535408657001298" />
+      <edge id="49" source="huffingtonpost.com" target="wsj.com" weight="4.3774554430425505" />
+      <edge id="50" source="foxnews.com" target="dailycaller.com" weight="3.332997489847468" />
+      <edge id="51" source="foxnews.com" target="thehill.com" weight="5.840923023648117" />
+      <edge id="52" source="foxnews.com" target="wsj.com" weight="2.0006088178440025" />
+      <edge id="53" source="foxnews.com" target="apnews.com" weight="2.7622730042331187" />
+      <edge id="54" source="foxnews.com" target="npr.org" weight="3.278037743772394" />
+      <edge id="55" source="foxnews.com" target="washingtonpost.com" weight="2.4560203092442383" />
+      <edge id="56" source="foxnews.com" target="breitbart.com" weight="3.0306212796976033" />
+      <edge id="57" source="foxnews.com" target="dailykos.com" weight="5.220950558618252" />
+      <edge id="58" source="foxnews.com" target="msnbc.com" weight="4.241989468754886" />
+      <edge id="59" source="foxnews.com" target="nytimes.com" weight="2.975530252810608" />
+      <edge id="60" source="apnews.com" target="dailycaller.com" weight="3.7603550469315707" />
+      <edge id="61" source="apnews.com" target="wsj.com" weight="3.681536886083051" />
+      <edge id="62" source="apnews.com" target="npr.org" weight="4.778123163937597" />
+      <edge id="63" source="apnews.com" target="msnbc.com" weight="5.843468141424053" />
+      <edge id="64" source="apnews.com" target="dailykos.com" weight="6.656884573619873" />
+      <edge id="65" source="apnews.com" target="breitbart.com" weight="5.4078472528839985" />
+      <edge id="66" source="apnews.com" target="thehill.com" weight="8.06175317174574" />
+      <edge id="67" source="apnews.com" target="nytimes.com" weight="3.5584189958605625" />
+      <edge id="68" source="apnews.com" target="washingtonpost.com" weight="3.550915315954266" />
+      <edge id="69" source="dailycaller.com" target="washingtonpost.com" weight="4.31755626784203" />
+      <edge id="70" source="dailycaller.com" target="nytimes.com" weight="5.303690929196329" />
+      <edge id="71" source="dailycaller.com" target="npr.org" weight="4.696006696714825" />
+      <edge id="72" source="dailycaller.com" target="breitbart.com" weight="3.3289695563773707" />
+      <edge id="73" source="dailycaller.com" target="dailykos.com" weight="6.147230976693466" />
+      <edge id="74" source="dailycaller.com" target="thehill.com" weight="6.078836800892911" />
+      <edge id="75" source="dailycaller.com" target="wsj.com" weight="3.5814792053298574" />
+      <edge id="76" source="dailycaller.com" target="msnbc.com" weight="4.862537780306601" />
+      <edge id="77" source="msnbc.com" target="washingtonpost.com" weight="5.972757268365089" />
+      <edge id="78" source="msnbc.com" target="wsj.com" weight="4.4110836038829095" />
+      <edge id="79" source="msnbc.com" target="breitbart.com" weight="4.612762180766049" />
+      <edge id="80" source="msnbc.com" target="dailykos.com" weight="6.922637410430566" />
+      <edge id="81" source="msnbc.com" target="nytimes.com" weight="5.603900287517459" />
+      <edge id="82" source="msnbc.com" target="thehill.com" weight="4.634576520762111" />
+      <edge id="83" source="msnbc.com" target="npr.org" weight="5.125239387229456" />
+      <edge id="84" source="washingtonpost.com" target="nytimes.com" weight="6.568153273808543" />
+      <edge id="85" source="washingtonpost.com" target="wsj.com" weight="5.0708181899512645" />
+      <edge id="86" source="washingtonpost.com" target="dailykos.com" weight="8.009123881325035" />
+      <edge id="87" source="washingtonpost.com" target="breitbart.com" weight="3.9627526376140008" />
+      <edge id="88" source="washingtonpost.com" target="npr.org" weight="4.968167321607335" />
+      <edge id="89" source="washingtonpost.com" target="thehill.com" weight="7.2852075900899855" />
+      <edge id="90" source="npr.org" target="wsj.com" weight="5.094252355899663" />
+      <edge id="91" source="npr.org" target="breitbart.com" weight="5.068775325870122" />
+      <edge id="92" source="npr.org" target="dailykos.com" weight="7.862296901217402" />
+      <edge id="93" source="npr.org" target="nytimes.com" weight="5.031111518308842" />
+      <edge id="94" source="npr.org" target="thehill.com" weight="7.478514977765406" />
+      <edge id="95" source="wsj.com" target="dailykos.com" weight="6.208029882851526" />
+      <edge id="96" source="wsj.com" target="breitbart.com" weight="4.275602732717215" />
+      <edge id="97" source="wsj.com" target="nytimes.com" weight="5.131841338826055" />
+      <edge id="98" source="wsj.com" target="thehill.com" weight="5.91985431866604" />
+      <edge id="99" source="dailykos.com" target="breitbart.com" weight="5.4249155864115925" />
+      <edge id="100" source="dailykos.com" target="nytimes.com" weight="7.982812196625925" />
+      <edge id="101" source="dailykos.com" target="thehill.com" weight="8.516073795532582" />
+      <edge id="102" source="nytimes.com" target="thehill.com" weight="7.205410956748274" />
+      <edge id="103" source="nytimes.com" target="breitbart.com" weight="4.696023863857483" />
+      <edge id="104" source="breitbart.com" target="thehill.com" weight="6.547722585257736" />
+    </edges>
+  </graph>
+</gexf>

@@ -28,6 +28,10 @@ textblob = "*"
 cached-property = "*"
 "flake8" = "*"
 "psycopg2-binary" = "*"
+pygraphviz = "*"
+python-igraph = "*"
+pycairo = "*"
+cairocffi = "*"
 
 [dev-packages]
 
