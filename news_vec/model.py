@@ -282,29 +282,31 @@ class Attention(nn.Module):
         self.score = nn.Sequential(
             nn.Linear(input_size, hidden_size),
             nn.ReLU(),
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
             nn.Linear(hidden_size, 1),
         )
 
         self.out_dim = input_size
 
-    def forward(self, states):
-        """Score states, regroup by seq, linearly combine states.
+    def forward(self, xs):
+        """Score embeddings, regroup by seq, linearly combine states.
         """
-        sizes = list(map(len, states))
+        sizes = list(map(len, xs))
 
-        attn = self.score(torch.cat(states))
+        attn = self.score(torch.cat(xs))
 
         attn = [
             F.softmax(scores.squeeze(), dim=0)
             for scores in utils.group_by_sizes(attn, sizes)
         ]
 
-        states_attn = torch.stack([
-            torch.sum(si * ai.view(-1, 1), 0)
-            for si, ai in zip(states, attn)
+        xs_attn = torch.stack([
+            torch.sum(xi * ai.view(-1, 1), 0)
+            for xi, ai in zip(xs, attn)
         ])
 
-        return states_attn
+        return xs_attn
 
 
 class LineEncoderLSTM_Attn(nn.Module):
@@ -384,6 +386,9 @@ class Classifier(nn.Module):
 
         if line_enc == 'cbow':
             self.encode_lines = LineEncoderCBOW(token_dim)
+
+        elif line_enc == 'attn':
+            self.encode_lines = Attention(token_dim)
 
         elif line_enc == 'lstm':
             self.encode_lines = LineEncoderLSTM(token_dim)
