@@ -95,7 +95,7 @@ Of course, there are also some downsides to the filter provided by Twitter, whic
 
 ## 8 million users, 73 million links, 1 million headlines
 
-What's the broader context for these headlines on Twitter? Over the course of the last two years, Cortico, a non-profit affiliated with the Laboratory for Social Machines, has archived a complete copy of the Decahose. In this study, we analyze data in a 625-day window running from January 1, 2017 through September 17, 2018. Over that period, the Decahose feed emitted 22,095,201,428 total tweets. Of these, 5,568,773,434 (25.2%) include at least one link.
+What's the broader context for these headlines on Twitter? Over the course of the last two years, Cortico, a non-profit affiliated with the Laboratory for Social Machines, has archived a complete copy of the Decahose. In this study, we analyze data in a 625-day window running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 22,095,201,428 total tweets. Of these, 5,568,773,434 (25.2%) include at least one link.
 
 <img src="figures/decahose-tweet-link-vol.png" />
 
