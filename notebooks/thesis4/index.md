@@ -93,17 +93,17 @@ And, last but not least -- headlines on Twitter are directly associated with uni
 
 Of course, there are also some downsides to the filter provided by Twitter, which, in a number of well-documented ways, is idiosyncratic and non-representative of broader patterns of media consumption. There's a tradeoff -- from Twitter we get a very consistent and very "deep" sample of news production and consumption; but at the cost of it being not terribly "wide."
 
-## 8 million users, 73 million links, 1 million headlines
+## 5.6 billion links
 
 What's the broader context for these headlines on Twitter? Over the course of the last two years, Cortico, a non-profit affiliated with the Laboratory for Social Machines, has archived a complete copy of the Decahose. In this study, we analyze data in a 625-day window running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 22,095,201,428 total tweets. Of these, 5,568,773,434 (25.2%) include at least one link.
 
 <img src="figures/decahose-tweet-link-vol.png" />
 
-Where do these links point to? As an first step, we can parse the raw URL strings into component parts -- protocol, subdomain, registered domain, path, etc -- and then count the total number of links to each registered domain; Here are the 100 most frequently-occurring domains from the Decahose:
+Where do these links point to? As an first step, we can parse the raw URL strings into component parts (protocol, subdomain, registered domain, path, etc.) and then count the total number of links to each registered domain. Here are the 100 most frequently-occurring domains from the Decahose, before any filtering is applied:
 
 [t100 domains]
 
-A majority of these, of course, don't represent "news" sources in a meaningful sense. Though of course, this isn't always clear-cut -- for example, links to Facebook might often point to content from news organizations that has been shared on Facebook. But, bracketing this, and just operating at the level of individual media brands -- if we take the 2,000 domains with overall largest link counts and then manually annotate this list, we can pull out a "long list" of ~90 major media organizations. Of course, the selection criteria here are subjective; here, we took all outlets that produce general-interest or political news and meet a minimum standard of name recognition; but not specialized outlets that focus on topics other than politics -- ESPN, TechCrunch, etc. Here are these 90, ranked here by the total number of links:
+A majority of these, of course, don't represent "news" sources in a meaningful sense. Though, this isn't always clear-cut -- for example, links to Facebook might often point to content from news organizations that has been shared on Facebook. But, bracketing this, and just operating at the level of individual media brands -- if we take the 2,000 domains with overall largest link counts and then manually annotate this list, we can pull out a "long list" of ~90 major media organizations. Of course, the selection criteria here are subjective; here, we took all outlets that produce general-interest or political news and meet a minimum standard of name recognition; but not specialized outlets that focus on topics other than politics -- ESPN, TechCrunch, etc. Here are these 90, ranked here by the total number of links:
 
 [top 90, links]
 
@@ -115,7 +115,7 @@ Grouping links on these three pieces of information, we can count the number of 
 
 [top 90, articles]
 
-Beyond these rolled-up link and article counts, we can also easily get a high-level sense of how the footprint of different outlets on Twitter has evolved over the 2-year data window. Using the `postedTime` timestamps on each tweet, we can group links from an outlet by day, for instance, and look at the historical volume trend. For NYT:
+Beyond these rolled-up link and article counts, we can also easily get a high-level sense of how the footprint of different outlets on Twitter has evolved over the 2-year data window. Using the `postedTime` timestamps on each tweet, we can group links from an outlet by day, for instance, and look at the historical volume trend. For The New York Times:
 
 <img src="figures/nyt-links-per-day.png" />
 
