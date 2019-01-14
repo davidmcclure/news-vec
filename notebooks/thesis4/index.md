@@ -97,7 +97,7 @@ Of course, there are also some downsides to the filter provided by Twitter, whic
 
 What's the broader context for these headlines on Twitter? Over the course of the last two years, Cortico, a non-profit affiliated with the Laboratory for Social Machines, has archived a complete copy of the Decahose. In this study, we analyze data in a XX-day window running from January 1, 2017 through XX, 2018. Over that period, the Decahose feed emitted XX total tweets. Of these, XX (XX%) include at least one link.
 
-[ts volume, all tweets and link tweets]
+<img src="figures/decahose-tweet-link-vol.png" />
 
 Where do these links point to? As an first step, we can parse the raw URL strings into component parts -- protocol, subdomain, registered domain, path, etc -- and then count the total number of links to each registered domain; Here are the 100 most frequently-occurring domains from the Decahose:
 
