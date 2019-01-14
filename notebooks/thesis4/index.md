@@ -121,13 +121,13 @@ Beyond these rolled-up link and article counts, we can also easily get a high-le
 
 Or, rollup up links by article, the total number of unique NYT articles that appeared by day:
 
-<img src="figures/nyt-articles-per-day.png" width="800" />
+<img src="figures/nyt-articles-per-day.png" />
 
 Finally, digging deeper into the metadata provided by Twitter -- for each tweet, we also have information about the user account that posted the tweet, including the follower count of the user at the time the tweet was posted. This is very useful information, since follower counts vary significantly -- a link posted from an account with 1M followers will have vastly more reach than a link posted from an account with 100 followers. In a crude sense, we can use the follower count of the user account as a proxy for "impressions," the total number of times that the tweet was seen by individual twitter users. (Of course, this isn't literally true -- when a user posts a tweet, the percentage of her followers who actually see it is probably fairly low, since many of them won't be logged on, etc. But, if we assume that this percentage is roughly similar across the platform, the follower count can give a (relative) signal of the real-world "reach" of the tweet.)
 
 Taking the total impressions produced by all tweets with links to The New York Times, and grouping by day:
 
-<img src="figures/nyt-imp-per-day.png" width="800" />
+<img src="figures/nyt-imp-per-day.png" />
 
 From this, we can then easily tabulate the historical frequency trends for all 90 outlets in the initial cut:
 
