@@ -117,7 +117,7 @@ Grouping links on these three pieces of information, we can count the number of 
 
 Beyond these rolled-up link and article counts, we can also easily get a high-level sense of how the footprint of different outlets on Twitter has evolved over the 2-year data window. Using the `postedTime` timestamps on each tweet, we can group links from an outlet by day, for instance, and look at the historical volume trend. For NYT:
 
-[NYT links per day]
+<img src="figures/nyt-links-per-day.png" width="800" />
 
 Or, rollup up links by article, the total number of unique NYT articles that appeared by day:
 
