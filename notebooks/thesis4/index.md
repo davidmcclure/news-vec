@@ -428,11 +428,11 @@ There seem to be fairly large differences, in other words, in what might be thou
 
 How to be more precise about this? One simple way to measure this is just to look at the *distribution over pairwise cosine distances* for each outlet. At an intuitive level -- if we randomly select two headlines from CNN -- how far apart would we expect them to be? And, how does this compare to the typical distance for The New York Times, Breitbart, BuzzFeed, and so on? Here, we randomly sample (with replacement) 1 million pairs from each outlet, and then build up the distributions over the set of cosine distances between each pair:
 
-<img src="figures/pwd-hist.png" width="600" />
+<img src="figures/pwd-hist.png" width="800" />
 
 Or, broken out vertically by outlet:
 
-<img src="figures/pwd-violins.png" width="600" />
+<img src="figures/pwd-violins.png" width="500" />
 
 We can see differences, then, along two axes. First, the modal ("center") value of these distributions varies significantly across the 15 outlets -- smallest for BuzzFeed, at ~0.3, and largest for CNN, at just shy of 0.9. Other very "narrow" or "focused" outlets include Bloomberg and the Daily Kos, which seem fairly intuitive (Bloomberg focuses on business and financial reporting; Daily Kos on left-leaning political coverage); But also, more surprising, AP which is the fourth most-focused outlet. (the reasons for this become clear below, when digging into the internal geometry of the embeddings for each outlet -- essentially, AP stories broadly cluster into two groups, (international) sports coverage and domestic political coverage.)
 
