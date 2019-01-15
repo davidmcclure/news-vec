@@ -135,17 +135,15 @@ Taking the total impressions produced by all tweets with links to The New York T
 
 <img src="figures/nyt-imp-per-day.png" />
 
-From this, we can tabulate the historical frequency trends for all 87 outlets in the initial cut:
+Some of which, interestingly, show very significant changes over the 2-year data window. Modeling this as a linear trend, here are the 10 domains with the most significant decreases, in terms of links, articles, and impressions:
 
-[per-day imp, all 90]
+<img src="figures/vol-dec.png" />
 
-Some of which, interestingly, show very significant changes over the 2-year data window. Modeling this as a linear trend:
+So, the number of unique articles from Huffington Post, on a per-day basis, has fallen by more than 50%. In the other direction, domains with the strongest increases in volume:
 
-[10 most increasing]
+<img src="figures/vol-inc.png" />
 
-So big upticks for Hannity.com, TruePundit, GatewayPunt; all of which are (far) right-leaning outlets. The most decreasing:
-
-[10 most decreasing]
+Which has a striking partisan tilt: all of the four domains at the top of the three lists -- `hannity.com`, `truepundit.com`, `judicialwatch.com`, `thefederalist.com` -- represent (far) right-leaning political perspectives.
 
 Of course, we don't really care about the "performance" of the headlines per-se -- our focus here is on the structure or "shape" of relationships among outlets, in terms of the actual content of what's being published and the audiences who are distributing it. But, these overall volume trends have important methodological implications, especially for the historical questions that emerge in the second half of the project. For example, if we're interested in exploring changes in relative similarity between outlets over time, it's clear that we need to explicitly standardize for these changes in volume, to prevent them from getting artificially proxied by other measurements. (For example, if we use classification accuracy as a signal for similarity -- if there are 50% fewer articles from The Huffington Post in the summer of 2018 than in the spring of 2017, this will inherently drive down the performance of a classifier trained on the raw data, since the model will see fewer training examples for 2018 than for 2017; even though the actual coverage itself might not have changed at all, just the quantity.)
 
