@@ -565,7 +565,7 @@ Indeed, looking more closely at the number of links posted by each user, we can 
 
 To make sure that these two extremes -- "undersampled" accounts that only appear a handful of times, and "oversampled" accounts that are incredibly prolific -- aren't skewing the correlations in problematic ways, we can calculate a second set of correlations for each pair of outlets, but this time just considering users who appear between 10 and 100 times in the dataset. Here, the same set of 3 correlation metrics:
 
-[filtered user corrs]
+<img src="figures/user-graph-bars-10-100.png" width="400" />
 
 Like with the headlines, the idea here is to pull out a "grid" of measurements using different techniques and hyperparameters, to be sure that we don't over-interpret a noisy or idiosyncratic result from a single type of measurement. Here, all six scores for each outlet pair:
 
