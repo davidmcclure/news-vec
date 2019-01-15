@@ -95,9 +95,13 @@ Of course, there are also some downsides to the filter provided by Twitter, whic
 
 ## 5.6 billion links
 
-What's the broader context for these headlines on Twitter? Over the course of the last two years, Cortico, a non-profit affiliated with the Laboratory for Social Machines, has archived a complete copy of the Decahose. In this study, we analyze data in a 625-day window running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 22,095,201,428 total tweets. Of these, 5,568,773,434 (25.2%) include at least one link.
+What's the broader context for these headlines on Twitter? Over the course of the last two years, Cortico, a non-profit affiliated with the Laboratory for Social Machines, has archived a complete copy of the Decahose. In this study, we analyze data in a 625-day window running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 21,219,935,342 total tweets. Of these, 5,243,960,217 (24.7%) include at least one link.
 
 <img src="figures/decahose-tweet-link-vol.png" />
+
+Though, interestingly, this ratio has actually fallen over time -- breaking out just the links, we can see that the volume has actually declined by ~40% over this time period, falling from ~10M per day at the beginning of 2017 to ~6M in fall of 2018, even while the overall tweet volume has stayed mostly constant:
+
+<img src="figures/decahose-link-vol.png" />
 
 Where do these links point to? As an first step, we can parse the raw URL strings into component parts (protocol, subdomain, registered domain, path, etc.) and then count the total number of links to each registered domain. Here are the 100 most frequently-occurring domains from the Decahose, before any filtering is applied:
 
