@@ -245,59 +245,80 @@ Where, on some labels, the model is almost perfect -- 100% precision for The Dai
 
 To get a sense of which features are doing the heavy lifting, we can skim off ngrams with strongest chi-squared statistic for each outlet:
 
-- **breitbart.com** - `delingpole :`, `illegal`, `delingpole`, `:`, `islamic`, `illegal aliens`, `amnesty`, `: '`, `report :`, `cartel`, `|`, `'`, `' |`, `' | breitbart`, `' -`, `' - breitbart`, `-`, `| breitbart`, `- breitbart`, `breitbart`
+- **breitbart.com** - delingpole :, illegal, delingpole, :, islamic, illegal aliens, amnesty, : ', report :, cartel, |, ', ' |, ' | breitbart, ' -, ' - breitbart, -, | breitbart, - breitbart, breitbart
 
-- **cnn.com** - `to know before`, `the bell`, `know before the`, `trump - cnn`, `fast facts`, `: live updates`, `before the bell`, `premarket`, `premarket :`, `- cnn.com`, `cnn.com`, `? -`, `? - cnn`, `' - cnn`, `-`, `video`, `cnn`, `cnn video`, `- cnn video`, `- cnn`
+- **cnn.com** - to know before, the bell, know before the, trump - cnn, fast facts, : live updates, before the bell, premarket, premarket :, - cnn.com, cnn.com, ? -, ? - cnn, ' - cnn, -, video, cnn, cnn video, - cnn video, - cnn
 
-- **nytimes.com** - `review`, `evening briefing`, `, dies`, `california today :`, `california today`, `recipe`, `n.f.l.`, `|`, `today :`, `nyc this week`, `g.o.p.`, `nyc this`, `in nyc this`, `opinion | the`, `review : '`, `briefing`, `review :`, `: your`, `opinion`, `opinion |`
+- **nytimes.com** - review, evening briefing, , dies, california today :, california today, recipe, n.f.l., |, today :, nyc this week, g.o.p., nyc this, in nyc this, opinion | the, review : ', briefing, review :, : your, opinion, opinion |
 
-- **bloomberg.com** - `start your`, `billion`, `know to`, `stocks`, `to know to`, `to start your`, `know to start`, `start your day`, `five things you`, `said to`, `markets`, `oil`, `wrap`, ` `, `: markets`, `: markets wrap`, `markets wrap`, `brexit`, `u.k.`
+- **bloomberg.com** - start your, billion, know to, stocks, to know to, to start your, know to start, start your day, five things you, said to, markets, oil, wrap,  , : markets, : markets wrap, markets wrap, brexit, u.k.
 
-- **dailycaller.com** - `? via dailycaller`, `caller`, `- the daily`, `daily caller`, `the daily caller`, `' [ video`, `' [`, `' via`, `' via dailycaller`, `video ] via`, `video ]`, `[ video ]`, `[ video`, `] via dailycaller`, `] via`, `]`, `[`, `via`, `via dailycaller`, `dailycaller`
+- **dailycaller.com** - ? via dailycaller, caller, - the daily, daily caller, the daily caller, ' [ video, ' [, ' via, ' via dailycaller, video ] via, video ], [ video ], [ video, ] via dailycaller, ] via, ], [, via, via dailycaller, dailycaller
 
-- **apnews.com** - `check : trump`, `police :`, `us`, `things to know`, `apnewsbreak`, `apnewsbreak :`, `latest : trump`, `ap fact`, `ap fact check`, `for today`, `know for today`, `10 things`, `10 things to`, `know for`, `to know for`, `ap`, `latest`, `the latest`, `the latest :`, `latest :`
+- **apnews.com** - check : trump, police :, us, things to know, apnewsbreak, apnewsbreak :, latest : trump, ap fact, ap fact check, for today, know for today, 10 things, 10 things to, know for, to know for, ap, latest, the latest, the latest :, latest :
 
-- **buzzfeed.com** - `are`, `that 'll`, `people are`, `19`, `make you`, `your`, `you ?`, `tell you`, `'ll tell you`, `'ll tell`, `are you ?`, `we 'll tell`, `are you`, `we 'll`, `which`, `'ll`, `and we`, `and we 'll`, `you`, `"`
+- **buzzfeed.com** - are, that 'll, people are, 19, make you, your, you ?, tell you, 'll tell you, 'll tell, are you ?, we 'll tell, are you, we 'll, which, 'll, and we, and we 'll, you, "
 
-- **washingtonpost.com** - `opinion | the`, `review |`, `| why`, `202`, `202 :`, `| trump 's`, `d.c.`, `analysis | trump`, `opinion | trump`, `analysis | the`, `| trump`, `.`, `| the`, `perspective`, `opinion`, `perspective |`, `opinion |`, `analysis`, `|`, `analysis |`
+- **washingtonpost.com** - opinion | the, review |, | why, 202, 202 :, | trump 's, d.c., analysis | trump, opinion | trump, analysis | the, | trump, ., | the, perspective, opinion, perspective |, opinion |, analysis, |, analysis |
 
-- **huffingtonpost.com** - `funniest`, `tips for`, `your`, `colbert`, `trans`, `'s morning email`, `via`, `parents this week`, `via dailycaller`, `dailycaller`, `morning email :`, `tweets from parents`, `from parents this`, `parents this`, `morning email`, `ways`, `funniest tweets`, `lgbtq`, `funniest tweets from`, `marketing`
+- **huffingtonpost.com** - funniest, tips for, your, colbert, trans, 's morning email, via, parents this week, via dailycaller, dailycaller, morning email :, tweets from parents, from parents this, parents this, morning email, ways, funniest tweets, lgbtq, funniest tweets from, marketing
 
-- **foxnews.com** - `via dailycaller`, `dailycaller`, `news first :`, `, cops`, `, officials say`, `what to know`, `watters`, `eric shawn`, `gutfeld on`, `tucker`, `police say`, `, report`, `, police`, `tucker :`, `gutfeld :`, `, police say`, `report says`, `hannity :`, `, report says`, `gutfeld`
+- **foxnews.com** - via dailycaller, dailycaller, news first :, , cops, , officials say, what to know, watters, eric shawn, gutfeld on, tucker, police say, , report, , police, tucker :, gutfeld :, , police say, report says, hannity :, , report says, gutfeld
 
-- **wsj.com** - `wsj`, `growth`, `the morning download`, `morning download`, `morning download :`, `download :`, `risk report :`, `the morning risk`, `morning risk report`, `risk report`, `morning risk`, `paid program`, `' review :`, `eurozone`, `china`, `'`, `investors`, `the morning`, `fed`, `u.s.`
+- **wsj.com** - wsj, growth, the morning download, morning download, morning download :, download :, risk report :, the morning risk, morning risk report, risk report, morning risk, paid program, ' review :, eurozone, china, ', investors, the morning, fed, u.s.
 
-- **npr.org** - `on mountain stage`, `mountain stage`, `stories :`, `top stories :`, `top stories`, `listen :`, `first listen :`, `first listen`, `npr`, `on world`, `cafe`, `on world cafe`, `world cafe`, `listen`, `now :`, `listen now`, `🔊`, `listen now :`, `🔊 listen now`, `🔊 listen`
+- **npr.org** - on mountain stage, mountain stage, stories :, top stories :, top stories, listen :, first listen :, first listen, npr, on world, cafe, on world cafe, world cafe, listen, now :, listen now, 🔊, listen now :, 🔊 listen now, 🔊 listen
 
-- **msnbc.com** - `mini`, `...`, `'s campaign round`, `campaign round`, `campaign round up`, `round up ,`, `joe :`, `report ,`, `'s mini`, `mini report`, `'s mini report`, `mini report ,`, `lawrence`, `lawrence :`, `mueller`, `trump`, `matthews`, `matthews :`, `fmr .`, `fmr`
+- **msnbc.com** - mini, ..., 's campaign round, campaign round, campaign round up, round up ,, joe :, report ,, 's mini, mini report, 's mini report, mini report ,, lawrence, lawrence :, mueller, trump, matthews, matthews :, fmr ., fmr
 
-- **thehill.com** - `: trump`, `dem lawmaker`, `gop senator`, `'`, `senator :`, `:`, `trump :`, `dem senator`, `dem :`, `gop lawmaker`, `the memo :`, `trump`, `poll`, `healthcare`, `poll :`, `gop`, `dems`, `report`, `dem`, `: report`
+- **thehill.com** - : trump, dem lawmaker, gop senator, ', senator :, :, trump :, dem senator, dem :, gop lawmaker, the memo :, trump, poll, healthcare, poll :, gop, dems, report, dem, : report
 
-- **dailykos.com** - `kos elections live`, `thread for night`, `for night owls`, `owls`, `open thread for`, `thread for`, `night owls`, `cartoon :`, `kos elections`, `daily kos elections`, `pundit`, `thread`, `abbreviated pundit`, `open thread`, `abbreviated`, `trumpcare`, `digest :`, `digest`, `daily kos`, `kos`
+- **dailykos.com** - kos elections live, thread for night, for night owls, owls, open thread for, thread for, night owls, cartoon :, kos elections, daily kos elections, pundit, thread, abbreviated pundit, open thread, abbreviated, trumpcare, digest :, digest, daily kos, kos
 
-Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any connection with the content or style of the headline in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" before or after the headline that literally just identify the outlet:
+Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any meaningful connection to the substance of the headline, in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" that literally just identify the outlet:
 
-[AP Breaking, CNN Video, via @dailycaller]
+- Cost of war on Syrian children 's mental health **- CNN Video**
+- **APNewsBreak :** US yanks funds from unbuilt windmill farm
+- Trump Just Named Five New Possible Supreme Court Nominees **Via dailycaller**
+- **WSJ :** Trump ignored advice to confront Putin over indictments
 
-Or, more indirect, but still often high discriminating, it seems -- some outlets add prefixes or suffixes to headlines that mark the category or "vertical" that the article originates from. For example, The Washington Post often prefixes headlines with strings like "OPINION | ..." or "ANALYSIS | ..." Or, similarly, a number of outlets have independently branded "blogs" or "series" that publish headlines that always include the name of the series. For instance, for a period of time Bloomberg published a daily stock-tips column called "The Daily Prophet":
+Or, more indirect -- some outlets add prefixes or suffixes to headlines that mark the "category" or "vertical" that the article belongs to:
 
-[opinion, daily prophet hls]
+- **OPINION |** Trump 's strategic incoherence is a recipe for war
+- **ANALYSIS :** Michael Wolff Makes the Argument for Removing Trump Under 25th Amendment
 
-Here, the outlet isn't directly identified, but, if only WaPo uses these prefixes (or if WaPo uses them much more frequently than anyone else), and if they appear on hundreds or thousands of headlines, then the model is able to make a classification decision just on the basis of what is essentially a formatting detail. Of course -- the classifier can't be blamed for this. Its only objective is to minimize the cross-entropy loss over the output distribution. But from an interpretive standpoint, to the extent that we want to use the classifier as a modeling paradigm, as a means to the end of inducing intellectually useful representations of the content -- this is bad, since it essentially lets the model off the hook from having to produce a good representation of the "meaning" of the headline.
+Or, similarly, a number of outlets have independently named "blogs" or "series." Eg, the Perspective from WaPo, the Morning Risk Report from WSJ:
 
-We're in the funny position, then, of essentially wanting to make the model *less accurate but more interesting* -- we need to snip out these "giveaway" features, and force the model to only operate on the substance of the headline.
+- **Perspective |** What Google and Facebook must do about one of their biggest problems
+- **The Morning Risk Report :** Huawei Looks to Avoid ZTE 's Fate
 
-It's worth noting, though, that beyond clear-cut cases like "CNN Video," there's also a longer tail of more subtle textual features that might be thought of as elements of "house style," for lack of a better phrase -- a set of stylistic "ticks" that tend to mark particular outlets, but (debatably) don't really contribute in a meaningful way to the substance of the headline. Fox, for example, produces a large number of headlines that include very short quotations -- often just a single word -- wrapped inside of quotation marks and inlined directly into the middle of an otherwise normal headline. Eg, things like:
+Author names can also an issue, if they get systematically included with headlines. Eg, Breitbart has a habit of writing headlines of the format `[NAME]: ...`. For example, James Deligpole shows up in about 100 headlines:
 
-[quote HLs]
+- **Delingpole :** Trump Pulls out of Paris; Internet Shrieks that End Is Nigh
+- **Delingpole :** When Comedians Stop Being Funny
 
-(Which, incidentally, is exactly the kind of pattern that a strong, character-level neural model is very good at learning, which in turn can have a significant effect on the final representation produced by the encoder.)
+With these, the outlet isn't directly identified, but, if the bigram `Perspective |` appears hundreds of times, but only ever in WaPo headlines, then the model is able to make a classification decision just on the basis of what is essentially a formatting detail. Of course -- the classifier can't be blamed for this. Its only objective is to minimize the cross-entropy loss over the output distribution. But from an interpretive standpoint, to the extent that we want to use the classifier as a modeling paradigm, as a means to the end of inducing intellectually useful representations of the content -- this is bad, since it essentially lets the model off the hook from having to produce a good representation of the "meaning" of the headline.
 
-Is this "meaningful"? arguably not really, since the quotation is very small, and deployed as a kind of functional part of an otherwise regular headline written by a reporter or editor at Fox. But, at the same time, a human reader might find meaning in this. For example -- an argument could be made that the presence of the quotes changes the "positioning" of the headline in a meaningful way -- by including the direct quote, the journalist somewhat disassociates herself from the phrasing of the quote; the quote holds the headline at arms length, in a sense; ownership is shifted away from the headline writer and towards the person being quoted.
+We're in the funny position, then, of essentially wanting to make the model less accurate but more interesting -- we need to snip out these "giveaway" features, and force the model to only operate on the substance of the headline.
 
-Another hard case: a handful of outlets sometimes use a distinctive lexicon of slang words -- namely Breitbart, which often uses "dems" instead of "democrats" and "libs" instead of "liberals." Here, again, if only Breitbart does this, a strong model will identify these tokens as highly differentiating features, and perhaps cause it to focus on them at the expense of more general information about the content of the headline. But in this case, these words seem meaningful; "libs," especially, has an independent existence outside of Breitbart and carries a very particular set of (negative) connotations. In theory we could unroll it into "liberal"; but this feels fairly invasive, and would arguably irons out information that could be meaningful to a human reader.
+It's worth noting, though, that beyond clear-cut cases like `- CNN Video`, there's also a longer tail of more subtle textual features that might be thought of as elements of "house style," for lack of a better phrase -- a set of stylistic "ticks" that tend to mark particular outlets, but (debatably) don't really contribute in a meaningful way to the substance of the headline. Fox, for example, produces a number of headlines that include very short quotations -- often just a single word -- wrapped inside of quotation marks and inlined directly into the middle of an otherwise normal headline. Eg, things like:
 
-So -- how to preprocess the headlines? For the purposes of this study, we decide to err in the direction of removing too much information instead of too little. The idea, essentially, is to pull out the longest unbroken "sentence" from the headline -- a sequence of words that don't contain any kind of non-standard separator character, like "|" or ":" -- and then aggressively remove differences at the level of punctuation, capitalization, for formatting. Specifically:
+- Police say remains are **'consistent'** with missing Iowa boy
+- Pakistani airline investigates **'extra passengers'** flown on fully booked plane
+- **'Lost'** asteroid the size of the Statue of Liberty to buzz by Earth Tuesday
+
+(This kind of pattern, incidentally, is precisely the kind of pattern that a strong, character-level neural model is very good at learning, which in turn can have a significant effect on the final representation produced by the encoder.)
+
+Are the quotes meaningful? Arguably not really, since they're generally being used as a functional part of an otherwise regular headline written by a reporter or editor at Fox. But, this is debatable. For example -- an argument could be made that the presence of the quotes changes the "positioning" of the headline -- by including the quote, the journalist somewhat disassociates herself from the phrasing of the quote. The quote holds the headline at arms length, in a sense; ownership is shifted away from the headline writer and towards the person being quoted.
+
+Another hard case: a handful of outlets sometimes use a distinctive lexicon of slang words -- for example, The Hill, which often uses "dem" instead of "democrat."
+
+- GOP sees omens of a **Dem** wave in Wisconsin
+- House **Dem** calls for bipartisan talks to fund children's health care
+
+In theory we could unroll "dem" into "democrat," and hide the difference from the model. But, this feels iffy -- "dem," arguably, carries a certain attitude that "democrat" doesn't -- it implies a kind of professional perspective on politics, and inside-the-beltway sophistication.
+
+So -- how to clean the headlines? For the purposes of this study, we err in the direction of removing too much information instead of too little. The idea, essentially, is to pull out the longest unbroken "sentence" from the headline -- a sequence of words that don't contain any kind of non-standard separator character, like "|" or ":" -- and then aggressively remove differences at the level of punctuation, capitalization, for formatting. Specifically:
 
 1. Standardize non-ASCII characters like curly quotes and em-dashes, to ensure consistent tokenization.
 
@@ -307,13 +328,25 @@ So -- how to preprocess the headlines? For the purposes of this study, we decide
 
 1. Clean the tokens - downcase, strip punctuation. Keep `$`, but replace `[0-9]+` digits with a single `#` character, since different outlets have different conventions for how numbers are reported / formatted.
 
-This produces a highly standardized representation of each headline that basically consists of a stream of ASCII lexemes. For example:
+This produces a highly standardized representation of each headline that basically consists of a stream of ASCII lexemes. For example, using some examples from before, with the original headline first, cleaned tokens second:
 
-[example cleaned hls]
+```
+Cost of war on Syrian children 's mental health - CNN Video
+cost of war on syrian children s mental health
 
-As a check that we're not missing anything -- we can train a fresh model on the cleaned data and look at the set of headlines where the model is extremely confident in the correct label. If there are any "giveaway" features that have slipped through the cleaning process, they should show up here -- circularly, we can use the model to audit the success of the process of making the task harder for the model. Here, we've trained an LSTM on the cleaned headlines, and then, for each headline in the test set, we take the *probability mass assigned to the correct class* by the model. So, if this is 1, then the model was positive (and correct) about which outlet produced the headline. Here's the overall distribution over these "p-true" values:
+Delingpole : Trump Pulls out of Paris ; Internet Shrieks that End Is Nigh
+trump pulls out of paris internet shrieks that end is nigh
 
-[ptrue]
+Police say remains are ' consistent ' with missing Iowa boy
+police say remains are consistent with missing iowa boy
+
+Perspective | What Google and Facebook must do about one of their biggest problems
+what google and facebook must do about one of their biggest problems
+```
+
+As a check that we're not missing anything -- we can train a new model on the cleaned data and look at the set of headlines where the model is extremely confident in the correct label. If there are any "giveaway" features that have slipped through the cleaning process, they should show up here -- circularly, we can use the model to audit the success of the process of making the task harder for the model. Here, we've trained an LSTM on the cleaned headlines, and then, for each headline in the test set, we take the *probability mass assigned to the correct class* by the model. So, if this is 1, then the model was positive (and correct) about which outlet produced the headline. Here's the overall distribution over these "p-true" values on the test set:
+
+<img src="figures/ptrue-all.png" />
 
 So, the area of interest is the spike on the right-hand side, cases where the model is very confident in the right answer. We can simply skim off headlines from each outlet where the model assigns over 90% of the probability mass to the true class, and then examine these for each domain:
 
