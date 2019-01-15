@@ -708,14 +708,133 @@ From this, a number of clear trends start to fall out. First, there seems to be 
 
 This makes it easier to reason about the full structure of all 120 pairwise accuracy changes, but, there's still one piece of information missing here. We're being somewhat imprecise, really, when we say that outlets are "converging" or "diverging," which implies that both are moving towards or away from each other. When really, the edges here are *undirected* -- all they tell us is that, for example, The Huffington Post and The Hill are harder for the classifier to tell apart in fall of 2018 than in spring of 2017. But, this doesn't us anything about the relative degree to which each outlet has changed of the change -- has Huffington Post moved towards the The Hill, or vice versa? Or, a bit of both? In theory, any combination is possible.
 
-- we can make educated guesses about this from the structure of the undirected graph. eg, if Fox becomes easier to differentiate from all other outlets, seems unlikely that each of these other outlets would have individually shifted away from Fox, more likely that Fox is actively drifting off into a more isolated linguistic space.
-- how to check this?
-- this makes it possible to infer direction on the changes:
-- [radial graph, directed]
-- so, dipping down to the level of actual headlines, what's actually going on here? what's the substance of these shifts?
-- Fox - move towards sensational, tabloid-esque, crime and (white) identity politics stories
-- HuffPo / DK / Hill - convergence of political reporting (?)
-- HuffPo / BuzzFeed - HuffPo abandons listicle / "guide" articles, moves towards political reporting; BuzzFeed massive shift towards listicles.
+**TODO**: Show direction on graph edges, by comparing size of mean embedding shift.
+
+So, the classifiers tell us that these shifts in proximity have taken place. But, what do they actually consist of? If BuzzFeed and Fox are significantly more recognizable to the models in the fall of 2018 than in winter of 2017 -- what's changed?
+
+This is a big question, and there are a few of ways we could start to block in different views on an answer. We could treat it as a purely descriptive corpus-linguistic question, and find words or phrases that rise or fall most significantly over the time period. Or, we could just take the headlines from winter of 2017 where the model is most confident in the correct class -- the most "distinctive" headlines -- and compare to the most distinctive headlines in fall of 2018.
+
+For example, for BuzzFeed -- here are the 10 headlines from the first 10 temporal windows that look most BuzzFeed-y to the model:
+
+```
+19 Weird AF Tumblr Questions That Actually Kinda Make Sense
+Which Cinderella Character Are You ?
+16 Times Tumblr Was Fucking Funny About History
+Which Celesbian Is Your Soulmate ?
+Which Legion Character Are You ?
+Literally Just 100 Hilarious Memes About Disney
+Which " Shadowhunters " Character Are You ?
+Which Potato Food Are You ?
+Literally Just 22 Memes That 'll Make Any Australian Crack The Fuck Up
+31 Period Jokes That Are Just Really Fucking Funny
+```
+
+And, from the last 10 windows:
+
+```
+Which Underrated Disney Character Are You ?
+Which " SpongeBob " Meme Are You ?
+Which " Friends " Character Are You ?
+Which Marvel Movie Character Are You ?
+Which Zodiac Goddess Are You ?
+19 Times Tumblr Was Fucking Funny About Periods
+Which Iconic Teen Movie Character Are You ?
+Which " Stranger Things " Character Are You Actually ?
+Which ACOTAR Character Are You ?
+33 Ridiculously Cute Products That Will 100 % Melt Your Heart
+```
+
+So -- all clickbait, pretty much, maybe with a bit more preference for the "Which ..." format in 2018. But, this might not actually be what we care about, in this setting. It's possible, for example, that there's a core body of very BuzzFeed-specific content that hasn't changed much over the last two years -- but that there could be significant changes in the content that sits "below" this, which wouldn't show up here.
+
+To get at this -- let's turn back to the embeddings learned by the neural models, and find the headlines that most specifically mark the difference -- in a literal, geometric sense -- between headlines at the beginning and end of the time period. We can do this -- take the embeddings for all BuzzFeed headlines in the first 10 windows, and take the dimension-wise mean; and then do the same for headlines in the last 10 windows. This gives two group-level averages. Then, if we subtract the first-10 average from the last-10 average, we get a "delta" vector that represents the aggregate movement in the vector space between the two groups. Then, we can find headlines that have the lowest angular distance from this delta vector -- the headlines, in a sense, that most precisely "typify" the group-level differences between the two time periods.
+
+Here are headlines closest to `(buzzfeed 2018) - (buzzfeed 2017)` -- things that are most typical of the end of the time window:
+
+```
+Build An Over The Top Skillet Cookie And We 'll Reveal Which Foodie Job You Should Have
+Cast And Create A Drama Movie In Six Steps And We 'll Tell You Its Score On Rotten Tomatoes
+Pick Your First Day Of School Outfit And We 'll Tell You If You 're A Freshman , Sophomore , Junior , Or Senior
+Pick Some Colored Shirts And We 'll Reveal Which " The Breakfast Club " Character You 're Most Like
+Design Your Dream Home And We 'll Tell You Which Character In " Gilmore Girls " You Are
+Answer These Five Questions And We 'll Tell You Which Shrek Character You Are In Bed
+Which " To All The Boys I 've Loved Before " And " Mamma Mia ! " Character Are You A Combo Of ?
+Describe Your Instagram Habits And We 'll Tell You What Type Of Camp Counselor You Are
+Make A Break Up Playlist And We 'll Tell You Which Marvel Superhero You 're Most Compatible With
+Dress Head To Toe In Urban Outfitters And We 'll Reveal Which " Riverdale " Character You Are
+```
+
+So, still clickbait, but a more particular type, of the form "[Do a quiz], and [we'll tell you something about yourself]." Going in the other direction, though, gives a clearer sense of the overall shift. Here's `(buzzfeed 2017) - (buzzfeed 2018)`, things that mark the beginning of the corpus as compared to the end:
+
+```
+Koch Network Focuses On Understanding Trump Voters
+Trump Moves To Challenge Vaccine Science
+Trump Vineyard Seeks More Foreign Workers
+Uber Defends Charging Customers 500 % More For Cars During Tube Strike
+Trump Stands By Past Support For Universal Health Care
+You 're Stuck With Gogo : Government Reverses Plan For Cell Service On Planes
+Activists Prepare To Battle Trump Over Immigrants ' Use Of Public Benefits
+Before The Gold Rush : The Legendary Decorator Who Tried ( And Failed ) To Make Trump Tower Tasteful
+Company Tied To Trump Campaign Once Pushed For Voter Suppression
+Trump Begins Rolling Back Major Obama Water Pollution Rule
+```
+
+So -- in aggregate, BuzzFeed's ratio of political-coverage-to-listicles has gone down; it seems as if the sudden surge in distinguishability in the summer of 2018 is caused by the quizzes, or other similar articles.
+
+What about Fox? Moving in chronological order, this time -- here are the 20 headlines that mark Fox in winter of 2017 relative to fall of 2018:
+
+```
+Alpha by day , beta by night : How to make love last
+White House ' Skype ' seats to debut on Wednesday
+Has science lost its way ?
+Donald Trump plans to undo Dodd Frank law , fiduciary rule
+Blind Gamer Wins ' Street Fighter ' Match
+ADB : Asian growth seen steady , US policy uncertainty a risk
+Tech Q&A : Dealing with Facebook blowhards
+Spain arrests Russian hacker sought by US
+SoftBank quarterly profit soars on investment empire
+Coal mining goes high tech
+Inspector general to review pullback of HealthCare.gov ads
+Trump policy dims hope for refugees in Indonesian limbo
+Trump Starts Over With Tax Plan : Report
+Court rules in favor of worker in gig economy lawsuit
+US challenge in Syria : Keep allies from fighting one another
+Teaching young Americans about money
+Evacuations from Syrian water rich region completed
+US launches airstrikes in Syria
+McMullin faces big election debt amid talk about run for Chaffetz seat
+Trump taps Neil Gorsuch to fill Supreme Court vacancy
+```
+
+Quite a bit of general political news -- often with an economic angle -- and international stories. In the other direction -- stories that mark 2018, compared to 2017:
+
+```
+How ' The View ' star Joy Behar went from teacher to comic to liberal pundit Trump supporters love to hate
+Albanian man reportedly kills 8 relatives over stolen turkeys , sends Facebook message to prime minister before arrest
+Missouri nun busted at Sydney airport for smuggling cocaine inside high heels , officials say
+ICE rips California county for scrapping contract to house detainees , says move could backfire
+4 climbers , including 2 Boy Scouts , found alive after going missing while hiking Mount Baker in Washington
+California school district 's ' permissive ' dress code welcoming tube tops , ripped jeans and pajamas sparks debate
+North Carolina woman claims she nearly lost leg after contracting serious infection from pedicure
+Dramatic video shows moment Florida cop saves little girl from hot car after she was trapped inside for 12 hours
+Lena Dunham poses in underwear while giving her support of Cynthia Nixon for NY governor
+Peter Strzok , FBI agent pulled from Mueller probe over anti Trump texts , reportedly open to testify to Congress
+Democrats gain entry to NJ immigration detention center after arguing with cops , ' literally banging on the door '
+Sports Illustrated Swimsuit model Hunter McGrady recalls the moment she accepted her ' God given body '
+Stevie Nicks survived abusive relationship with former bandmate Lindsey Buckingham , crippling drug addiction , book claims
+American Airlines flight makes emergency landing after passengers say ' flames ' came out of engine
+Woman claims ' marriage scam ' tricked her into marrying complete stranger during mock wedding
+MSNBC 's Joy Reid threatened colleague with violence , was homophobic during her radio days , ex bosses say
+Cincinnati police release bodycam footage of cop firing through window , gunning down mass shooter at bank
+Off duty police officer , mom hailed as hero for taking out would be robber at Mother 's Day event near school
+Press barred from event where Samantha Bee apologizes for ' unfiltered ' slam on Ivanka Trump while accepting ' social change ' award
+NBC News ' ' self described unbiased journalist ' Andrea Mitchell slammed for siding with Eagles over Trump
+```
+
+Which is a very distinctive list -- for lack of a better word, it's a sort of "tabloid" style, focusing on crime (often grisly, bizarre), personal misfortune (marriage scams, Stevie Nicks' drug addiction), and socially charged political issues (siding with the NFL over Trump).
+
+This suggests, then, that the "departure" of Fox -- its monotonic rise in distinctiveness, the shift away from almost all other outlets -- is driven by a subtle shift in the "genre" coverage -- away from down-the-middle political and business reporting, in the direction of something like the National Enquirer.
+
+<img src="figures/ts-ova-fox.png" />
 
 ## Shifting headlines, shifting audience?
 
