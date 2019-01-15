@@ -719,16 +719,29 @@ This makes it easier to reason about the full structure of all 120 pairwise accu
 
 ## Shifting headlines, shifting audience?
 
-- We've found, then, that the "content graph" and "audience graph," treated as synchronic systems, generally tend to align, though with some notable exceptions. And, from studying historical changes in controlled comparisons of classification accuracies across the full graph of outlets, we have identified pairs and cohorts of outlets that migrated into different linguistic configurations over time -- convergence of HuffPo / DK / Hill; HuffPo shifting away from BuzzFeed; Fox away from almost literally everything else. the "content graph," then, is a dynamic system; the overall view we got in section XX is a kind of synchronic blending of a system that looks different, in subtle but significant ways, in fall of 2018 vs winter 2017.
+We've found, then, that the "content graph" and "audience graph," treated as synchronic systems, generally tend to align, though with some notable exceptions. And, from studying historical changes in accuracies across the full graph of outlets, we have identified pairs and cohorts of outlets that migrated into different linguistic configurations over time -- HuffPo / DK / Hill have converged; HuffPo is shifting away from BuzzFeed; Fox is moving away from almost everything else. The "content graph," then, is a dynamic system; the overall view we got in section XX is a kind of synchronic blending of a system that looks different, in subtle but significant ways, in fall of 2018 versus winter 2017.
 
-- But, this suggests one final question question. in section XX, we asked -- does the (synchronic) content graph align with the (synchronic) audience graph? mostly yes. but -- does this also hold for the diachronic content graph and diachronic audience graph? That is -- as outlets become more or less different, does this correlate with parallel changes in the composition of their audiences? eg, as Fox moves away from BB, do their audiences become less similar? as HuffPo moves towards the Hill, do the audiences converge? though the question of causality here is complex, and beyond the scope of this project, by examining temporal correlations between these two systems we can start to block in context of a larger and more applied set of questions about the degree to which changes at the level of language can drive "depolarizing" changes at the level of audience.
+But, this suggests one final question question. In section XX, we asked -- does the (synchronic) content graph align with the (synchronic) audience graph? Mostly, it seems that it does. But -- does this also hold for the *diachronic* content graph and *diachronic* audience graph? That is -- as outlets become more or less different, does this correlate with parallel changes in the composition of their audiences? For example, as Fox headlines move away from Breitbart headlines, do their audiences also become less similar? Or, as HuffPo moves towards The Hill, do the audiences converge? Though the question of causality here is complex, and beyond the scope of this project, by examining temporal correlations between these two systems we can start to block in context of a larger and more applied set of questions about the degree to which changes at the level of language can drive "depolarizing" changes at the level of audience.
 
-In the same way we can unroll the headline graph over historical time, we can also model diachronic changes in audience similarity in the same way. Using the same set of temporal windows over the data, we simply calculate the audience correlations over each pair of outlets in each window. This gives a time-series trend for the correlation of each pair of outlets, which we can then directly compare to changes in the headline similarities.
+Methodologically, this is fairly straightforward. In the same way we can unroll the headline graph over historical time, we can also model diachronic changes in audience similarity in the same way. Using the same set of temporal windows over the data, we simply calculate the audience correlations over each pair of outlets in each window. This gives a time-series trend for the correlation of each pair of outlets, which we can then directly compare to changes in the headline similarities.
 
-The results are interestingly mixed. Sometimes, content and audience have a strong positive correlation. Eg, Bloomberg / Fox, or HuffPo / MSNBC:
+The results are interestingly mixed. In some cases, movements in content / audience appear to be very tightly correlated. For example, for Fox and Bloomberg, they have moved in almost perfect lockstep over the last two years -- as the headlines have become less similar, the audience has also become less similar:
 
-[corrs]
+xxx
 
-But, other times, they have a very strong negative correlation, and move in almost exactly inverse patterns -- high headline similarity, low audience similarity; and vice versa.
+But, in other cases, there appears to be a strong *negative* correlation. For example, again with Fox -- headlines from Fox and Breitbart have become steadily less similar, but the audience correlation has consistently increased over this time:
 
-[corrs]
+xxx
+
+Indeed, these are actually the two strongest overall relationships -- the full set of 105 pairs distribute fairly evenly between these extremes, with about half positive and half negative:
+
+xxx
+
+And, zooming in on a larger set of the strongest pairs in each direction:
+
+xxx
+xxx
+
+This is a bit mysterious, and in many ways it generates more questions that it answers. At a very speculative level, though -- maybe this implies that different combinations of news sources have different levels of "fungibility" or "substitutability" with each other? Which, in turn, could be related to whether the relationship between an outlet and (some part of) its audience is based on the content itself -- in a kind of transactional sense -- or on the outlet as a kind of proxy for something more broad, and not just a source of information -- a political perspective, a community, a worldview, etc.
+
+For example, with Fox and Bloomberg, we might guess that both outlets are producing some type of coverage (maybe financial news?) that has a kind of "elasticity" in the news ecosystem -- there's a cohort of readers want this type of coverage, but don't care very much where it comes from. So if both Fox and Bloomberg produce this content, this audience cohort is happy to read / share articles from either source. But, with Fox and Breibart -- it's not so much about the coverage that they actually produce, and more about what they represent, in some sense?
