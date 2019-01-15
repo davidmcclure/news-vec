@@ -603,7 +603,7 @@ So, for NYT -- overall, an alignment between content and audience, though with a
 
 <img src="figures/nyt-corr-dist.png" />
 
-So, a modal value of ~0.4, though with some meaningful variation. (This is where all of the different measurements of similarity come in handy -- by aggregating over all of them, we can get a much more densely-sampled view on these relationships.) We can then do this for each of the 15 outlets, and compare these distributions over correlations, which surfaces some very significant differences:
+So, a modal value of ~0.4, though with quite a bit of variation. (This is where all of the different measurements of similarity come in handy -- by aggregating over all of them, we can get a much more densely-sampled view on these relationships.) We can then do this for each of the 15 outlets, and compare these distributions over correlations, which surfaces some very significant differences:
 
 <img src="figures/ca-corr.png" />
 
