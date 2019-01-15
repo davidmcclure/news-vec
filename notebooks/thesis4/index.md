@@ -402,13 +402,13 @@ Interestingly, though, this varies significantly for individual outlets. Here, t
 
 <img src="figures/ptrue-multiples.png" />
 
-Where, we can see two basic groups. Bloomberg, BuzzFeed, and Daily Kos all have a spike of very easily-identifiable headlines where the model put ~100% of its weight on the correct answer:
+Where, we can see two basic groups. Bloomberg, BuzzFeed, and Daily Kos all have a spike of very easily-identifiable headlines where the model put ~100% of its weight on the correct answer. BuzzFeed is the huge outlier -- the model is completely positive a majority of the time.
 
-[ptrue for Bloomberg, BuzzFeed, DK]
+<img src="figures/ptrue-buzzfeed.png" />
 
-With BuzzFeed as the huge outlier, where the model is completely positive a majority of the time. To get a sense of what these headlines actually are, we can query out the 10 headlines for each where the model gave the highest weight to the true label:
+To get a sense of what these headlines actually are, we can query out the 10 headlines for each where the model gave the highest weight to the true label:
 
-[top 10s]
+**TODO**: Top 10s
 
 Whereas, by contrast, for CNN -- the model almost never gives more than 0.5 weight to the true label. There are almost no headlines, in other words, that are *obviously* from CNN, in the eyes of the model.
 
