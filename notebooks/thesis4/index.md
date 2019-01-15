@@ -456,7 +456,7 @@ Just eyeballing things on the UMAP projection -- some outlets clearly seem to oc
 
 <img src="figures/wsj-bloomberg.png" />
 
-How to add precision to this? How to extract a "score" from the behavior of the classifiers?
+How to add precision to this? How can we convert the behavior of the classifiers into a single "score"?
 
 Maybe the simplest and most natural way to model similarity, in a predictive setting, is just to look at the confusion matrix -- that is, for each permutation of outlets A and B, the number of headlines from A that the model incorrectly assigns to B. The higher this number, the more "confusable" the two outlets. Using test-set predictions from strong neural model from before:
 
