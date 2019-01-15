@@ -508,7 +508,7 @@ For example, using the linear SVC, the stronger of the two non-neural baselines 
 
 These per-pair scores can simply be averaged, to get a set of 120 scores, which can then be scaled to zero-mean-unit-variance and plugged in with the previously developed scores:
 
-[grouped bars]
+**TODO**: [A-B accuracies with confusion counts + probability corrs, grouped bars]
 
 (With the classification accuracies, to make them comparable with the confusion counts and mass correlations, we simply flip the signs on the scaled scores, since a high accuracy corresponds to low similarity.)
 
@@ -519,13 +519,13 @@ So, what does the full set of available metrics look like? There's a kind of com
 - Confusion counts and probability correlations (Pearson, Spearman, Kendall-Tau) for the three major neural architectures -- LSTM, CNN, and CBOW.
 - Confusion counts and classification accuracies from pairwise SVC and logistic models.
 
-Which gives a total of 16 different representations of headline similarity for each pair of outlets. Then, joining all of these together and applying standard scaling, we can represent the similarity between each pair of outlets as a collection over these X independently calculated scores:
+Which gives a total of 16 different representations of headline similarity for each pair of outlets. Then, joining all of these together and applying standard scaling, we can represent the similarity between each pair of outlets as a collection over these 16 independently calculated scores:
 
-[grouped bars, all pairs and metrics]
+<img src="figures/hl-graph-bars-all-metrics.png" width="200" />
 
 And, averaging over the metrics, and converting into a literal graph -- here, for visual clarity, collapsing the bidirectional edges into a single undirected edge, averaging over the two scores:
 
-[radial graph, averaged metrics]
+<img src="figures/hl-graph-radial-all-metrics.png" />
 
 So -- WSJ / Bloomberg take the cake for the single strongest link, followed by HuffPo / Buzzfeed, Daily Caller / Breitbart, MSNBC / The Hill, and NYT / NPR.
 
@@ -546,7 +546,7 @@ Measuring similarity between the outlets at the level of the headlines was relat
 
 And, unlike with the headlines, where we had to do quite a lot of work before we could say that a headline from outlet A is "confusable" for a headline from B -- with the social graph on Twitter, users have literal multiple-membership relationships with the different outlets, baked natively into the raw data. A single user can be unambiguously associated with more than one outlet -- by tweeting a link, following an account, etc -- whereas, with the headlines, a single headline only ever belongs to a single outlet, and we needed to infer similarity from scratch via the classifiers.
 
-Again, there are various ways to do this, but we stick with something simple -- we simply calculate correlations in link counts at the level of individual users. So, for example, if user A has tweeted 10 links to NYT, 8 to NPR, and 3 to HuffPo, we'd represent this with a vector like:
+Again, there are various ways to do this, but we stick with something simple -- simply calculate correlations in link counts at the level of individual users. So, for example, if user A has tweeted 10 links to NYT, 8 to NPR, and 3 to HuffPo, we'd represent this with a vector like:
 
 [vector]
 
