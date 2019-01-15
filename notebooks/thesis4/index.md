@@ -344,23 +344,19 @@ Perspective | What Google and Facebook must do about one of their biggest proble
 what google and facebook must do about one of their biggest problems
 ```
 
-As a check that we're not missing anything -- we can train a new model on the cleaned data and look at the set of headlines where the model is extremely confident in the correct label. If there are any "giveaway" features that have slipped through the cleaning process, they should show up here -- circularly, we can use the model to audit the success of the process of making the task harder for the model. Here, we've trained an LSTM on the cleaned headlines, and then, for each headline in the test set, we take the *probability mass assigned to the correct class* by the model. So, if this is 1, then the model was positive (and correct) about which outlet produced the headline. Here's the overall distribution over these "p-true" values on the test set:
-
-<img src="figures/ptrue-all.png" />
-
-So, the area of interest is the spike on the right-hand side, cases where the model is very confident in the right answer. We can simply skim off headlines from each outlet where the model assigns over 90% of the probability mass to the true class, and then examine these for each domain:
-
-[UMAP of 90+, example lists]
-
-So -- from BuzzFeed, lots of listicles; from Breitbart, lots of "israel," "hamas," and "cartel"; from Bloomberg, lots of "CEOs," "markets," "trading"; etc. The important point, though, is that all of these are *real*, in the sense that we don't see any kind of artificial text outside of the headline that is driving the classification decision -- it's simply the case, apparently, that only Bloomberg would ever produce a headline about "iron ore," and so on and so forth. These are the most extreme cases, in a sense, of the substantive differences that we want to model -- the place where "paratext" gives way to just text.
-
 ### (Cleaned) differentiability
 
 Now that we've scrubbed out these "giveaway" features, which would otherwise give a distorted sense of the distinctiveness of the headlines -- let's return to the basic question of how "learnable" the relationship is between headlines and outlets.
 
 As a first experiment, we train each of the seven architectures on the same class-balanced subset of headlines, breaking the corpus into 80/10/10% train/dev/test splits. For the logistic regression and SVC, the dev set is ignored, and the model is simply fit on the training split and evaluated on test. For the neural models, we evaluate the performance on the dev set after every 100,000 training pairs, and implement an early-stopping rule that stops the training run when the loss on the dev set fails to improve over a 5-step window. The models achieve these accuracies, over 15 classes:
 
-[accs, all 7]
+- LSTM: 38.55%
+- LSTM + attention: 38.33%
+- LSTM + CNN: 38.31%
+- Linear SVC: 36.57%
+- Logistic regression: 35.46%
+- CNN: 35.09%
+- CBOW: 31.56%
 
 So, even after aggressively scrubbing out the paratext, the models are able to learn a large amount of structure across the 15 outlets -- a random baseline here would get 7%. The strongest model turns out to be the vanilla LSTM -- nothing is gained by the attention network or convolutions over the states. (Which isn't particularly surprising here, since the the headlines are relatively short -- about 8 words on average -- and these kinds of additions tend to help most with longer sequences.)
 
@@ -394,17 +390,19 @@ washingtonpost.com       0.36      0.26      0.30      1838
 
 Why? What does this correspond to, in the underlying content? Before we tackle the question of *proximity* between outlets -- trying to assign precise measurements for the degree to which outlets are similar and different, which will open the door to the comparison with the underlying audience graph -- how to get a birds-eye view of what the content from different outlets actually consists of? If we imagine that the 18k headlines from each outlet constitute a kind of linguistic "footprint" or "signature" -- how can we characterize these footprints? What do they consist of, how are they organized, how do they differ from outlet to outlet? How to "read" 200k headlines, without actually reading 200k headlines?
 
-Before we try to quantify the differences -- how to first just describe them?
-
 ## Mapping the "shape" of the headline space
 
-Digging a bit deeper into the differences in "distinctiveness" that seem to rise to the surface in the F1 scores -- to get a better view of this, one very simple way to characterize the "shape" of each outlet is to look at the weights that the model assigns to the correct label for the headlines in each outlet -- just like we did before, when evaluating the effectiveness of the preprocessing steps. But this time, instead of looking at everything rolled together, we break out separate distributions for each outlet -- which, it turns out, are different in interesting ways.
+Digging a bit deeper into the differences in "distinctiveness" that seem to rise to the surface in the F1 scores -- to get a better view of this, one very simple way to characterize the "shape" of each outlet is to look at the *distribution over the weights that the model assigns to the correct class*. So, for a given headline, if the true label is `wsj.com`, we just record the probability mass that the model put on `wsj.com`; and then plot out the distribution over these weights. Here's what this looks like for the whole test set, with everything rolled together:
 
-For example, for CNN -- we just take all headlines from CNN in the test set and record the weight that the model assigned to the (correct) `cnn.com` label for each of these. Then, we can plot the distribution over these masses, which effectively gives a view of the degree to which the model "committed" to the correct label when presented with headlines from CNN. On the right side of the axis, near 1.0, the model threw all its weight behind the correct answer; On the left side, the model allocated most of the available weight to other (incorrect) outlets. So, in these histograms, weight on the right-hand side means that the outlet is highly "distinctive" and easy for the model to identify; weight on the left side means that the outlet is hard to pick out.
+<img src="figures/ptrue-all.png" />
 
-[ptrue for all]
+This gives a view of the degree to which the model "committed" to the correct answer, essentially. To put this in context -- if the model were perfect, and always put 100% of its mass on the right label, we'd just see a single vertical bar at 1.0. So, in the modal case, the model just doesn't really know, and spreads an even ~0.06 of weight on each of the 15 classes. But, we can think of all of the mass to the right of 0.06 as representing meaningful structure learned by the classifier.
 
-Two different basic profiles pop out. Bloomberg, BuzzFeed, and Daily Kos all have a spike of very easily-identifiable headlines where the model put ~100% of its weight on the correct answer:
+Interestingly, though, this varies significantly for individual outlets. Here, the same data, but faceted out for each label:
+
+<img src="figures/ptrue-multiples.png" />
+
+Where, we can see two basic groups. Bloomberg, BuzzFeed, and Daily Kos all have a spike of very easily-identifiable headlines where the model put ~100% of its weight on the correct answer:
 
 [ptrue for Bloomberg, BuzzFeed, DK]
 
