@@ -595,7 +595,7 @@ With these two sets of similarities in place, we can now simply ask -- to what e
 
 To make the comparison clearer, we can stack the two sets of weights on top of each other. Here, the headline similarity metrics for each (NYT, other) pair are rolled together into the blue bars, and the audience similarities are averaged into the orange bar. Then, we sort by headline similarity:
 
-<img src="figures/ca-nytimes-composite.png" />
+<img src="figures/ca-nytimes-composite.png" width="600" />
 
 Which makes it possible to see the overall level of alignment between the two sets of weights. Generally, the correlation between headlines and audience is fairly tight; though, we can see a couple of places where this breaks down. Namely, NYT has very low headline overlap with The Hill -- in fact, the *lowest* out of all 14 of the other outlets -- but a relatively high overlap at the level of audience. Also notable is the fairly large disconnect with NPR -- NYT is closer-than-average to NPR for both content and audience, but by a significantly larger margin for audience than for content -- NYT headlines "sound" very similar to NPR headlines; but the audience correlation is just a bit above average for the NYT.
 
@@ -609,19 +609,19 @@ So, a modal value of ~0.4, though with quite a bit of variation. (This is where 
 
 So -- Bloomberg, Breitbart, and WSJ occupy very similar "locations" in the headline and audience graphs -- when Bloomberg "sounds like" another outlet, it generally also has a very high level of audience overlap with the outlet. To get a sense of what this looks like -- here are the broken-out content / audience similarities for these three:
 
-<img src="figures/ca-bloomberg-composite.png" />
+<img src="figures/ca-bloomberg-composite.png" width="600" />
 
-<img src="figures/ca-breitbart-composite.png" />
+<img src="figures/ca-breitbart-composite.png" width="600" />
 
-<img src="figures/ca-wsj-composite.png" />
+<img src="figures/ca-wsj-composite.png" width="600" />
 
 Meanwhile, at the other end of the spectrum -- AP, The Hill, and Huffington Post have significantly "misaligned" headline / audience graphs -- there are (many) places, in other words, where they produce headlines that sound very similar to another outlet, but the audience overlap between the two is low; or vice versa. Here are the broken-out similarities:
 
-<img src="figures/ca-apnews-composite.png" />
+<img src="figures/ca-apnews-composite.png" width="600" />
 
-<img src="figures/ca-thehill-composite.png" />
+<img src="figures/ca-thehill-composite.png" width="600" />
 
-<img src="figures/ca-huffingtonpost-composite.png" />
+<img src="figures/ca-huffingtonpost-composite.png" width="600" />
 
 So, what's actually going on with these? Though the specifics are different, one interpretation is to say -- in each case, there is a high level of headline overlap with right-leaning outlets, but a high level of audience overlap with left-leaning outlets. For example, with AP -- the headlines sound most similar to Fox, by a large margin, but the audience overlap with Fox is very low; and, the highest audience overlaps are with WaPo, The Hill, and NYT. Likewise, with The Hill -- the headlines sound (comparatively) similar to The Daily Caller and Breitbart, but the higher audience overlaps are with WaPo, HuffPo, and CNN.
 
