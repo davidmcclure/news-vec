@@ -454,9 +454,12 @@ So, from digging into the embeddings produced by the neural models, we can get a
 
 Just eyeballing things on the UMAP projection -- some outlets clearly seem to occupy roughly similar regions of the reduced 2d space. For example, Bloomberg and WSJ -- both of which generate a lot of business and financial coverage -- both occupy a significant amount of space in the bottom left of the UMAP projection, around (-6,-4):
 
-<img src="figures/wsj-bloomberg.png" />
+<img src="figures/wsj-bloomberg.png" width="400" />
 
 How to add precision to this? How can we convert the behavior of the classifiers into a single "score"?
+
+
+
 
 Maybe the simplest and most natural way to model similarity, in a predictive setting, is just to look at the confusion matrix -- that is, for each permutation of outlets A and B, the number of headlines from A that the model incorrectly assigns to B. The higher this number, the more "confusable" the two outlets. Using test-set predictions from strong neural model from before:
 
