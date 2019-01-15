@@ -440,27 +440,13 @@ Meanwhile, at the other end of the spectrum, along with CNN are Fox, The Washing
 
 Another related (though also somewhat different) way of thinking about this is to say that different outlets have different numbers of *clusters*. Looking at the per-outlet UMAP visualizations, again -- we might say, roughly, that BuzzFeed has 1 cluster; Breitbart has 2-3, depending on how you squint at it; Fox has two groups, one fairly focused and the other more diffuse; CNN is just scattered all over the place.
 
-Can we formalize this? Clustering, especially in high dimensions, is kind of a dark art, and it's hard to really produce a definitive result; so all of this should be taken with a grain of salt. But, as an experiment -- here, we do a basic agglomerative cluster over the embeddings based on pairwise cosine distances, using an "average" linkage rule when deciding whether to join groups.
+Can we formalize this? Clustering, especially in high dimensions, is kind of a dark art, and it's hard to really produce a definitive result; so all of this should be taken with a grain of salt. But, as an experiment -- here, we do a basic agglomerative cluster over the embeddings based on pairwise cosine distances, using an "average" linkage rule when deciding whether to join groups. The one hyperparameter here is the cluster merging threshold -- the cosine distance at which, if two (groups of) embeddings are farther apart than this value, they get broken out as flat clusters in the final result. For this value, we simply use the modal value of the complete distribution over pairwise distances, across all outlets (0.72).
 
 <img src="figures/cluster-multiples.png" />
 
-These clusters, then, can give a kind of triangulated view onto internal structure of the content produced by each outlet. For example, with BuzzFeed, almost everything -- 93%, to be exact -- gets put into a single cluster:
+These clusters, then, can give a kind of triangulated view onto internal structure of the content produced by each outlet.
 
-[buzzfeed dendrogram]
-
-Whereas, NPR appears to break into two primary clusters:
-
-[NPR dendrogram]
-
-And, CNN has a large number of roughly equally-sized groups:
-
-[CNN dendrogram]
-
-Dipping down to the level of actual headlines -- what are these clusters, actually?
-
-- Breitbart -- american politics, middle east / migrant crisis, op-eds
-- The Hill -- capitol hill; trump admin; non-DC news; financial news
-- BuzzFeed -- all listicles
+**TODO**: Dig into BuzzFeed / AP / CNN / Fox, example cluster headlines
 
 ## Modeling the headline graph
 
