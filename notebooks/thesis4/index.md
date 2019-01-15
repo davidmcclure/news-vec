@@ -727,21 +727,22 @@ Methodologically, this is fairly straightforward. In the same way we can unroll 
 
 The results are interestingly mixed. In some cases, movements in content / audience appear to be very tightly correlated. For example, for Fox and Bloomberg, they have moved in almost perfect lockstep over the last two years -- as the headlines have become less similar, the audience has also become less similar:
 
-xxx
+<img src="figures/fox-bloomberg-corr.png" />
 
 But, in other cases, there appears to be a strong *negative* correlation. For example, again with Fox -- headlines from Fox and Breitbart have become steadily less similar, but the audience correlation has consistently increased over this time:
 
-xxx
+<img src="figures/fox-breitbart-corr.png" />
 
 Indeed, these are actually the two strongest overall relationships -- the full set of 105 pairs distribute fairly evenly between these extremes, with about half positive and half negative:
 
-xxx
+<img src="figures/ts-ca-corrs.png" />
 
 And, zooming in on a larger set of the strongest pairs in each direction:
 
-xxx
-xxx
+<img src="figures/ts-ca-pos-corrs.png" />
 
-This is a bit mysterious, and in many ways it generates more questions that it answers. At a very speculative level, though -- maybe this implies that different combinations of news sources have different levels of "fungibility" or "substitutability" with each other? Which, in turn, could be related to whether the relationship between an outlet and (some part of) its audience is based on the content itself -- in a kind of transactional sense -- or on the outlet as a kind of proxy for something more broad, and not just a source of information -- a political perspective, a community, a worldview, etc.
+<img src="figures/ts-ca-neg-corrs.png" />
+
+This is a bit mysterious, and in many ways it generates more questions that it answers. At a very speculative level, though -- maybe this implies that different combinations of news sources have different levels of "fungibility" or "substitutability" with each other? Which, in turn, could be related to whether the relationship between an outlet and (some part of) its audience is based on the content itself -- in a kind of transactional sense -- or on the outlet as a proxy for something more broad, and not just a source of information -- a political perspective, a community, a worldview, etc.
 
 For example, with Fox and Bloomberg, we might guess that both outlets are producing some type of coverage (maybe financial news?) that has a kind of "elasticity" in the news ecosystem -- there's a cohort of readers want this type of coverage, but don't care very much where it comes from. So if both Fox and Bloomberg produce this content, this audience cohort is happy to read / share articles from either source. But, with Fox and Breibart -- it's not so much about the coverage that they actually produce, and more about what they represent, in some sense?
