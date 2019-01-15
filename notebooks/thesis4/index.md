@@ -836,6 +836,8 @@ This suggests, then, that the "departure" of Fox -- its monotonic rise in distin
 
 <img src="figures/ts-ova-fox.png" />
 
+**TODO**: How much of this is driven by changes in the length of the headlines? The tabloid-y headlines are longer than average, but that doesn't seem to be the driving factor -- when we do this with the "CBOW" model, which has no knowledge of the word count, similar results.
+
 ## Shifting headlines, shifting audience?
 
 We've found, then, that the "content graph" and "audience graph," treated as synchronic systems, generally tend to align, though with some notable exceptions. And, from studying historical changes in accuracies across the full graph of outlets, we have identified pairs and cohorts of outlets that migrated into different linguistic configurations over time -- HuffPo / DK / Hill have converged; HuffPo is shifting away from BuzzFeed; Fox is moving away from almost everything else. The "content graph," then, is a dynamic system; the overall view we got in section XX is a kind of synchronic blending of a system that looks different, in subtle but significant ways, in fall of 2018 versus winter 2017.
