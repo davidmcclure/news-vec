@@ -408,11 +408,13 @@ Where, we can see two basic groups. Bloomberg, BuzzFeed, and Daily Kos all have 
 
 To get a sense of what these headlines actually are, we can query out the 10 headlines for each where the model gave the highest weight to the true label:
 
-**TODO**: Top 10s
+**TODO**: [top 10s]
 
-Whereas, by contrast, for CNN -- the model almost never gives more than 0.5 weight to the true label. There are almost no headlines, in other words, that are *obviously* from CNN, in the eyes of the model.
+Whereas, for CNN -- the model almost never gives more than 0.5 weight to the true label. There are almost no headlines, in other words, that are *obviously* from CNN, in the eyes of the model.
 
-This gives some texture to the raw precision and recall scores. But, beyond the performance of the model -- how can we get a birds-eye view of the representations learned by the model -- the content of the actual headlines themselves? One simple (if somewhat reductive) approach is to project the high-dimensional embeddings down to 2 dimensions, which can be plotted out visually. Under the hood, the raw sentence embeddings produced by the model are 512-dimension vectors. Here, we use UMAP to transform these into a 2-dimensional embedding, in a way that tries to preserve the relative proximities among the headlines.
+<img src="figures/ptrue-cnn.png" />
+
+But, beyond the performance of the model -- how can we get a birds-eye view of the *representations* learned by the model -- the content of the actual headlines themselves? An easy first step is to project the sentence embeddings down to 2 dimensions, which can be plotted out visually. Under the hood, the raw sentence embeddings produced by the model are 512-dimension vectors. Here, we use UMAP to transform these into a 2-dimensional embedding, in a way that tries to preserve the relative proximities among the headlines.
 
 [UMAP with labels]
 
