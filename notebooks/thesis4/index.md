@@ -215,15 +215,41 @@ All models are all trained under a standard cross-entropy loss, using the Adam o
 
 ### Headline cleaning
 
-Before diving into a full comparison across all seven of the models, though -- as an initial smoke test, just to get a sense of the baseline difficulty of the task, if we apply a standard tokenization to the raw headline strings that come through the Decahose and then fit the vanilla logistic regression, we get a remarkable XX% accuracy in a 15-class model:
+Before diving into a full comparison across all seven of the models, though -- as an initial smoke test, just to get a sense of the baseline difficulty of the task -- if we apply a standard tokenization to the raw headline strings that come through the Decahose, and then fit the vanilla logistic regression, we get 50% accuracy on the full 15-class model:
 
-[LR f1, uncleaned]
+```
+                    precision    recall  f1-score   support
 
-Which, in a sense, is *too* good -- the model is getting almost perfect accuracy on some outlets. Which seems unlikely, and suggests that there is some kind of unambiguous lexical signal in the headlines that's making the task trivial, in some cases.
+        apnews.com       0.45      0.48      0.47      1824
+     bloomberg.com       0.49      0.58      0.53      1913
+     breitbart.com       0.75      0.74      0.75      1894
+      buzzfeed.com       0.58      0.79      0.67      1880
+           cnn.com       0.64      0.24      0.35      1940
+   dailycaller.com       1.00      0.85      0.92      1900
+      dailykos.com       0.47      0.71      0.56      1853
+       foxnews.com       0.36      0.36      0.36      1888
+huffingtonpost.com       0.36      0.29      0.32      1830
+         msnbc.com       0.45      0.58      0.51      1840
+           npr.org       0.36      0.36      0.36      1823
+       nytimes.com       0.45      0.34      0.39      1966
+       thehill.com       0.41      0.54      0.47      1899
+washingtonpost.com       0.57      0.44      0.50      1838
+           wsj.com       0.42      0.32      0.37      1924
 
-What's happening here? To get a sense of which features are doing the heavy lifting, we can skim off ngrams with strongest chisquare for each outlet:
+         micro avg       0.51      0.51      0.51     28212
+         macro avg       0.52      0.51      0.50     28212
+      weighted avg       0.52      0.51      0.50     28212
+```
 
-[top 10 features, per domain]
+Where, on some labels, the model is almost perfect -- 100% precision for The Daily Caller; 79% recall for BuzzFeed; 75% precision for BuzzFeed. Which, in a sense, almost seems *too* good. It could be that The Daily Caller is just that distinctive, but, more likely, this suggests that there is some kind of unambiguous lexical signal in the headlines that's making the task trivial in some cases.
+
+To get a sense of which features are doing the heavy lifting, we can skim off ngrams with strongest chi-squared statistic for each outlet:
+
+  - **breitbart.com** - delingpole :, illegal, delingpole, :, islamic, illegal aliens, amnesty, : ', report :, cartel, |, ', ' |, ' | breitbart, ' -, ' - breitbart, -, | breitbart, - breitbart, breitbart
+
+  - **cnn.com** - to know before, the bell, know before the, trump - cnn, fast facts, : live updates, before the bell, premarket, premarket :, - cnn.com, cnn.com, ? -, ? - cnn, ' - cnn, -, video, cnn, cnn video, - cnn video, - cnn
+
+  - **nytimes.com** - review, evening briefing, , dies, california today :, california today, recipe, n.f.l., |, today :, nyc this week, g.o.p., nyc this, in nyc this, opinion | the, review : ', briefing, review :, : your, opinion, opinion |
 
 Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any connection with the content or style of the headline in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" before or after the headline that literally just identify the outlet:
 
