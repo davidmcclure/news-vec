@@ -410,7 +410,7 @@ Where, we can see two basic groups. Bloomberg, BuzzFeed, and Daily Kos all have 
 
 To get a sense of what these headlines actually are, we can query out the 10 headlines for each where the model gave the highest weight to the true label:
 
-**TODO**: [top 10s]
+**TODO**: [Top headlines for each label, by p-true]
 
 Whereas, for CNN -- the model almost never gives more than 0.5 weight to the true label. There are almost no headlines, in other words, that are *obviously* from CNN, in the eyes of the model.
 
@@ -462,31 +462,35 @@ How to add precision to this? How can we convert the behavior of the classifiers
 
 <img src="figures/lstm-cm.png" />
 
-Since the class sizes are exactly balanced across the 15 outlets (each has exactly XX headlines in the test set), these counts are directly comparable. So, here, the two most confusable / similar outlets are X and Y; and the two least confusable / different outlets are A and B. (Important to note that the confusion counts are *asymmetric* -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
+Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, here, the two most frequently "confused" headlines are from WSJ -> Bloomberg, where the model makes 353 mistakes; and the two least confused are from AP -> BuzzFeed, where the model only makes 7 mistakes. (Important to note that the confusion counts are *asymmetric* -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
 
 This can also be directly interpreted as a graph -- just treat the confusion matrix as an adjacency matrix, and the confusion counts as weights on directed edges. For example, just rendering the outlets in a circular layout, where the ordering in the circle is arbitrary, we can get a quick sense of what's similar to what, and how different subsets of outlets cluster together into cohorts. (Thicker edges correspond to high confusion counts.)
 
-[CM radial graph]
+**TODO**: [Confusion matrix as radial graph]
 
 But, this is just one way to do this among many others. For example, instead of counting literal misclassification -- places where the model actually makes an incorrect prediction -- a somewhat more relaxed version of this would be to look at correlations in the assignments of probability mass by the model. For example, if we're comparing WSJ and Bloomberg, we would take the ordered list of probability masses assigned to WSJ for all headlines:
 
-(hl1_pWSJ, hl2_pWSJ, hl3_pWSJ, ...)
+```
+0.00619, 0.17596, 0.03041, 0.01991, 0.00007, 0.01776, 0.01682, 0.00010, 0.00626, 0.09664 ...
+```
 
 And the the probability masses assigned to Bloomberg for the same headlines, keeping order constant:
 
-(hl1_pBb, hl2_pBb, hl3_pBb, ...)
+```
+0.00279, 0.49098, 0.00894, 0.00222, 0.00005, 0.00449, 0.00378, 0.00012, 0.00284, 0.02261 ...
+```
 
 And then just calculate the level or correlation between these two sets of weights -- that is, when the model puts more weight on WSJ, does it also tend to put more weight on Bloomberg? Just taking the Pearson correlation:
 
-[radial graph, pr corr]
+**TODO**: [Radial graph of Pearson correlations between weights]
 
 Or also, also plausible, the Spearman or Kendall-Tau:
 
-[radial graphs, sp / kt]
+**TODO**: [Spearman + KT radials]
 
 Which, at first glance, look broadly similar to the confusion counts. But, how true is this? We can't directly compare the two types scores, since the units are fundamentally different -- probability masses vs raw counts. But, to get around this, we can simply normalize them -- subtract out the mean, scale to unit variance -- and then directly compare these adjusted scores. Here, sorting by the scaled confusion counts, we can see that they generally agree. (To be precise, we can then take take the spearman correlation over these rankings, which is XX):
 
-[CM vs pcorr, grouped bars]
+**TODO**: [Confusion counts vs pcorr, grouped bars]
 
 Though, the correlation also isn't perfect -- eg, for X and Y, high confusion count, but comparatively low probability mass correlation; and by a fairly large margin, which is a bit troubling.
 
