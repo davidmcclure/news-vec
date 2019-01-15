@@ -251,6 +251,30 @@ To get a sense of which features are doing the heavy lifting, we can skim off ng
 
   - **nytimes.com** - review, evening briefing, , dies, california today :, california today, recipe, n.f.l., |, today :, nyc this week, g.o.p., nyc this, in nyc this, opinion | the, review : ', briefing, review :, : your, opinion, opinion |
 
+  - **bloomberg.com** - start your, billion, know to, stocks, to know to, to start your, know to start, start your day, five things you, said to, markets, oil, wrap,  , : markets, : markets wrap, markets wrap, brexit, u.k.
+
+  - **dailycaller.com** - ? via dailycaller, caller, - the daily, daily caller, the daily caller, ' [ video, ' [, ' via, ' via dailycaller, video ] via, video ], [ video ], [ video, ] via dailycaller, ] via, ], [, via, via dailycaller, dailycaller
+
+  - **apnews.com** - check : trump, police :, us, things to know, apnewsbreak, apnewsbreak :, latest : trump, ap fact, ap fact check, for today, know for today, 10 things, 10 things to, know for, to know for, ap, latest, the latest, the latest :, latest :
+
+  - **buzzfeed.com** - are, that 'll, people are, 19, make you, your, you ?, tell you, 'll tell you, 'll tell, are you ?, we 'll tell, are you, we 'll, which, 'll, and we, and we 'll, you, "
+
+  - **washingtonpost.com** - opinion | the, review |, | why, 202, 202 :, | trump 's, d.c., analysis | trump, opinion | trump, analysis | the, | trump, ., | the, perspective, opinion, perspective |, opinion |, analysis, |, analysis |
+
+  - **huffingtonpost.com** - funniest, tips for, your, colbert, trans, 's morning email, via, parents this week, via dailycaller, dailycaller, morning email :, tweets from parents, from parents this, parents this, morning email, ways, funniest tweets, lgbtq, funniest tweets from, marketing
+
+  - **foxnews.com** - via dailycaller, dailycaller, news first :, , cops, , officials say, what to know, watters, eric shawn, gutfeld on, tucker, police say, , report, , police, tucker :, gutfeld :, , police say, report says, hannity :, , report says, gutfeld
+
+  - **wsj.com** - wsj, growth, the morning download, morning download, morning download :, download :, risk report :, the morning risk, morning risk report, risk report, morning risk, paid program, ' review :, eurozone, china, ', investors, the morning, fed, u.s.
+
+  - **npr.org** - on mountain stage, mountain stage, stories :, top stories :, top stories, listen :, first listen :, first listen, npr, on world, cafe, on world cafe, world cafe, listen, now :, listen now, 🔊, listen now :, 🔊 listen now, 🔊 listen
+
+  - **msnbc.com** - mini, ..., 's campaign round, campaign round, campaign round up, round up ,, joe :, report ,, 's mini, mini report, 's mini report, mini report ,, lawrence, lawrence :, mueller, trump, matthews, matthews :, fmr ., fmr
+
+  - **thehill.com** - : trump, dem lawmaker, gop senator, ', senator :, :, trump :, dem senator, dem :, gop lawmaker, the memo :, trump, poll, healthcare, poll :, gop, dems, report, dem, : report
+
+  - **dailykos.com** - kos elections live, thread for night, for night owls, owls, open thread for, thread for, night owls, cartoon :, kos elections, daily kos elections, pundit, thread, abbreviated pundit, open thread, abbreviated, trumpcare, digest :, digest, daily kos, kos
+
 Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any connection with the content or style of the headline in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" before or after the headline that literally just identify the outlet:
 
 [AP Breaking, CNN Video, via @dailycaller]
