@@ -195,11 +195,11 @@ As a first step, we train a series of multiclass models, in which the classifier
 
 We compare seven models. First, two non-neural baselines, using standard implementations from the `sklearn` Python package:
 
-- **Logistic regression** -- Standard logistic regression, under L2 regularization, on tfidf-scaled ngram count features (size 1-3). In the multiclass case, we use the `sag` solver.
+- **Logistic regression** -- Standard logistic regression under L2 regularization, fit on TFIDF-scaled ngram count features (order 1-3). In the multiclass case, we use the `sag` solver.
 
 - **Linear SVC** -- A standard SVM, fit on the same features.
 
-Then, we explore five different neural architectures. All of these models share a common token embedding pipeline, and then implement different line encoders on top of the token embeddings. Tokens are encoded first with a CNN over individual characters -- characters are mapped to 15d embeddings, and then encoded with a CNN with six filter maps of widths 1-6, each with 25 units per character of width and with maxpooling over the feature maps, which produces a 525d embedding for each individual token. This character-level representation is then concatenated with a standard 300d pre-trained GloVe embedding for the token, where one is available, resulting in a composite 825d embedding for each token. then, these token sequences are handed to one of five different line encoders, with increasing levels of complexity:
+Then, we explore five different neural architectures. All of these models share a common token embedding pipeline, and then implement different line encoders on top of the token embeddings. Tokens are encoded first with a CNN over individual characters -- characters are mapped to 15d embeddings, and then encoded with a CNN with six filter maps of widths 1-6, each with 25 units per character of width and with max-pooling over the feature maps, which produces a 525d embedding for each individual token. This character-level representation is then concatenated with a standard 300d pre-trained GloVe embedding for the token, where one is available, resulting in a composite 825d embedding for each token. then, these token sequences are handed to one of five different line encoders, with increasing levels of complexity:
 
 - **CBOW** - Simply the unweighted, dimension-wise mean of all token embeddings in the headline.
 
@@ -211,9 +211,9 @@ Then, we explore five different neural architectures. All of these models share 
 
 - **LSTM + CNN** - Similar to attention, but instead of using a linear combination over the states, the states are instead treated as higher-order token embeddings and passed through the same convolutional layers used in the standard CNN encoder. Like with the attention network, the output of the CNN is concatenated with the regular LSTM output.
 
-All of these models are all trained under a standard cross-entropy loss, using the Adam optimizer with a learning rate of `1e-4` and a batch size of 50. The implementation is in Pytorch, and models are trained on a single NVIDIA V100 GPU, running on a `p3.2xlarge` node on EC2.
+All models are all trained under a standard cross-entropy loss, using the Adam optimizer with a learning rate of `1e-4` and a batch size of 50. The implementation is in Pytorch, and models are trained on a single NVIDIA V100 GPU, running on a `p3.2xlarge` node on EC2.
 
-### Proprocessing, tokenization, cleaning
+### Headline cleaning
 
 Before diving into a full comparison across all seven of the models, though -- as an initial smoke test, just to get a sense of the baseline difficulty of the task, if we apply a standard tokenization to the raw headline strings that come through the Decahose and then fit the vanilla logistic regression, we get a remarkable XX% accuracy in a 15-class model:
 
