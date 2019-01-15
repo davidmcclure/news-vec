@@ -422,17 +422,17 @@ With everything together, this is a bit hard to make sense of. Foregrounding eac
 
 <img src="figures/umap-multiples.png" />
 
-Of course, UMAP a very significant reduction, useful mainly as a kind of "intuition pump," not so much a fine-grained analytical tool. But, at a high level, this suggests that there could be significant differences in the basic "shape" of the embedding space across the different outlets. For example, compare BuzzFeed -- which looks very focused, tightly-packed -- to CNN -- which looks much more scattered and evenly diffused. Or, compare NPR, which, in this projection, seems to have ~2 salient "clusters," to Fox, which has perhaps has 3-4.
+Though it's important not to read too much into these types of visualizations, at a high level this suggests that there could be significant differences in the basic "shape" of the embedding space across the different outlets. For example, compare BuzzFeed -- which looks very focused, tightly-packed -- to CNN -- which looks much more scattered and evenly diffused. Or, compare NPR, which, in this projection, seems to have ~2 salient "clusters," to Fox, which has perhaps has 3-4.
 
 There seem to be fairly large differences, in other words, in what might be thought of as the "breadth" or "diameter" of the embeddings in different outlets -- the degree to which the headlines tend to concentrate in a particular region of the linguistic space, or scatter across a larger and more diverse set of topics and styles.
 
-How to be more precise about this? One simple way to measure this is just to look at the *distribution over pairwise cosine distances* for each outlet. At an intuitive level -- if we randomly select two headlines from CNN -- how far apart would we expect them to be? And, how does this compare to the typical distance for The New York Times, Breitbart, BuzzFeed, etc? Here, we randomly sample (with replacement) 1 million pairs from each outlet, and then build up the distributions over the distances:
+How to be more precise about this? One simple way to measure this is just to look at the *distribution over pairwise cosine distances* for each outlet. At an intuitive level -- if we randomly select two headlines from CNN -- how far apart would we expect them to be? And, how does this compare to the typical distance for The New York Times, Breitbart, BuzzFeed, and so on? Here, we randomly sample (with replacement) 1 million pairs from each outlet, and then build up the distributions over the set of cosine distances between each pair:
 
-[pwd densities]
+<img src="figures/pwd-dist.png" />
 
 Or, broken out vertically by outlet:
 
-[pwd violinplots]
+<img src="figures/pwd-violins.png" />
 
 We can see differences, then, along two axes. First, the modal ("center") value of these distributions varies significantly across the 15 outlets -- smallest for BuzzFeed, at ~0.3, and largest for CNN, at just shy of 0.9. Other very "narrow" or "focused" outlets include Bloomberg and the Daily Kos, which seem fairly intuitive (Bloomberg focuses on business and financial reporting; Daily Kos on left-leaning political coverage); But also, more surprising, AP which is the fourth most-focused outlet. (the reasons for this become clear below, when digging into the internal geometry of the embeddings for each outlet -- essentially, AP stories broadly cluster into two groups, (international) sports coverage and domestic political coverage.)
 
