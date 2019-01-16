@@ -18,11 +18,12 @@ Or, if it's about (both) New York baseball teams:
 
 > East Coast MS 13 gang leader admits racketeering conspiracy
 
-But, other things might be significantly harder. For example -- 3 of these headlines came from Fox, 3 from The New York Times:
+But, other things might be significantly harder. For example -- one of these headlines came from Fox, the other from The New York Times:
 
-xxx
+> Zambia's 1st female fighter pilot says she 'doesn't feel like a woman' in her job
+> 4 freed from Thailand cave, but rescuers face 'war with water and time' to get to others
 
-Here, to my eye, there aren't obvious "tells" -- there are small things that might push me in one direction or the other, but it's not obvious. In trying to guess the outlet, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, locations, people that the outlet tends to focus on. And, beyond the raw content of what's being -- *how* it's being covered, the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
+Here, to my eye, there aren't obvious "tells" -- there are small things that might push me in one direction or the other, but it's not clear. (The answer -- NYT, Fox.) In trying to guess the outlet, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, locations, people that the outlet tends to focus on. And, beyond the raw content of what's being -- *how* it's being covered, the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
 
 It also, indirectly, gives a way to reason about the *degree* to which they're similar or different. Now, imagine that instead of just doing this once, we did it for 100 headlines, and counted up the number of correct guesses. We'd likely do better than random -- but how much better? 60%, 70%, 95%? How differentiable are NYT and Fox? To put this into context -- what if we then swapped out the outlets -- pulled headlines from NYT and CNN, instead of NYT and Fox, for example -- and repeated the experiment. We might guess that NYT and CNN are more similar, harder to tell apart. But, how true is this, exactly? Say we got 80 headlines right for the NYT vs. Fox comparison -- would we get 70, 60, 55 right for NYT vs. CNN? In a rough sense, we could start to reason about the relative proximities between different pairs of outlets.
 
