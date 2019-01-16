@@ -12,7 +12,7 @@ Or, if it's about (both) New York baseball teams:
 
 > In Early Going, the Yankees Steal the Mets' Thunder
 
-(Though, of course, Fox also does plenty of sports reporting.) Meanwhile, we might associate a story about MS13 with Fox, to the extent that right-leaning outlets have focused attention on immigration and crime:
+(Though, of course, Fox also does plenty of sports reporting.) Meanwhile, we might associate a story about MS 13 with Fox, to the extent that right-leaning outlets have focused attention on immigration and crime:
 
 > East Coast MS 13 gang leader admits racketeering conspiracy
 
