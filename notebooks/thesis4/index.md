@@ -3,23 +3,43 @@
 
 ## Introduction
 
-Imagine someone handed you the headline of a news article, but in complete isolation, totally stripped of context, and told only that it came from either The New York Times or Breitbart -- and asked you to guess which one. In some cases, this might be relatively easy. For example, if the headline is about some kind of fairly insider-baseball NY local politics issue -- de Blasio arguing with Cuomo, etc -- we might guess NYT with some confidence. Or, if the headline were some kind of very overtly right-leaning opinion piece, we might guess Breitbart. But, in other cases, this might be considerably harder. For example where does this come from:
+Imagine that someone showed you a headline from a news article, but in complete isolation, stripped of all context -- just a sequence of words. All they told you is that the headline came from either the New York Times or Fox, and asked you to guess which one.
 
-XXX
+In some cases, this might be fairly easy. For example, if it's a recipe -- we might remember that The New York Times has a large cooking section:
 
-There aren't any completely obvious "tells." In making a guess, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the range of topics, issues, stories that the outlet tends to cover; and, beyond what's being covered -- *how* it's being covered, the style, affect, intonation, attitude. Trying to guess the outlet, in other words, forces us to formalize a kind of mental model about exactly how the two outlets are similar and different.
+> Chicken Thighs With Cumin, Cayenne and Citrus
 
-It also, indirectly, gives a way to reason about the *degree* to which the two outlets are similar or different. Now, imagine that instead of just doing this once, we did it for 100 headlines, and counted up the number of correct guesses. Surely we'd do better than random -- but how much better? 60%, 70%? 95%? How differentiable, in a precise sense, are NYT and Breitbart? Taken alone, this number isn't very meaningful, without some kind of point of reference. To put this into context -- what if we then swapped out the outlets -- say, NYT and CNN, instead of NYT and Breitbart -- and repeated the experiment. We might guess that NYT / CNN are more similar, harder to tell apart -- but, how true is this, how much harder? Say we got 80 headlines right for NYT / BB -- would we get 70, 60, 55 right for NYT / CNN? In a very crude rough sense, we could start to reason, in a quantitative way, about the relative proximities between different pairs of outlets.
+Or, if it's about (both) New York baseball teams:
 
-Beyond just two pairs -- what if we could model this systematically across a fairly wide swath of the media landscape -- 5, 10, 15 different major outlets? And, instead of just 100 headlines -- what if we could study this systematically, at the scale of tens or hundreds of thousands of headlines for each outlet?
+> In Early Going, the Yankees Steal the Mets' Thunder
 
-Of course, this can't be done manually. This thesis explores this question, instead, as a supervised learning task -- to what degree can we train models to predict the outlet, given a headline? This is modeled over a corpus of 1M headlines from 15 major outlets, extracted from 70M links posted on Twitter by 8M users over the course of roughly 18 months. From this, we can model a complete set of proximities, at the level of headline, across all 105 unique combinations of the 15 outlets. Here, using a simple SVM over ngram count features -- 100 models are fit on 100 different random samples of headlines for each pair, to get a tight confidence interval:
+(Though, of course, Fox also does plenty of sports reporting.) Meanwhile, we might associate a story about MS13 with Fox, to the extent that right-leaning outlets have focused more attention on issues at the intersection of illegal immigration and crime:
 
-<img src="figures/svc-ab-acc.png" width="400" />
+> East Coast MS 13 gang leader admits racketeering conspiracy
 
-Which, in a sense, can be interpreted as a fully-connected "content graph" over the 15 outlets -- a set of weighted edges between all pairs, where the edge of the weight represents the level of similarity at the level of headlines:
+But, other things might be significantly harder. For example -- 3 of these headlines came from Fox, 3 from The New York Times:
+
+xxx
+
+Here, to my eye, there aren't obvious "tells" -- there are small things that might push me in one direction or the other, but it's not obvious. In trying to guess the outlet, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, locations, people that the outlet tends to focus on. And, beyond the raw content of what's being -- *how* it's being covered, the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
+
+It also, indirectly, gives a way to reason about the *degree* to which they're similar or different. Now, imagine that instead of just doing this once, we did it for 100 headlines, and counted up the number of correct guesses. We'd likely do better than random -- but how much better? 60%, 70%, 95%? How differentiable are NYT and Fox? To put this into context -- what if we then swapped out the outlets -- pulled headlines from NYT and CNN, instead of NYT and Fox, for example -- and repeated the experiment. We might guess that NYT and CNN are more similar, harder to tell apart. But, how true is this, exactly? Say we got 80 headlines right for the NYT vs. Fox comparison -- would we get 70, 60, 55 right for NYT vs. CNN? In a rough sense, we could start to reason about the relative proximities between different pairs of outlets.
+
+Of course, doing this manually, it would be hard to scale beyond a few outlets and a couple hundred headlines. But -- what if we could do this at a much larger scale, across dozens of different media organizations and millions of headlines? This thesis explores this question as a *language engineering task* -- to what degree is it possible to train machine learning models to differentiate between headlines produced by different news outlets? Unlike other studies that have explored the tractability of language inference tasks on news data, though, goal here isn't to solve a literal engineering task (flagging "clickbait" headlines, optimizing click-through rates) -- instead, we use the predictive models as a descriptive and interpretive tool. by training models to differentiate between content from different sources, we can then crack open the hood and examine the representations that are induced by the models; which then makes it possible to "map" headlines as a kind of conceptual space.
+
+Most fundamentally, beyond this ability to "read" headlines at a scale that would otherwise be impossible -- these models make it possible to start filling in a kind of ground-truthed understanding of the degree to which different outlets are similar and different, where we might otherwise have to rely on intuition and anecdote. Modeling a complete matrix of pairwise similarities across 15 major media organizations, we can construct a kind of "content graph," a fully-connected representation how, and to what degree, outlets produce (dis)similar headlines:
 
 <img src="figures/hl-graph.png" width="600" />
+
+
+
+
+
+this question of the discriminability or separation of content from different news organizations cuts to
+
+
+these conversations
+
 
 - this, in a sense, makes it possible to very precisely model the degree to which different media outlets are similar and different, as operationalized in terms of the similarity of the headlines. this study systematically explores this, attempting to begin to "ground truth" claims about how similar or different media outlets are.
 - once these ground-truth proximities are graph is in hand, though, interesting question then becomes -- are then, in a sense, what we would expect? eg, if we find that the difference between BB / DC is 1.0, and BB / NYT is 3.2 -- how to throw this into relief? in a way -- how to ground truth the linguistic ground-truth with other truths about the relative similarities and differences? actionable question, really, is where the pure linguistic differences are either larger or smaller than we would expect. where are things surprising?
