@@ -1,3 +1,4 @@
+
 # Headlines as networked language
 > A study of content and audience across 73 million news article links on Twitter
 
@@ -31,14 +32,16 @@ Most fundamentally, beyond this ability to "read" headlines at a scale that woul
 
 <img src="figures/hl-graph.png" width="600" />
 
+Once we have this empirical view of the linguistic proximities among the outlets, though, there's a way in which this immediately just generates a new set of questions. Most of which, really, are some version of just one -- where is this graph *not what we would expect*? To return to the analogy of voice -- are there outlets that are "speaking" in ways that don't map onto assumptions about the role that they play in a broader political, commercial, historical context?
+
+---
+
+second half of the thesis takes up this question, explores the degree to which these linguistic relationships correspond (and don't correspond) to two different backdrops.
+
+First, we explore the degree to which these similarities at the level of content align with similarities at the level of audience. parallel to the "content graph" defined by the headline similarities, can imagine an "audience graph" that represents similarities at the level of the people who read and distribute content from each pair of outlets.
 
 
 
-
-this question of the discriminability or separation of content from different news organizations cuts to
-
-
-these conversations
 
 
 - this, in a sense, makes it possible to very precisely model the degree to which different media outlets are similar and different, as operationalized in terms of the similarity of the headlines. this study systematically explores this, attempting to begin to "ground truth" claims about how similar or different media outlets are.
