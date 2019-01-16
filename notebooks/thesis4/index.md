@@ -21,6 +21,7 @@ Or, if it's about (both) New York baseball teams:
 But, other things might be significantly harder. For example -- one of these headlines came from Fox, the other from The New York Times:
 
 > Zambia's 1st female fighter pilot says she 'doesn't feel like a woman' in her job
+
 > 4 freed from Thailand cave, but rescuers face 'war with water and time' to get to others
 
 Here, to my eye, there aren't obvious "tells" -- there are small things that might push me in one direction or the other, but it's not clear. (The answer -- NYT, Fox.) In trying to guess the outlet, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, locations, people that the outlet tends to focus on. And, beyond the raw content of what's being -- *how* it's being covered, the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
