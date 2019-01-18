@@ -380,7 +380,7 @@ class Classifier(nn.Module):
         self.ltoi = {label: i for i, label in enumerate(labels)}
 
         self.embed_tokens = TokenEmbedding(token_counts)
-        token_dim =self.embed_tokens.out_dim
+        token_dim = self.embed_tokens.out_dim
 
         # TODO: Better way to handle this?
 
