@@ -28,7 +28,7 @@ def main(headline_root, skim, line_enc, pred_root):
     model = Classifier.from_dataset(dataset, line_enc=line_enc)
 
     trainer = Trainer(model, dataset)
-    # trainer.train()
+    trainer.train()
 
     preds = trainer.eval_test()
     logger.info('Test accuracy: %f' % preds.accuracy)
