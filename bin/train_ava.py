@@ -24,7 +24,7 @@ def freeze_dataset(headline_root, out_path, skim):
     """
     corpus = Corpus(headline_root)
 
-    dataset = HeadlineDataset.from_df(corpus.sample_all_vs_all())
+    dataset = HeadlineDataset.from_df(corpus.sample_ava())
 
     if skim:
         dataset = dataset.skim(skim)

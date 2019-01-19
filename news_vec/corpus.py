@@ -119,7 +119,7 @@ class Corpus:
     def min_count(self):
         return self.df.groupby('domain').size().min()
 
-    def sample_all_vs_all(self):
+    def sample_ava(self):
         return (self.df
             .groupby('domain')
             .apply(lambda x: x.sample(self.min_count)))
