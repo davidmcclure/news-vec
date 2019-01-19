@@ -150,7 +150,8 @@ class Corpus:
             for d in r.deciles:
                 rows.append((r.clf_tokens, r.domain, int(d)))
 
-        df_deciles = pd.DataFrame(rows, columns=('tokens', 'domain', 'decile'))
+        df_deciles = pd.DataFrame(rows,
+            columns=('clf_tokens', 'domain', 'decile'))
 
         min_size = df_deciles.groupby(['domain', 'decile']).size().min()
 
