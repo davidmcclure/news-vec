@@ -134,3 +134,30 @@ class Corpus:
         return (self
             .filter_ab(d1, d2)
             .apply(lambda x: x.sample(self.min_count)))
+
+    def sample_ava_ts_deciles(self):
+        """Sample balanced (domain, decile).
+        """
+        df = self.df.copy()
+
+        # Window percentiles -> deciles.
+        df['deciles'] = (df.windows
+            .apply(lambda ws: set([(w - w % 10) / 10 for w in ws])))
+
+        # Explode out deciles.
+        rows = []
+        for r in df.itertuples():
+            for d in r.deciles:
+                rows.append((r.clf_tokens, r.domain, int(d)))
+
+        df_deciles = pd.DataFrame(rows, columns=('tokens', 'domain', 'decile'))
+
+        min_size = df_deciles.groupby(['domain', 'decile']).size().min()
+
+        balanced = (df_deciles
+            .groupby(['domain', 'decile'])
+            .apply(lambda x: x.sample(min_size)))
+
+        balanced['label'] = list(zip(balanced.domain, balanced.decile))
+
+        return balanced
