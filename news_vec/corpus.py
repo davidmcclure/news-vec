@@ -148,10 +148,10 @@ class Corpus:
         rows = []
         for r in df.itertuples():
             for d in r.deciles:
-                rows.append((r.clf_tokens, r.domain, int(d)))
+                rows.append((r.tokens, r.clf_tokens, r.domain, int(d)))
 
         df_deciles = pd.DataFrame(rows,
-            columns=('clf_tokens', 'domain', 'decile'))
+            columns=('tokens', 'clf_tokens', 'domain', 'decile'))
 
         min_size = df_deciles.groupby(['domain', 'decile']).size().min()
 
@@ -159,6 +159,9 @@ class Corpus:
             .groupby(['domain', 'decile'])
             .apply(lambda x: x.sample(min_size)))
 
-        balanced['label'] = list(zip(balanced.domain, balanced.decile))
+        balanced['label'] = [
+            f'{domain}.{decile}'
+            for domain, decile in zip(balanced.domain, balanced.decile)
+        ]
 
         return balanced
