@@ -13,7 +13,7 @@ from news_vec import logger
 @click.command()
 @click.argument('headline_root', type=click.Path())
 @click.option('--skim', type=int)
-@click.option('--line_enc', type=str, default='lstm-attn')
+@click.option('--line_enc', type=str, default='lstm')
 @click.option('--pred_root', type=click.Path())
 def main(headline_root, skim, line_enc, pred_root):
     """Train all-vs-all.
