@@ -223,7 +223,7 @@ All models are all trained under a standard cross-entropy loss, using the Adam o
 
 ### Headline cleaning
 
-Before diving into a full comparison across all seven of the models, though -- as an initial smoke test, just to get a sense of the baseline difficulty of the task -- if we apply a standard tokenization to the raw headline strings that come through the Decahose, and then fit the vanilla logistic regression, we get 50% accuracy on the full 15-class model:
+Before comparing across the full set of seven models, though -- how difficult is the task? What kind of performance should we expect? As an initial smoke test -- if we apply a standard tokenization to the raw headline strings that come through the Decahose, and then fit the vanilla logistic regression, we get 50% accuracy on the full 15-class model:
 
 ```
                     precision    recall  f1-score   support
@@ -249,7 +249,7 @@ washingtonpost.com       0.57      0.44      0.50      1838
       weighted avg       0.52      0.51      0.50     28212
 ```
 
-Where, on some labels, the model is almost perfect -- 100% precision for The Daily Caller; 79% recall for BuzzFeed; 75% precision for BuzzFeed. Which, in a sense, almost seems *too* good. It could be that The Daily Caller is just that distinctive, but, more likely, this suggests that there is some kind of unambiguous lexical signal in the headlines that's making the task trivial in some cases.
+Where, for a some outlets, the model is almost perfect -- 100% precision for The Daily Caller. Which, in a sense, almost seems *too* good. It could be that The Daily Caller is just that distinctive, but, more likely, this suggests that there is some kind of unambiguous lexical signal in the headlines that's making the task trivial in some cases.
 
 To get a sense of which features are doing the heavy lifting, we can skim off ngrams with strongest chi-squared statistic for each outlet:
 
@@ -283,7 +283,7 @@ To get a sense of which features are doing the heavy lifting, we can skim off ng
 
 - **dailykos.com** - kos elections live, thread for night, for night owls, owls, open thread for, thread for, night owls, cartoon :, kos elections, daily kos elections, pundit, thread, abbreviated pundit, open thread, abbreviated, trumpcare, digest :, digest, daily kos, kos
 
-Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any meaningful connection to the substance of the headline, in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" that literally just identify the outlet:
+Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any meaningful connection to the substance of the headline, in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" to the outlets that literally just identify the outlet:
 
 - Cost of war on Syrian children 's mental health **- CNN Video**
 - **APNewsBreak :** US yanks funds from unbuilt windmill farm
@@ -295,7 +295,7 @@ Or, more indirect -- some outlets add prefixes or suffixes to headlines that mar
 - **OPINION |** Trump 's strategic incoherence is a recipe for war
 - **ANALYSIS :** Michael Wolff Makes the Argument for Removing Trump Under 25th Amendment
 
-Or, similarly, a number of outlets have independently named "blogs" or "series." Eg, the Perspective from WaPo, the Morning Risk Report from WSJ:
+Or, similarly, a number of outlets have independently named "blogs" or "series." Eg, the "Perspective" from The Washington Post, the "Morning Risk Report" from WSJ:
 
 - **Perspective |** What Google and Facebook must do about one of their biggest problems
 - **The Morning Risk Report :** Huawei Looks to Avoid ZTE 's Fate
@@ -305,36 +305,50 @@ Author names can also an issue, if they get systematically included with headlin
 - **Delingpole :** Trump Pulls out of Paris; Internet Shrieks that End Is Nigh
 - **Delingpole :** When Comedians Stop Being Funny
 
-With these, the outlet isn't directly identified, but, if the bigram `Perspective |` appears hundreds of times, but only ever in WaPo headlines, then the model is able to make a classification decision just on the basis of what is essentially a formatting detail. Of course -- the classifier can't be blamed for this. Its only objective is to minimize the cross-entropy loss over the output distribution. But from an interpretive standpoint, to the extent that we want to use the classifier as a modeling paradigm, as a means to the end of inducing intellectually useful representations of the content -- this is bad, since it essentially lets the model off the hook from having to produce a good representation of the "meaning" of the headline.
+With these, the outlet isn't directly identified, but, if the bigram `Perspective |` appears in hundreds of WaPo headlines and nowhere else, then the model is able to make a classification decision just on the basis of what is essentially a formatting decision. Of course -- the classifier can't be blamed for this. Its only objective is to minimize the cross-entropy loss over the output distribution. But from an interpretive standpoint, to the extent that we want to use the classifier as a modeling paradigm, as a means to the end of inducing intellectually useful representations of the content -- this is bad, since it essentially lets the model off the hook from having to produce a good representation of the "meaning" of the headline.
 
 We're in the funny position, then, of essentially wanting to make the model less accurate but more interesting -- we need to snip out these "giveaway" features, and force the model to only operate on the substance of the headline.
 
-It's worth noting, though, that beyond clear-cut cases like `- CNN Video`, there's also a longer tail of more subtle textual features that might be thought of as elements of "house style," for lack of a better phrase -- a set of stylistic "ticks" that tend to mark particular outlets, but (debatably) don't really contribute in a meaningful way to the substance of the headline. Fox, for example, produces a number of headlines that include very short quotations -- often just a single word -- wrapped inside of quotation marks and inlined directly into the middle of an otherwise normal headline. Eg, things like:
+It's worth noting, though, that beyond clear-cut cases like `- CNN Video`, there's also a longer tail of more subtle textual features that might be thought of as elements of "house style," for lack of a better phrase -- a set of stylistic "ticks" that tend to mark particular outlets, but (debatably) don't really contribute in a meaningful way to the substance of the headline. For example, some outlets produce a number of headlines that include very short quotes -- often just a single word -- wrapped inside of quotation marks and inlined directly into the middle of an otherwise normal headline. Eg, from Fox:
 
 - Police say remains are **'consistent'** with missing Iowa boy
 - Pakistani airline investigates **'extra passengers'** flown on fully booked plane
 - **'Lost'** asteroid the size of the Statue of Liberty to buzz by Earth Tuesday
 
-(This kind of pattern, incidentally, is precisely the kind of pattern that a strong, character-level neural model is very good at learning, which in turn can have a significant effect on the final representation produced by the encoder.)
+(This kind of pattern, incidentally, is precisely the kind of pattern that a strong, character-level neural model is very good at learning, which in turn can have a strong effect on the final representation produced by the encoder.)
 
 Are the quotes meaningful? Arguably not really, since they're generally being used as a functional part of an otherwise regular headline written by a reporter or editor at Fox. But, this is debatable. For example -- an argument could be made that the presence of the quotes changes the "positioning" of the headline -- by including the quote, the journalist somewhat disassociates herself from the phrasing of the quote. The quote holds the headline at arms length, in a sense; ownership is shifted away from the headline writer and towards the person being quoted.
 
-Another hard case: a handful of outlets sometimes use a distinctive lexicon of slang words -- for example, The Hill, which often uses "dem" instead of "democrat."
+Another interesting case: a handful of outlets sometimes use a distinctive lexicon of slang words -- for example, The Hill, which often uses "dem" instead of "democrat."
 
 - GOP sees omens of a **Dem** wave in Wisconsin
 - House **Dem** calls for bipartisan talks to fund children's health care
 
-In theory we could unroll "dem" into "democrat," and hide the difference from the model. But, this feels iffy -- "dem," arguably, carries a certain attitude that "democrat" doesn't -- it implies a kind of professional perspective on politics, and inside-the-beltway sophistication.
+In theory we could hide this from the model by unrolling "dem" into "democrat." But, this feels iffy; "dem," arguably, has a meaning that's distinct from "democrat" in a substantive way -- it implies a kind of professional perspective on politics, and inside-the-beltway sophistication.
 
-So -- how to clean the headlines? For the purposes of this study, we err in the direction of removing too much information instead of too little. The idea, essentially, is to pull out the longest unbroken "sentence" from the headline -- a sequence of words that don't contain any kind of non-standard separator character, like "|" or ":" -- and then aggressively remove differences at the level of punctuation, capitalization, for formatting. Specifically:
+So -- how to clean the headlines, how to cut out the "paratext" without dipping too far into the meaningful "text" that we care about? For the purposes of this study, we take a simple, hands-off approach that errs in the direction of removing too much information instead of too little. First, tokens are cleaned to standardize over formatting differences at the level of capitalization and punctuation. Then, lines are split into segments marked by any kind of "break" character -- periods, semicolons, colons, question marks, exclamation marks, and things like `|` or `~`. Then, we identify segments that have very strong statistical associations with one or more outlets -- pieces of headlines like `CNN Video` and `via @dailycaller` that are exactly repeated across thousands of headlines for a subset of outlets. These segments are removed, and the classifiers are just shown the (cleaned) tokens that remain. In detail:
 
 1. Standardize non-ASCII characters like curly quotes and em-dashes, to ensure consistent tokenization.
 
-1. Break on any kind of "separator" characters that don't appear in vanilla English sentences -- headlines are only allowed to contain letters, numbers, quotes, `.,;`, `?!`, `$`, and spaces. As a special case, also break on the word "via," which is used by some outlets to identify the source ("... via @dailycaller").
+1. Clean the tokens - downcase, strip punctuation. Keep `$` and `%`, but replace `[0-9]+` digits with a single `#` character, since different outlets have different conventions for how numbers are reported / formatted.
 
-1. Take the longest sequence of unbroken tokens.
+1. Break on any kind character that could mark a logical "break," defined here as `'[^a-z0-9\s,\'"\$%]'`. Essentially, anything other than letters, numbers, commas, and quotes -- `.`, `;`, `:`, `!`, `?`, `|`, `-`, `~`, etc. As a special case, also break on the word "via," which is used by some outlets to identify the source ("... via @dailycaller"). This breaks each headline into a set of cleaned segments -- for example,
 
-1. Clean the tokens - downcase, strip punctuation. Keep `$`, but replace `[0-9]+` digits with a single `#` character, since different outlets have different conventions for how numbers are reported / formatted.
+    ```python
+    'Catching waves with top-ranked African surfer - CNN Video'
+    ```
+
+    gets split into
+
+    ```python
+    ('catching waves with top ranked african surfer', 'cnn video')
+    ```
+
+1. Treating these segments as higher-order "tokens," in effect -- take the chi-squared statistic between each segment and the response variable defined by the outlet labels. This makes it possible to identify the segments that have the strongest associations with some subset of outlets. For example, the 50 segments with the highest scores:
+
+    `dailycaller, breitbart, cnn video, the daily caller, listen now, analysis, video, opinion, perspective, the latest, report, ap news, cnn, the huffington post, cartoon, fmr, markets wrap, d, open thread for night owls, morning digest, exclusive, midday open thread, matthews, abbreviated pundit round up, bloomberg, watch, poll, joe, review, cnnpolitics, lawrence, first listen, delingpole, trump, episode #, breaking, chart, paid program, r, top stories, bloomberg professional services, tiny desk concert, slideshow, abbreviated pundit roundup, police, the morning download, ap fact check, sign the petition, flashback, add your name`
+
+1. Skim off segments where the p-value under the chi-squared test is under `0.0001`, which gives set of 1,855 spans with (very) strong associations with one or more outlets. Remove  these from all headlines.
 
 This produces a highly standardized representation of each headline that basically consists of a stream of ASCII lexemes. For example, using some examples from before, with the original headline first, cleaned tokens second:
 
