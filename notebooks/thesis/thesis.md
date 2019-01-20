@@ -346,9 +346,11 @@ So -- how to clean the headlines, how to cut out the "paratext" without dipping 
 
 1. Treating these segments as higher-order "tokens," in effect -- take the chi-squared statistic between each segment and the response variable defined by the outlet labels. This makes it possible to identify the segments that have the strongest associations with some subset of outlets. For example, the 50 segments with the highest scores:
 
-    `dailycaller, breitbart, cnn video, the daily caller, listen now, analysis, video, opinion, perspective, the latest, report, ap news, cnn, the huffington post, cartoon, fmr, markets wrap, d, open thread for night owls, morning digest, exclusive, midday open thread, matthews, abbreviated pundit round up, bloomberg, watch, poll, joe, review, cnnpolitics, lawrence, first listen, delingpole, trump, episode #, breaking, chart, paid program, r, top stories, bloomberg professional services, tiny desk concert, slideshow, abbreviated pundit roundup, police, the morning download, ap fact check, sign the petition, flashback, add your name`
+    ```
+    dailycaller, breitbart, cnn video, the daily caller, listen now, analysis, video, opinion, perspective, the latest, report, ap news, cnn, cnncom, cartoon, the huffington post, d, markets wrap, exclusive, open thread for night owls, morning digest, matthews, abbreviated pundit round up, midday open thread, watch, review, joe, poll, cnnpolitics, lawrence, first listen, episode #, delingpole, bloomberg, trump, bloomberg professional services, r, sign the petition, breaking, tiny desk concert, the morning download, top stories, chart, slideshow, police, the morning risk report, abbreviated pundit roundup, paid program, add your name, ap fact check
+    ```
 
-1. Skim off segments where the p-value under the chi-squared test is under `0.0001`, which gives set of 1,855 spans with (very) strong associations with one or more outlets. Remove  these from all headlines.
+1. Skim off segments where the p-value under the chi-squared test is under `0.0001`, which gives set of 1,719 spans with (very) strong associations with one or more outlets. Remove  these from all headlines.
 
 This produces a highly standardized representation of each headline that basically consists of a stream of ASCII lexemes. For example, using some examples from before, with the original headline first, cleaned tokens second:
 
