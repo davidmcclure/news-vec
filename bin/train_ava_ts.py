@@ -20,7 +20,7 @@ def main(headline_root, skim, line_enc, pred_root):
     """
     corpus = Corpus(headline_root)
 
-    dataset = HeadlineDataset.from_df(corpus.sample_ava_ts_deciles(), 'label')
+    dataset = HeadlineDataset.from_df(corpus.sample_ava_ts_deciles())
 
     if skim:
         dataset = dataset.skim(skim)
