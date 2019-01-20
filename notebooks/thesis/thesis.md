@@ -332,7 +332,7 @@ So -- how to clean the headlines, how to cut out the "paratext" without dipping 
 
 1. Clean the tokens - downcase, strip punctuation. Keep `$` and `%`, but replace `[0-9]+` digits with a single `#` character, since different outlets have different conventions for how numbers are reported / formatted.
 
-1. Break on any kind character that could mark a logical "break," defined here as `'[^a-z0-9\s,\'"\$%]'`. Essentially, anything other than letters, numbers, commas, and quotes -- `.`, `;`, `:`, `!`, `?`, `|`, `-`, `~`, etc. As a special case, also break on the word "via," which is used by some outlets to identify the source ("... via @dailycaller"). This breaks each headline into a set of cleaned segments -- for example,
+1. Break on any kind "separator" character that could mark a logical break between sections of a headline -- `:`, `|`, `-`, `~`, etc. As a special case, also break on the word "via," which is used by some outlets to identify the source ("... via @dailycaller"). This breaks each headline into a set of cleaned segments -- for example,
 
     ```python
     'Catching waves with top-ranked African surfer - CNN Video'
