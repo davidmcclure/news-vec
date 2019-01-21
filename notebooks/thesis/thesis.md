@@ -228,60 +228,60 @@ Before comparing across the full set of seven models, though -- how difficult is
 ```
                     precision    recall  f1-score   support
 
-        apnews.com       0.45      0.48      0.47      1824
-     bloomberg.com       0.49      0.58      0.53      1913
-     breitbart.com       0.75      0.74      0.75      1894
-      buzzfeed.com       0.58      0.79      0.67      1880
-           cnn.com       0.64      0.24      0.35      1940
-   dailycaller.com       1.00      0.85      0.92      1900
-      dailykos.com       0.47      0.71      0.56      1853
-       foxnews.com       0.36      0.36      0.36      1888
-huffingtonpost.com       0.36      0.29      0.32      1830
-         msnbc.com       0.45      0.58      0.51      1840
-           npr.org       0.36      0.36      0.36      1823
-       nytimes.com       0.45      0.34      0.39      1966
-       thehill.com       0.41      0.54      0.47      1899
-washingtonpost.com       0.57      0.44      0.50      1838
-           wsj.com       0.42      0.32      0.37      1924
+        apnews.com       0.47      0.48      0.47      1909
+     bloomberg.com       0.51      0.58      0.54      1942
+     breitbart.com       0.77      0.75      0.76      1910
+      buzzfeed.com       0.57      0.79      0.67      1949
+           cnn.com       0.69      0.26      0.37      1854
+   dailycaller.com       1.00      0.86      0.92      1959
+      dailykos.com       0.47      0.69      0.56      1990
+       foxnews.com       0.35      0.37      0.36      1822
+huffingtonpost.com       0.35      0.30      0.32      1802
+         msnbc.com       0.46      0.57      0.51      1833
+           npr.org       0.38      0.37      0.37      1874
+       nytimes.com       0.45      0.34      0.39      1923
+       thehill.com       0.42      0.56      0.48      1884
+washingtonpost.com       0.59      0.45      0.51      1835
+           wsj.com       0.44      0.33      0.37      1879
 
-         micro avg       0.51      0.51      0.51     28212
-         macro avg       0.52      0.51      0.50     28212
-      weighted avg       0.52      0.51      0.50     28212
+         micro avg       0.52      0.52      0.52     28365
+         macro avg       0.53      0.51      0.51     28365
+      weighted avg       0.53      0.52      0.51     28365
 ```
 
 Where, for a some outlets, the model is almost perfect -- 100% precision for The Daily Caller. Which, in a sense, almost seems *too* good. It could be that The Daily Caller is just that distinctive, but, more likely, this suggests that there is some kind of unambiguous lexical signal in the headlines that's making the task trivial in some cases.
 
 To get a sense of which features are doing the heavy lifting, we can skim off ngrams with strongest chi-squared statistic for each outlet:
 
-- **breitbart.com** - delingpole :, illegal, delingpole, :, islamic, illegal aliens, amnesty, : ', report :, cartel, |, ', ' |, ' | breitbart, ' -, ' - breitbart, -, | breitbart, - breitbart, breitbart
+- **cnn.com** - the bell, know before the, : live, before the bell, premarket :, premarket, : live updates, fast facts, trump - cnn, - cnn.com, cnn.com, ? -, ' - cnn, ? - cnn, -, video, cnn, cnn video, - cnn video, - cnn
 
-- **cnn.com** - to know before, the bell, know before the, trump - cnn, fast facts, : live updates, before the bell, premarket, premarket :, - cnn.com, cnn.com, ? -, ? - cnn, ' - cnn, -, video, cnn, cnn video, - cnn video, - cnn
+- **dailycaller.com** - ? via dailycaller, - the daily, ' [ video, caller, ' [, the daily caller, daily caller, ' via, ' via dailycaller, video ] via, [ video, video ], [ video ], ] via, ] via dailycaller, ], [, via, dailycaller, via dailycaller
 
-- **nytimes.com** - review, evening briefing, , dies, california today :, california today, recipe, n.f.l., |, today :, nyc this week, g.o.p., nyc this, in nyc this, opinion | the, review : ', briefing, review :, : your, opinion, opinion |
+- **breitbart.com** - illegal, - ', nolte, illegal aliens, delingpole :, amnesty, delingpole, report :, : ', cartel, |, ', ' |, ' | breitbart, ' -, ' - breitbart, -, | breitbart, - breitbart, breitbart
 
-- **bloomberg.com** - start your, billion, know to, stocks, to know to, to start your, know to start, start your day, five things you, said to, markets, oil, wrap,  , : markets, : markets wrap, markets wrap, brexit, u.k.
+- **dailykos.com** - for night, round up :, night owls, for night owls, open thread for, thread for night, thread for, daily kos elections, kos elections, pundit, thread, cartoon :, abbreviated pundit, open thread, abbreviated, trumpcare, digest :, daily kos, kos, digest
 
-- **dailycaller.com** - ? via dailycaller, caller, - the daily, daily caller, the daily caller, ' [ video, ' [, ' via, ' via dailycaller, video ] via, video ], [ video ], [ video, ] via dailycaller, ] via, ], [, via, via dailycaller, dailycaller
+- **npr.org** - top stories, top stories :, on mountain, on mountain stage, mountain stage, listen :, first listen :, first listen, npr, on world, cafe, on world cafe, world cafe, listen, now :, listen now, 🔊 listen now, 🔊 listen, 🔊, listen now :
 
-- **apnews.com** - check : trump, police :, us, things to know, apnewsbreak, apnewsbreak :, latest : trump, ap fact, ap fact check, for today, know for today, 10 things, 10 things to, know for, to know for, ap, latest, the latest, the latest :, latest :
+- **msnbc.com** - rep., ..., round up ,, 's campaign round, campaign round, campaign round up, report ,, joe :, lawrence, 's mini, 's mini report, mini report ,, mini report, lawrence :, mueller, matthews, matthews :, trump, fmr ., fmr
 
-- **buzzfeed.com** - are, that 'll, people are, 19, make you, your, you ?, tell you, 'll tell you, 'll tell, are you ?, we 'll tell, are you, we 'll, which, 'll, and we, and we 'll, you, "
+- **bloomberg.com** - start your, bloomberg, know to, to know to, oil, five things you, to start your, know to start, start your day, stocks, billion, markets, wrap, said to,  , : markets, markets wrap, : markets wrap, brexit, u.k.
 
-- **washingtonpost.com** - opinion | the, review |, | why, 202, 202 :, | trump 's, d.c., analysis | trump, opinion | trump, analysis | the, | trump, ., | the, perspective, opinion, perspective |, opinion |, analysis, |, analysis |
+- **nytimes.com** - in nyc this, nyc this, g.o.p., new york today, york today, york today :, california today, california today :, , dies at, , dies, evening briefing, review : ', recipe, opinion | the, briefing, today :, review :, : your, opinion, opinion |
 
-- **huffingtonpost.com** - funniest, tips for, your, colbert, trans, 's morning email, via, parents this week, via dailycaller, dailycaller, morning email :, tweets from parents, from parents this, parents this, morning email, ways, funniest tweets, lgbtq, funniest tweets from, marketing
+- **washingtonpost.com** - review |, opinion | the, | trump 's, | why, opinion | trump, d.c., 202 :, 202, analysis | trump, | trump, analysis | the, | the, ., perspective, opinion, perspective |, opinion |, analysis, |, analysis |
 
-- **foxnews.com** - via dailycaller, dailycaller, news first :, , cops, , officials say, what to know, watters, eric shawn, gutfeld on, tucker, police say, , report, , police, tucker :, gutfeld :, , police say, report says, hannity :, , report says, gutfeld
+- **wsj.com** - download :, the morning download, china, the morning risk, morning risk, morning risk report, risk report :, risk report, fed 's, ecb, opinion journal, opinion journal :, ', eurozone, ' review, ' review :, the morning, investors, fed, u.s.
 
-- **wsj.com** - wsj, growth, the morning download, morning download, morning download :, download :, risk report :, the morning risk, morning risk report, risk report, morning risk, paid program, ' review :, eurozone, china, ', investors, the morning, fed, u.s.
+- **buzzfeed.com** - that will, make you, your, we 'll reveal, 'll reveal, 19, you ?, tell you, are you ?, 'll tell you, 'll tell, are you, we 'll tell, which, we 'll, 'll, and we, and we 'll, you, "
 
-- **npr.org** - on mountain stage, mountain stage, stories :, top stories :, top stories, listen :, first listen :, first listen, npr, on world, cafe, on world cafe, world cafe, listen, now :, listen now, 🔊, listen now :, 🔊 listen now, 🔊 listen
+- **apnews.com** - 1st, check : trump, us, things to know, for today, apnewsbreak :, apnewsbreak, know for today, ap fact, ap fact check, 10 things, latest : trump, 10 things to, know for, to know for, ap, latest, the latest, the latest :, latest :
 
-- **msnbc.com** - mini, ..., 's campaign round, campaign round, campaign round up, round up ,, joe :, report ,, 's mini, mini report, 's mini report, mini report ,, lawrence, lawrence :, mueller, trump, matthews, matthews :, fmr ., fmr
+- **huffingtonpost.com** - via dailycaller, marketing, from women this, tweets from women, 20 funniest tweets, 20 funniest, the 20 funniest, funniest, from parents this, parents this week, parents this, tweets from, tweets from parents, email :, 's morning email, morning email, morning email :, lgbtq, funniest tweets, funniest tweets from
 
-- **thehill.com** - : trump, dem lawmaker, gop senator, ', senator :, :, trump :, dem senator, dem :, gop lawmaker, the memo :, trump, poll, healthcare, poll :, gop, dems, report, dem, : report
+- **thehill.com** - dem :, dem senator :, memo :, : trump, ', :, dem lawmaker, gop senator, trump, healthcare, poll, the memo :, senator :, dem senator, gop, poll :, dems, report, dem, : report
 
-- **dailykos.com** - kos elections live, thread for night, for night owls, owls, open thread for, thread for, night owls, cartoon :, kos elections, daily kos elections, pundit, thread, abbreviated pundit, open thread, abbreviated, trumpcare, digest :, digest, daily kos, kos
+- **foxnews.com** - eric shawn, , reports say, via, dailycaller, via dailycaller, police, napolitano :, tucker, gingrich, report says, gutfeld :, , report says, gutfeld on, gingrich :, tucker :, , police, police say, , police say, gutfeld, hannity :
 
 Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any meaningful connection to the substance of the headline, in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" to the outlets that literally just identify the outlet:
 
