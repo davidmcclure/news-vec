@@ -651,6 +651,9 @@ Meanwhile, with HuffPo, the misalignment plays out a bit differently. Here, agai
 
 Stepping back -- with these 15 outlets, it seems that when content and audience misalign, the discrepancies represent a kind of one-way short circuit in the underlying audience graph -- outlets with generally left-leaning audiences are producing headlines that sound more typical of headlines produced by right-leaning outlets. Or -- AP and The Hill are exposing left-leaning readers to issues, stories, topics, or styles that are generally more typical of right-leaning news feeds. But, this seems to only happen in one direction, from left to right; there don't appear to be outlets, in this set of 15, that perform this bridging function in the other direction.
 
+**TODO**: Overlap HL examples.
+**TODO**: Disaggregated pair deltas.
+
 ## Headlines as a temporal process
 
 - So -- content and audience generally do align quite closely. But not always, and when they don't, evidence that there's a one-directional aspect to misalignments, left -> right
