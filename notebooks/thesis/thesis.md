@@ -374,42 +374,40 @@ Now that we've scrubbed out these "giveaway" features, which would otherwise giv
 
 As a first experiment, we train each of the seven architectures on the same class-balanced subset of headlines, breaking the corpus into 80/10/10% train/dev/test splits. For the logistic regression and SVC, the dev set is ignored, and the model is simply fit on the training split and evaluated on test. For the neural models, we evaluate the performance on the dev set after every 100,000 training pairs, and implement an early-stopping rule that stops the training run when the loss on the dev set fails to improve over a 5-step window. The models achieve these accuracies, over 15 classes:
 
-- LSTM: 38.55%
-- LSTM + attention: 38.33%
-- LSTM + CNN: 38.31%
-- Linear SVC: 36.57%
-- Logistic regression: 35.46%
-- CNN: 35.09%
-- CBOW: 31.56%
+- LSTM + attention: 41.35%
+- LSTM + CNN: 40.95%
+- LSTM: 40.35%
+- Linear SVC: 38.60%
+- Logistic regression: 36.58%
+- CNN: 34.85%
+- CBOW: 33.59%
 
-So, even after aggressively scrubbing out the paratext, the models are able to learn a large amount of structure across the 15 outlets -- a random baseline here would get 7%. The strongest model turns out to be the vanilla LSTM -- nothing is gained by the attention network or convolutions over the states. (Which isn't particularly surprising here, since the the headlines are relatively short -- about 8 words on average -- and these kinds of additions tend to help most with longer sequences.)
+So, even after aggressively cleaning the headlines, the models are able to learn a large amount of structure across the 15 outlets -- a random baseline here would get 7%. The strongest models are the enhanced LSTMs, though the improvement over the vanilla LSTM is minor, just about 1%. (Which isn't surprising here, since the the headlines are relatively short -- about 8 words on average -- and these kinds of additions tend to help most with longer sequences.) Also notable is the quite strong performance of the non-neural baselines, which are just 4 points off the strong neural models, and better than the weakest two neural architectures. (And, it's worth noting, they also fit two orders of magnitude faster, on CPUs, than it takes to train the neural models on a GPU.) This suggests that a majority of the learnable structure across the outlets is a function of which words and phrases are being used -- information that can be captured in the bag-of-words ngram features exposed to the logistic regression and SVC -- and that syntagmatic structure of the headlines -- the sequence of combination, which can be modeled by the recurrent neural models -- is comparatively less important. To borrow categories from Jakobson -- the salient differences are largely in the axis of "selection" -- which words and phrases are being included -- and less in the axis of "combination," the patterns with which they are strung together into left-to-right sequences.
 
-Also notable is the quite strong performance of the non-neural baselines, which are just 4 points off the strong neural models, and better than the weakest two neural architectures. (And, it's worth noting, they also fit two orders of magnitude faster, on CPUs, than it takes to train the neural models on a GPU.) This suggests that a majority of the learnable structure across the outlets is a function of which words and phrases are being used -- information that can be captured in the bag-of-words ngram features exposed to the logistic regression and SVC -- and that syntagmatic structure of the headlines -- the sequence of combination, which can be modeled by the recurrent neural models -- is comparatively less important. To borrow categories from Jakobson -- the salient differences are largely in the axis of "selection" -- which words and phrases are being included -- and less in the axis of "combination," the patterns with which they are strung together into left-to-right sequences.
-
-Moving beyond the overall accuracy score -- we can also unroll the individual F1 scores for each of the outlets, which starts to give crude evidence that there could be interesting differences in the "structure" or "profile" of the content across the 15 outlets. Taking results from the LSTM -- the precision and recall scores vary considerably. For example, the model is able to correctly identify 71% of all BuzzFeed headlines; but just 13% of CNN headlines, and 23% of Fox:
+Moving beyond the overall accuracy score -- we can also unroll the individual F1 scores for each of the outlets, which starts to give crude evidence that there could be interesting differences in the "structure" or "profile" of the content across the 15 outlets. Taking results from the LSTM with attention -- the precision and recall scores vary considerably. For example, the model is able to correctly identify 73% of all BuzzFeed headlines; but just 23% of CNN headlines, and 26% of Fox:
 
 ```
                     precision    recall  f1-score   support
 
-        apnews.com       0.36      0.51      0.42      1824
-     bloomberg.com       0.47      0.59      0.52      1913
-     breitbart.com       0.39      0.39      0.39      1894
-      buzzfeed.com       0.69      0.71      0.70      1880
-           cnn.com       0.25      0.13      0.17      1940
-   dailycaller.com       0.38      0.22      0.28      1900
-      dailykos.com       0.48      0.54      0.51      1853
-       foxnews.com       0.33      0.23      0.27      1888
-huffingtonpost.com       0.33      0.28      0.30      1830
-         msnbc.com       0.36      0.57      0.44      1840
-           npr.org       0.30      0.27      0.29      1823
-       nytimes.com       0.34      0.30      0.32      1966
-       thehill.com       0.31      0.45      0.37      1899
-washingtonpost.com       0.36      0.26      0.30      1838
-           wsj.com       0.34      0.35      0.34      1924
+        apnews.com       0.42      0.59      0.49      1909
+     bloomberg.com       0.49      0.64      0.56      1942
+     breitbart.com       0.46      0.44      0.45      1910
+      buzzfeed.com       0.63      0.73      0.68      1949
+           cnn.com       0.26      0.23      0.24      1854
+   dailycaller.com       0.35      0.28      0.31      1959
+      dailykos.com       0.56      0.57      0.57      1990
+       foxnews.com       0.31      0.26      0.29      1822
+huffingtonpost.com       0.39      0.23      0.29      1802
+         msnbc.com       0.38      0.58      0.46      1833
+           npr.org       0.36      0.28      0.31      1874
+       nytimes.com       0.35      0.31      0.33      1923
+       thehill.com       0.35      0.41      0.37      1884
+washingtonpost.com       0.34      0.26      0.30      1835
+           wsj.com       0.40      0.35      0.37      1879
 
-         micro avg       0.39      0.39      0.39     28212
-         macro avg       0.38      0.39      0.38     28212
-      weighted avg       0.38      0.39      0.37     28212
+         micro avg       0.41      0.41      0.41     28365
+         macro avg       0.40      0.41      0.40     28365
+      weighted avg       0.41      0.41      0.40     28365
 ```
 
 Why? What does this correspond to, in the underlying content? Before we tackle the question of *proximity* between outlets -- trying to assign precise measurements for the degree to which outlets are similar and different, which will open the door to the comparison with the underlying audience graph -- how to get a birds-eye view of what the content from different outlets actually consists of? If we imagine that the 18k headlines from each outlet constitute a kind of linguistic "footprint" or "signature" -- how can we characterize these footprints? What do they consist of, how are they organized, how do they differ from outlet to outlet? How to "read" 200k headlines, without actually reading 200k headlines?
