@@ -780,31 +780,51 @@ To get at this -- let's turn back to the embeddings learned by the neural models
 Here are headlines closest to `(buzzfeed 2018) - (buzzfeed 2017)` -- things that are most typical of the end of the time window:
 
 ```
-Build An Over The Top Skillet Cookie And We 'll Reveal Which Foodie Job You Should Have
-Cast And Create A Drama Movie In Six Steps And We 'll Tell You Its Score On Rotten Tomatoes
-Pick Your First Day Of School Outfit And We 'll Tell You If You 're A Freshman , Sophomore , Junior , Or Senior
-Pick Some Colored Shirts And We 'll Reveal Which " The Breakfast Club " Character You 're Most Like
-Design Your Dream Home And We 'll Tell You Which Character In " Gilmore Girls " You Are
-Answer These Five Questions And We 'll Tell You Which Shrek Character You Are In Bed
-Which " To All The Boys I 've Loved Before " And " Mamma Mia ! " Character Are You A Combo Of ?
-Describe Your Instagram Habits And We 'll Tell You What Type Of Camp Counselor You Are
+Build A Trendy Hipster Meal And We 'll Tell You Which YA Heroine You Are
+Write A Love Letter And We 'll Tell You Which " To All The Boys " Character You 're Compatible With
+Eat A Bunch Of Food And We 'll Tell You Which " SpongeBob " Character You Are
+Rate These Movie Theater Snacks And We 'll Reveal If You 'd Survive In A Slasher Film
 Make A Break Up Playlist And We 'll Tell You Which Marvel Superhero You 're Most Compatible With
-Dress Head To Toe In Urban Outfitters And We 'll Reveal Which " Riverdale " Character You Are
+Pick Some Colored Shirts And We 'll Reveal Which " The Breakfast Club " Character You 're Most Like
+Make A Breakup Playlist And We 'll Tell You Which Marvel Superhero You 're Most Compatible With
+Pick Your First Day Of School Outfit And We 'll Tell You If You 're A Freshman , Sophomore , Junior , Or Senior
+Order Some McDonald 's , And We 'll Reveal Whether Your Soulmate Is More Like Jamey Or Peter Kavinsky
+Choose Between These Gucci Items And We 'll Tell You Which Disney Princess You Are
+See A Movie At The Premiere And We 'll Tell You If You 're More Drake Or Josh
+Plan A Movie Night And We 'll Tell You Which Character From " The Incredibles " You 're Most Like
+Eat Your Way Through A Picky Eaters Buffet And We 'll Guess Your Actual And Emotional Ages
+Tick Off The Instagram Influencers You Know And We 'll Tell You How Instagram Obsessed You Are
+Go Back To School Shopping And We Will Tell You Which BTS Member Is Your Soulmate
+Eat At Taco Bell And We 'll Tell You Which Avenger Would Be Your Best Friend
+Plan A Netflix Marathon , And We 'll Reveal Why Your Crush Has n't Noticed You Yet
+Choose Your Favorite TV Shows And We 'll Tell You Which Fandom You Should Join
+Pick Random Things From The ' 90s And We 'll Tell You Who Your " Everything Sucks ! " BFF Is
+Fill Up Your ASOS Cart And We 'll Tell You Which Female Celeb You Belong With
 ```
 
 So, still clickbait, but a more particular type, of the form "[Do a quiz], and [we'll tell you something about yourself]." Going in the other direction, though, gives a clearer sense of the overall shift. Here's `(buzzfeed 2017) - (buzzfeed 2018)`, things that mark the beginning of the corpus as compared to the end:
 
 ```
-Koch Network Focuses On Understanding Trump Voters
-Trump Moves To Challenge Vaccine Science
+Dakota Access Pipeline Challengers Race To Court To Block Construction
 Trump Vineyard Seeks More Foreign Workers
-Uber Defends Charging Customers 500 % More For Cars During Tube Strike
-Trump Stands By Past Support For Universal Health Care
-You 're Stuck With Gogo : Government Reverses Plan For Cell Service On Planes
-Activists Prepare To Battle Trump Over Immigrants ' Use Of Public Benefits
-Before The Gold Rush : The Legendary Decorator Who Tried ( And Failed ) To Make Trump Tower Tasteful
-Company Tied To Trump Campaign Once Pushed For Voter Suppression
 Trump Begins Rolling Back Major Obama Water Pollution Rule
+Trump Wrote Iraq WMDs Were Threat Year Before Bush Took Office
+Trump Winery Seeks Even More Foreign Workers
+Alongside Trump , Intel Reannounces Arizona Factory
+Trump Moves To Challenge Vaccine Science
+Trump Gets Anonymity After Dissing Anonymous Sources
+With Tough Re Elections Looming , Democrats Plot Confirmation Hearing Strategy
+EPA 's Science Panel Might Soon Be Stacked With Polluters
+Tom Steyer Moves Beyond Climate
+Guardian Ditches Move To Kushner Building After Newsroom Revolt
+NAACP Leaders : Romney Ca n't Connect With Black Audiences
+Pentagon " Presenting Options " For Military Action In Syria
+20th Century Fox Optioned Bill O'Reilly WWII Book Months Before His Exit
+Employers Abuse Foreign Workers . U.S. Says , By All Means , Hire More .
+Trump Says Post Crisis Financial Rules Will Be Cut Back
+Democrats Confront Lefty Fake News
+US Intelligence Officials : Latest WikiLeaks Drop " Worse Than Snowden " Docs
+Lawyers Descend On Washington To Aid Trump Protesters
 ```
 
 So -- in aggregate, BuzzFeed's ratio of political-coverage-to-listicles has gone down; it seems as if the sudden surge in distinguishability in the summer of 2018 is caused by the quizzes, or other similar articles.
@@ -814,51 +834,51 @@ So -- in aggregate, BuzzFeed's ratio of political-coverage-to-listicles has gone
 What about Fox? Moving in chronological order, this time -- here are the 20 headlines that mark Fox in winter of 2017 relative to fall of 2018:
 
 ```
-Alpha by day , beta by night : How to make love last
-White House ' Skype ' seats to debut on Wednesday
-Has science lost its way ?
-Donald Trump plans to undo Dodd Frank law , fiduciary rule
-Blind Gamer Wins ' Street Fighter ' Match
-ADB : Asian growth seen steady , US policy uncertainty a risk
-Tech Q&A : Dealing with Facebook blowhards
-Spain arrests Russian hacker sought by US
-SoftBank quarterly profit soars on investment empire
-Coal mining goes high tech
-Inspector general to review pullback of HealthCare.gov ads
-Trump policy dims hope for refugees in Indonesian limbo
+Trump : No plans to fill ' unnecessary ' appointed positions
+Teachers Unions In A Panic Over School Choice
+Best job search websites
+' Bikepacking ' adds a dose of fun to backpacking
+Fox News Poll : Fewer fret over , more focus on politics
+Eurozone growth edging higher at the start of second quarter
+Is health care a right ?
+Five reasons not to observe Lent
+Governor of Puerto Rico on debt crisis , push to become state
+North Korea : A rare look inside an insulated yet menacing country
+Mosquitoes and ticks are coming for us all this summer
+Is whiskey becoming less popular ?
+CEO gives job applicants a ' snowflake test '
+Reformist head of Ukraine 's central bank resigns
+Is Zika still a concern ?
+OPINION : One Way or Another , Confirm Judge Gorsuch
 Trump Starts Over With Tax Plan : Report
-Court rules in favor of worker in gig economy lawsuit
-US challenge in Syria : Keep allies from fighting one another
-Teaching young Americans about money
-Evacuations from Syrian water rich region completed
-US launches airstrikes in Syria
-McMullin faces big election debt amid talk about run for Chaffetz seat
-Trump taps Neil Gorsuch to fill Supreme Court vacancy
+Who runs the world ?
+Stock it or skip it ? How to cut grocery costs
+Agriculture nominee will distance himself from businesses
 ```
 
 Quite a bit of general political news -- often with an economic angle -- and international stories. In the other direction -- stories that mark 2018, compared to 2017:
 
 ```
-How ' The View ' star Joy Behar went from teacher to comic to liberal pundit Trump supporters love to hate
+Florida female felon 's bloody mugshot the result of her head on crash while fleeing cops , officials say
+SC woman allegedly told cops she 's a ' clean , thoroughbred , white girl ' after being pulled over : report
+Jefferson Airplane singer Marty Balin sues hospital , claiming he lost part of his tongue after botched tracheotomy
+' Smallville ' actress Allison Mack asks court to let her continue acting amid NXIVM sex cult allegations
+Charlie Sheen claims he ca n't afford child support after being ' blacklisted ' in Hollywood , says report
+Gunman shot by Florida armed bystander still hospitalized , NRA says shooting example of ' good guy with a gun '
+' The Wire ' creator David Simon reveals in profanity laced post that he was banned from Twitter after wishing death on Trump supporter
+World renowned lesbian NYU professor suspended after probe finds she sexually harassed gay male student , report says
+Carter Page was ' more like Inspector Gadget than Jason Bourne , ' Gowdy says amid FISA release
+Ohio grocery store employee facing felony theft charges for eating $ 9,200 of deli ham
+USS Arlington , named in honor of 9/11 victims and responders , visits NYC for first time during Fleet Week
+Fury as feminist activist says she 's ' confused ' seeing black man with pro NRA and Tea Party bumper stickers
+Crystal Rogers ' mother suspects boyfriend for her disappearance in doc : ' You do n't know what kind of monsters live there '
+South Carolina mom blown away by students ' sweet act toward son at lunchtime : ' It gives me peace '
+' Horny ' passenger on United flight allegedly molested woman sitting next to him , lawsuit claims
+2 American Airlines planes land at Philadelphia International Airport carrying multiple passengers experiencing ' flu like symptoms '
 Albanian man reportedly kills 8 relatives over stolen turkeys , sends Facebook message to prime minister before arrest
-Missouri nun busted at Sydney airport for smuggling cocaine inside high heels , officials say
-ICE rips California county for scrapping contract to house detainees , says move could backfire
-4 climbers , including 2 Boy Scouts , found alive after going missing while hiking Mount Baker in Washington
-California school district 's ' permissive ' dress code welcoming tube tops , ripped jeans and pajamas sparks debate
-North Carolina woman claims she nearly lost leg after contracting serious infection from pedicure
-Dramatic video shows moment Florida cop saves little girl from hot car after she was trapped inside for 12 hours
-Lena Dunham poses in underwear while giving her support of Cynthia Nixon for NY governor
-Peter Strzok , FBI agent pulled from Mueller probe over anti Trump texts , reportedly open to testify to Congress
-Democrats gain entry to NJ immigration detention center after arguing with cops , ' literally banging on the door '
-Sports Illustrated Swimsuit model Hunter McGrady recalls the moment she accepted her ' God given body '
-Stevie Nicks survived abusive relationship with former bandmate Lindsey Buckingham , crippling drug addiction , book claims
-American Airlines flight makes emergency landing after passengers say ' flames ' came out of engine
-Woman claims ' marriage scam ' tricked her into marrying complete stranger during mock wedding
-MSNBC 's Joy Reid threatened colleague with violence , was homophobic during her radio days , ex bosses say
-Cincinnati police release bodycam footage of cop firing through window , gunning down mass shooter at bank
-Off duty police officer , mom hailed as hero for taking out would be robber at Mother 's Day event near school
-Press barred from event where Samantha Bee apologizes for ' unfiltered ' slam on Ivanka Trump while accepting ' social change ' award
-NBC News ' ' self described unbiased journalist ' Andrea Mitchell slammed for siding with Eagles over Trump
+Trump calls on DOJ to investigate New York Times ' publication of anonymous , anti Trump column by ' senior administration official '
+Texas mom , concert pianist 's wife , found not guilty of smothering daughters by reason of insanity
+Shirtless man stares down Hurricane Florence with American flag in hand : ' Just being free and American '
 ```
 
 Which is a very distinctive list -- for lack of a better word, it's a sort of "tabloid" style, focusing on crime (often grisly, bizarre), personal misfortune (marriage scams, Stevie Nicks' drug addiction), and socially charged political issues (siding with the NFL over Trump).
