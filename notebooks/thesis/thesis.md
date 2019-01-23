@@ -629,11 +629,15 @@ So, a modal value of ~0.45, though with quite a bit of variation. (This is where
 
 So -- Bloomberg, Breitbart, and WSJ occupy very similar "locations" in the headline and audience graphs -- when Bloomberg "sounds like" another outlet, it generally also has a very high level of audience overlap with the outlet. To get a sense of what this looks like -- here are the broken-out content / audience similarities for these three:
 
-<img src="figures/ca-bloomberg-composite.png" width="600" />
-
 <img src="figures/ca-breitbart-composite.png" width="600" />
 
+<img src="figures/ca-bloomberg-composite.png" width="600" />
+
+<img src="figures/ca-foxnews-composite.png" width="600" />
+
 <img src="figures/ca-wsj-composite.png" width="600" />
+
+<img src="figures/ca-dailycaller-composite.png" width="600" />
 
 Meanwhile, at the other end of the spectrum -- AP, The Hill, and Huffington Post have significantly "misaligned" headline / audience graphs -- there are (many) places, in other words, where they produce headlines that sound very similar to another outlet, but the audience overlap between the two is low; or vice versa. Here are the broken-out similarities:
 
@@ -641,7 +645,11 @@ Meanwhile, at the other end of the spectrum -- AP, The Hill, and Huffington Post
 
 <img src="figures/ca-thehill-composite.png" width="600" />
 
+<img src="figures/ca-washingtonpost-composite.png" width="600" />
+
 <img src="figures/ca-huffingtonpost-composite.png" width="600" />
+
+<img src="figures/ca-cnn-composite.png" width="600" />
 
 So, what's actually going on with these? Though the specifics are different, one interpretation is to say -- in each case, there is a high level of headline overlap with right-leaning outlets, but a high level of audience overlap with left-leaning outlets. For example, with AP -- the headlines sound most similar to Fox, by a large margin, but the audience overlap with Fox is very low; and, the highest audience overlaps are with WaPo, The Hill, and NYT. Likewise, with The Hill -- the headlines sound (comparatively) similar to The Daily Caller and Breitbart, but the higher audience overlaps are with WaPo, HuffPo, and CNN.
 
