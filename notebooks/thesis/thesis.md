@@ -621,7 +621,7 @@ Which makes it possible to see the overall level of alignment between the two se
 
 So, for NYT -- overall, an alignment between content and audience, though with a couple of wrinkles. How can we quantify this? Under the hood, for each combination of `(NYT, other outlet)`, we've got 16 different headline similarity scores and 6 different audience similarity scores. From these, we can take each unique pairing of headline metric and audience metric and simply calculate the correlation of these scores, across each of the other 14 outlets. This gives, then a *distribution* over correlations that represent the degree to which the NYT headline graph matches up with the NYT audience graph:
 
-<img src="figures/nyt-corr-dist.png" />
+<img src="figures/nyt-corr-dist.png" width="400" />
 
 So, a modal value of ~0.45, though with quite a bit of variation. (This is where all of the different measurements of similarity come in handy -- by aggregating over all of them, we can get a much more densely-sampled view on these relationships.) We can then do this for each of the 15 outlets, and compare these distributions over correlations, which surfaces some very significant differences:
 
