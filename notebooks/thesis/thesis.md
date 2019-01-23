@@ -649,8 +649,14 @@ Meanwhile, with HuffPo, the misalignment plays out a bit differently. Here, agai
 
 Stepping back -- with these 15 outlets, it seems that when content and audience misalign, the discrepancies represent a kind of one-way short circuit in the underlying audience graph -- outlets with generally left-leaning audiences are producing headlines that sound more typical of headlines produced by right-leaning outlets. Or -- AP and The Hill are exposing left-leaning readers to issues, stories, topics, or styles that are generally more typical of right-leaning news feeds. But, this seems to only happen in one direction, from left to right; there don't appear to be outlets, in this set of 15, that perform this bridging function in the other direction.
 
-**TODO**: Overlap HL examples.
-**TODO**: Disaggregated pair deltas.
+- disaggregated pair deltas.
+- under the hood -- what's actually going on here? eg, when AP sounds like Fox, or DK like DC, what does that mean? what is/isn't the clf picking up?
+- how to find examples of "confusable" hls? not totally obvious -- can take hls from A that sound most like hls from B, but this will generally just tell something about most B-ish hls, not the specific A/B overlap.
+- instead -- like before, when measuring "diameter" of embedding families -- sample N hls from A, N from B, take pw cosine distances, then skim off N closest pairs; or, the matched A/B pairs that are closest in the high-dimensional space. by looking at these, can get a sense of why the model considers A/B to be similar.
+- mixed results
+- Fox/AP, Fox/CNN -- shared attention + shared viewpoint (crime, international)
+- DailyCaller/DailyKos, Breitbart/DailyKos -- shared attention, but different viewpoints
+- Hill/DailyCaller -- shared attention + *neutral* viewpoint -- (relatively) down-the-middle political reporting
 
 ## Headlines as a temporal process
 
@@ -731,7 +737,7 @@ From this, a number of clear trends start to fall out. First, there seems to be 
 
 This makes it easier to reason about the full structure of all 120 pairwise accuracy changes, but, there's still one piece of information missing here. We're being somewhat imprecise, really, when we say that outlets are "converging" or "diverging," which implies that both are moving towards or away from each other. When really, the edges here are *undirected* -- all they tell us is that, for example, The Huffington Post and The Hill are harder for the classifier to tell apart in fall of 2018 than in spring of 2017. But, this doesn't us anything about the relative degree to which each outlet has changed of the change -- has Huffington Post moved towards the The Hill, or vice versa? Or, a bit of both? In theory, any combination is possible.
 
-**TODO**: Show direction on graph edges, by comparing size of mean embedding shift.
+- direction on graph edges.
 
 So, the classifiers tell us that these shifts in proximity have taken place. But, what do they actually consist of? If BuzzFeed and Fox are significantly more recognizable to the models in the fall of 2018 than in winter of 2017 -- what's changed?
 
@@ -803,6 +809,8 @@ Trump Begins Rolling Back Major Obama Water Pollution Rule
 
 So -- in aggregate, BuzzFeed's ratio of political-coverage-to-listicles has gone down; it seems as if the sudden surge in distinguishability in the summer of 2018 is caused by the quizzes, or other similar articles.
 
+- huffpo is the opposite of BF - moves away from listicle / advice headlines, towards political reporting, similar to hill, DK, CNN
+
 What about Fox? Moving in chronological order, this time -- here are the 20 headlines that mark Fox in winter of 2017 relative to fall of 2018:
 
 ```
@@ -859,7 +867,11 @@ This suggests, then, that the "departure" of Fox -- its monotonic rise in distin
 
 <img src="figures/ts-ova-fox.png" />
 
-**TODO**: How much of this is driven by changes in the length of the headlines? The tabloid-y headlines are longer than average, but that doesn't seem to be the driving factor -- when we do this with the "CBOW" model, which has no knowledge of the word count, similar results.
+- so, BuzzFeed spins off into quizzes; HuffPo stops producing listicles / advice, moves into more down-the-middle political reporting; Fox spins off into tabloids.
+- last big trend -- convergence of CNN, NYT, WaPo, and NPR -> DK. what's up here?
+- can get at this by taking, eg, (NYT beginning -> DK end), and finding closest NYT end articles to this difference vector.
+- in all cases -- everyone converging on covering Trump admin, which DK was apparently doing all along.
+- for CNN, NYT, and WaPo, this comes at the expense of international coverage; for NPR, music / art coverage. so, convergence on domestic political coverage.
 
 ## Shifting headlines, shifting audience?
 
