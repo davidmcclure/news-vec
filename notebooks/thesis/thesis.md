@@ -762,171 +762,217 @@ To ensure that the headline embeddings are consistently sampled for all outlets 
 
 <img src="figures/ts-ab-radial-magnitude.png" width="800" />
 
-
-
-
-
-it could be that both CNN and HuffPo have independently shifted their headlines in a common direction; or, it might be that CNN has stayed relatively stable, and HuffPo has moved towards it; or, vice versa, or any
-
-
- there's still one piece of information missing here. We're being somewhat imprecise, really, when we say that outlets are "converging" or "diverging," which implies that both are moving towards or away from each other. When really, the edges here are *undirected* -- all they tell us is that, for example, The Huffington Post and The Hill are harder for the classifier to tell apart in fall of 2018 than in spring of 2017. But, this doesn't us anything about the relative degree to which each outlet has changed of the change -- has Huffington Post moved towards the The Hill, or vice versa? Or, a bit of both? In theory, any combination is possible.
-
-- direction on graph edges.
-
-So, the classifiers tell us that these shifts in proximity have taken place. But, what do they actually consist of? If BuzzFeed and Fox are significantly more recognizable to the models in the fall of 2018 than in winter of 2017 -- what's changed?
-
-This is a big question, and there are a few of ways we could start to block in different views on an answer. We could treat it as a purely descriptive corpus-linguistic question, and find words or phrases that rise or fall most significantly over the time period. Or, we could just take the headlines from winter of 2017 where the model is most confident in the correct class -- the most "distinctive" headlines -- and compare to the most distinctive headlines in fall of 2018.
-
-For example, for BuzzFeed -- here are the 10 headlines from the first 10 temporal windows that look most BuzzFeed-y to the model:
+From this, a clearer picture comes into view -- the largest individual shifts are HuffPo, Fox, BuzzFeed, and then Daily Caller and CNN. What's actually going on with these? To get a specific sense of this, we can find the individual headlines that are most characteristic of the geometric movements in the embedding space. For example, to find headlines that "typify" the movement of BuzzFeed between the beginning and end of the data, we can take `(BuzzFeed 2018) - (BuzzFeed 2017)`, and then query for the individual BuzzFeed headlines that are closest to this difference vector -- headlines that mark BuzzFeed in 2018, specifically in comparison to BuzzFeed in 2017. Here are the top 20:
 
 ```
-19 Weird AF Tumblr Questions That Actually Kinda Make Sense
-Which Cinderella Character Are You ?
-16 Times Tumblr Was Fucking Funny About History
-Which Celesbian Is Your Soulmate ?
-Which Legion Character Are You ?
-Literally Just 100 Hilarious Memes About Disney
-Which " Shadowhunters " Character Are You ?
-Which Potato Food Are You ?
-Literally Just 22 Memes That 'll Make Any Australian Crack The Fuck Up
-31 Period Jokes That Are Just Really Fucking Funny
+pick some colors and we ll tell you which disney movie you should watch
+pick your favorite dcoms and we ll tell you which disney heartthrob you belong with
+pick # movies and we ll tell you if you re a pessimist or optimist
+shop at sportsgirl and we ll tell you which pet you should adopt
+pick some fruits and we ll guess your favorite disney princess
+pick a movie from each year and we ll tell you which comedy show you belong on
+pick some disney movies and we ll reveal your disney soulmate
+build your own disney storyline and we ll reveal your prince
+choose some food combos and we ll reveal which iconic duo you and your bff are
+choose some disney channel characters and we ll reveal if you re more extroverted or introverted
+pick nine random things and we ll tell you which sex and the city girl you are
+choose your favourite lyrics from the harry styles album and we ll tell you which of his suits you are
+build your own spooky restaurant and we ll tell you what costume you should wear for halloween
+eat a bunch of food and we ll tell you which spongebob character you are
+shop at the disney store and we ll give you a cute disney movie to watch
+which harry styles hair style are you
+which harry styles body part are you
+eat at taco bell and we ll tell you which avenger would be your best friend
+build your dream home and we ll tell you which twice song you are
+which disney cat are you
 ```
 
-And, from the last 10 windows:
+This suggests, then, that the rise in differentiability for BuzzFeed in the summer of 2018 is driven by a sudden explosion of this "quiz" genre, of the form "[Do a quiz], and [we'll tell you something about yourself]" -- which, evidently, is highly distinctive of BuzzFeed. Going in the other direction, though, gives a clearer sense of the overall shift. Here's `(BuzzFeed 2017) - (BuzzFeed 2018)`, things that mark the beginning of the corpus as compared to the end:
 
 ```
-Which Underrated Disney Character Are You ?
-Which " SpongeBob " Meme Are You ?
-Which " Friends " Character Are You ?
-Which Marvel Movie Character Are You ?
-Which Zodiac Goddess Are You ?
-19 Times Tumblr Was Fucking Funny About Periods
-Which Iconic Teen Movie Character Are You ?
-Which " Stranger Things " Character Are You Actually ?
-Which ACOTAR Character Are You ?
-33 Ridiculously Cute Products That Will 100 % Melt Your Heart
+congressmen seek to lift propaganda ban
+as trump takes office birth control startups see demand spike
+trump hotel contractor drops $ # million lawsuit
+north carolina officials seek to stop special elections
+guardian ditches move to kushner building after newsroom revolt
+two key republicans express doubts over devos s nomination
+trump warns republicans about botching obamacare repeal before thursday s climactic vote
+clinton iowa volunteers train when to push backers to omalley to block bernie
+prosecutors win back broad authority to charge supreme court protesters
+libyan dissident wins right to sue ex foreign secretary jack straw over rendition
+guardian announces layoffs after $ # kushner lease debacle
+prosecutors charge protesters with rioting over inauguration day protests
+newly designated national monuments highlight nation s civil rights struggle
+president trump speaks at cpac conference
+trump to address the nation tonight
+trump administration keeps major news orgs out of closed press briefing
+fear grips immigrants as enforcement raids sweep across us
+governor senator call for investigation of troubled youth psych facility
+prosecutors pursue rioting charges over inauguration day protests
+congressman met with sanctioned putin friend in moscow
 ```
 
-So -- all clickbait, pretty much, maybe with a bit more preference for the "Which ..." format in 2018. But, this might not actually be what we care about, in this setting. It's possible, for example, that there's a core body of very BuzzFeed-specific content that hasn't changed much over the last two years -- but that there could be significant changes in the content that sits "below" this, which wouldn't show up here.
+Which, in essence, is simply *politics*. So, BuzzFeed's ratio of political-coverage-to-listicles has gone down; in terms of its overall content profile, BuzzFeed is moving away from political coverage, towards quizzes.
 
-To get at this -- let's turn back to the embeddings learned by the neural models, and find the headlines that most specifically mark the difference -- in a literal, geometric sense -- between headlines at the beginning and end of the time period. We can do this -- take the embeddings for all BuzzFeed headlines in the first 10 windows, and take the dimension-wise mean; and then do the same for headlines in the last 10 windows. This gives two group-level averages. Then, if we subtract the first-10 average from the last-10 average, we get a "delta" vector that represents the aggregate movement in the vector space between the two groups. Then, we can find headlines that have the lowest angular distance from this delta vector -- the headlines, in a sense, that most precisely "typify" the group-level differences between the two time periods.
-
-Here are headlines closest to `(buzzfeed 2018) - (buzzfeed 2017)` -- things that are most typical of the end of the time window:
+What about Huffington Post, which, more than the other outlets, appears to have undergone a kind of "repulsive" shift relative to BuzzFeed? Moving in chronological order this time -- here's `(HuffPo 2017) - (HuffPo 2018)`, headlines that are distinctive of HuffPo at the beginning of the window:
 
 ```
-Build A Trendy Hipster Meal And We 'll Tell You Which YA Heroine You Are
-Write A Love Letter And We 'll Tell You Which " To All The Boys " Character You 're Compatible With
-Eat A Bunch Of Food And We 'll Tell You Which " SpongeBob " Character You Are
-Rate These Movie Theater Snacks And We 'll Reveal If You 'd Survive In A Slasher Film
-Make A Break Up Playlist And We 'll Tell You Which Marvel Superhero You 're Most Compatible With
-Pick Some Colored Shirts And We 'll Reveal Which " The Breakfast Club " Character You 're Most Like
-Make A Breakup Playlist And We 'll Tell You Which Marvel Superhero You 're Most Compatible With
-Pick Your First Day Of School Outfit And We 'll Tell You If You 're A Freshman , Sophomore , Junior , Or Senior
-Order Some McDonald 's , And We 'll Reveal Whether Your Soulmate Is More Like Jamey Or Peter Kavinsky
-Choose Between These Gucci Items And We 'll Tell You Which Disney Princess You Are
-See A Movie At The Premiere And We 'll Tell You If You 're More Drake Or Josh
-Plan A Movie Night And We 'll Tell You Which Character From " The Incredibles " You 're Most Like
-Eat Your Way Through A Picky Eaters Buffet And We 'll Guess Your Actual And Emotional Ages
-Tick Off The Instagram Influencers You Know And We 'll Tell You How Instagram Obsessed You Are
-Go Back To School Shopping And We Will Tell You Which BTS Member Is Your Soulmate
-Eat At Taco Bell And We 'll Tell You Which Avenger Would Be Your Best Friend
-Plan A Netflix Marathon , And We 'll Reveal Why Your Crush Has n't Noticed You Yet
-Choose Your Favorite TV Shows And We 'll Tell You Which Fandom You Should Join
-Pick Random Things From The ' 90s And We 'll Tell You Who Your " Everything Sucks ! " BFF Is
-Fill Up Your ASOS Cart And We 'll Tell You Which Female Celeb You Belong With
+how many people are vegetarian
+the rise of deaftalent
+the problem with tickling
+do women really need a yearly pelvic exam
+your favorite book characters are as real as you feel they are
+the genius trick for oatmeal that ll make your mornings easier
+make your goals stick
+start where you are
+a life in transitions the firsts
+shopping with an avatar
+the future of food is black
+the art of being kind
+how to make vegan parmesan cheese and make your dreams come true
+a lesson in organicology
+how dieting makes you gain weight
+tired of mid century modern try these cozy couches instead
+the revolting reason you might want to avoid canned greens
+why the floor is your friend
+the most anticipated books of # thus far
+the easiest salmon teriyaki you ve ever made
 ```
 
-So, still clickbait, but a more particular type, of the form "[Do a quiz], and [we'll tell you something about yourself]." Going in the other direction, though, gives a clearer sense of the overall shift. Here's `(buzzfeed 2017) - (buzzfeed 2018)`, things that mark the beginning of the corpus as compared to the end:
+Which, though different, might be categorized alongside BuzzFeed's quizzes and listicles -- here, lifestyle and advice content, maybe with a particular focus on diet and food. Meanwhile, headlines that are distinctive of HuffPo at the end of the window are almost all politics:
 
 ```
-Dakota Access Pipeline Challengers Race To Court To Block Construction
-Trump Vineyard Seeks More Foreign Workers
-Trump Begins Rolling Back Major Obama Water Pollution Rule
-Trump Wrote Iraq WMDs Were Threat Year Before Bush Took Office
-Trump Winery Seeks Even More Foreign Workers
-Alongside Trump , Intel Reannounces Arizona Factory
-Trump Moves To Challenge Vaccine Science
-Trump Gets Anonymity After Dissing Anonymous Sources
-With Tough Re Elections Looming , Democrats Plot Confirmation Hearing Strategy
-EPA 's Science Panel Might Soon Be Stacked With Polluters
-Tom Steyer Moves Beyond Climate
-Guardian Ditches Move To Kushner Building After Newsroom Revolt
-NAACP Leaders : Romney Ca n't Connect With Black Audiences
-Pentagon " Presenting Options " For Military Action In Syria
-20th Century Fox Optioned Bill O'Reilly WWII Book Months Before His Exit
-Employers Abuse Foreign Workers . U.S. Says , By All Means , Hire More .
-Trump Says Post Crisis Financial Rules Will Be Cut Back
-Democrats Confront Lefty Fake News
-US Intelligence Officials : Latest WikiLeaks Drop " Worse Than Snowden " Docs
-Lawyers Descend On Washington To Aid Trump Protesters
+susan collins receives # coat hangers ahead of kavanaugh vote
+tennessee man accused of burning black man alive was known white supremacist
+karl rove likens trump to stalin tells him to tone down anti press rants
+omarosa claims trump has mental decline that could not be denied
+country star gretchen wilson arrested after altercation on american airlines flight
+georgia cop suspended after liking racist kkk facebook posts
+c span caller unleashes racist rant about barack obama on air
+kathy griffin tells tomi lahren to go herself in scathing tweet
+twitter users shred trump for attacking labor leader on labor day
+gop rep duncan hunter wife indicted by grand jury in san diego
+democrats denounce ivanka trump for hypocrisy after she touts american jobs
+omarosa releases secret tape of lara trump discussing high paying campaign job
+it s time to decriminalize immigration say top texas dems
+maxine waters warns trump cabinet steel yourself for more public confrontations
+trump supporter arrested for threatening to kill journalists at boston globe
+statue of liberty protester trolls melania s i do nt care jacket
+cindy mccain kisses husband john mccain s casket during arizona service
+bob woodward fires back at eric trump over anti semitic slur
+colbert mocks humiliating moron trump for still obsessing over obama
+msnbc host mocks trump s phone call wishes for english to english translator
 ```
 
-So -- in aggregate, BuzzFeed's ratio of political-coverage-to-listicles has gone down; it seems as if the sudden surge in distinguishability in the summer of 2018 is caused by the quizzes, or other similar articles.
+So, Huffington Post has undergone a kind of mirror-image version of BuzzFeed's evolution. BuzzFeed shifted away from politics and towards clickbait; HuffPo shifted away from clickbait and towards politics.
 
-- huffpo is the opposite of BF - moves away from listicle / advice headlines, towards political reporting, similar to hill, DK, CNN
-- and, notable that in this period, significant decrease in total article volume and total links / impressions on Twitter.
-
-What about Fox? Moving in chronological order, this time -- here are the 20 headlines that mark Fox in winter of 2017 relative to fall of 2018:
+What about Fox? Which, again, has shifted away from almost everything else -- WSJ, BuzzFeed, CNN, WSJ, NYT, WaPo, and even other conservative outlets like Breitbart and Daily Caller -- it appears to be drifting off into some largely unoccupied linguistic space, far from everything. Moving chronologically -- here are headlines that mark Fox in spring of 2017 relative to fall of 2018:
 
 ```
-Trump : No plans to fill ' unnecessary ' appointed positions
-Teachers Unions In A Panic Over School Choice
-Best job search websites
-' Bikepacking ' adds a dose of fun to backpacking
-Fox News Poll : Fewer fret over , more focus on politics
-Eurozone growth edging higher at the start of second quarter
-Is health care a right ?
-Five reasons not to observe Lent
-Governor of Puerto Rico on debt crisis , push to become state
-North Korea : A rare look inside an insulated yet menacing country
-Mosquitoes and ticks are coming for us all this summer
-Is whiskey becoming less popular ?
-CEO gives job applicants a ' snowflake test '
-Reformist head of Ukraine 's central bank resigns
-Is Zika still a concern ?
-OPINION : One Way or Another , Confirm Judge Gorsuch
-Trump Starts Over With Tax Plan : Report
-Who runs the world ?
-Stock it or skip it ? How to cut grocery costs
-Agriculture nominee will distance himself from businesses
+are government leaders turning a blind eye toward debt
+biggest movies to look forward to in #
+bao bao ready for new life in china
+mayim bialik to register as muslim
+testing wearable sensors as check engine light for health
+why outdated seat belts may be putting lives at risk
+alitalia workers vote on cuts to stave off bankruptcy
+eurozone economic sentiment at near decade highs
+severe bolivian drought hurts crops threatens capital
+# minutes to a flatter firmer belly
+schools in rural areas shifting toward a # day week
+swede who made numbers and facts entertaining dies at #
+fewer fret over more focus on politics
+seiu s fight for $ # a flop despite spending $ # million
+winds from monster black holes can rapidly change their temperature
+a crash course in creative destruction
+dubai has new safety rules after high rise fires but few details
+apple s new spaceship hq set to open
+a former model starved to death but not from anorexia
+nigerian governor aid agencies misusing refugee funds
 ```
 
 Quite a bit of general political news -- often with an economic angle -- and international stories. In the other direction -- stories that mark 2018, compared to 2017:
 
 ```
-Florida female felon 's bloody mugshot the result of her head on crash while fleeing cops , officials say
-SC woman allegedly told cops she 's a ' clean , thoroughbred , white girl ' after being pulled over : report
-Jefferson Airplane singer Marty Balin sues hospital , claiming he lost part of his tongue after botched tracheotomy
-' Smallville ' actress Allison Mack asks court to let her continue acting amid NXIVM sex cult allegations
-Charlie Sheen claims he ca n't afford child support after being ' blacklisted ' in Hollywood , says report
-Gunman shot by Florida armed bystander still hospitalized , NRA says shooting example of ' good guy with a gun '
-' The Wire ' creator David Simon reveals in profanity laced post that he was banned from Twitter after wishing death on Trump supporter
-World renowned lesbian NYU professor suspended after probe finds she sexually harassed gay male student , report says
-Carter Page was ' more like Inspector Gadget than Jason Bourne , ' Gowdy says amid FISA release
-Ohio grocery store employee facing felony theft charges for eating $ 9,200 of deli ham
-USS Arlington , named in honor of 9/11 victims and responders , visits NYC for first time during Fleet Week
-Fury as feminist activist says she 's ' confused ' seeing black man with pro NRA and Tea Party bumper stickers
-Crystal Rogers ' mother suspects boyfriend for her disappearance in doc : ' You do n't know what kind of monsters live there '
-South Carolina mom blown away by students ' sweet act toward son at lunchtime : ' It gives me peace '
-' Horny ' passenger on United flight allegedly molested woman sitting next to him , lawsuit claims
-2 American Airlines planes land at Philadelphia International Airport carrying multiple passengers experiencing ' flu like symptoms '
-Albanian man reportedly kills 8 relatives over stolen turkeys , sends Facebook message to prime minister before arrest
-Trump calls on DOJ to investigate New York Times ' publication of anonymous , anti Trump column by ' senior administration official '
-Texas mom , concert pianist 's wife , found not guilty of smothering daughters by reason of insanity
-Shirtless man stares down Hurricane Florence with American flag in hand : ' Just being free and American '
+stars rally around liberal james gunn after offensive tweets unlike reaction to trump supporting roseanne barr
+washington state store clerk left to die by teen robbers after suffering heart attack cops say
+until the kneeling happened fl police union official backs call to return nfl tickets over protests
+ocasio cortez claims solidarity with cab drivers while campaign buys rides from uber other alternatives fec data show
+gunman shot by florida armed bystander still hospitalized nra says shooting example of good guy with a gun
+papa john schnatter allegedly refused to work with kanye west because of n word in his lyrics
+anne hathaway calls out white privilege in wake of black woman stabbed to death at bart station
+abc news star joy behar finally apologizes for anti christian remarks vice president pence is right
+trump predicts electoral doom for democrats with abolish ice push they re going to get beaten so badly
+matt lauer complains he s an easy mark victim of misinformation in first interview since sex scandal
+good times star jimmie walker reveals what went on behind the scenes and explains why he does nt mock trump
+philadelphia checkers employee allegedly threw hot grease on customer in drive thru over order dispute
+flip this seat red dem socialist ocasio cortez mixes up political colors on campaign trail
+wwe legend jerry lawler s son reportedly on life support after attempting suicide in his jail cell
+verbally abusive united airlines passenger caused massive delay after refusing to check bag leave aircraft
+fbi left out important facts when presenting dossier to court to obtain fisa warrant jordan tells fox news
+gold star wife nike kaepernick should visit arlington natl cemetery to see true sacrifice
+anthony scaramucci rips traitors and cockroaches who wrote ny times op ed this is a disgusting day for america
+delta passenger claims man sexually assaulted her on flight but was nt detained i was left devastated
+hannity blasts nike kaepernick soldiers officers firefighters are the ones who sacrificed everything
 ```
 
-Which is a very distinctive list -- for lack of a better word, it's a sort of "tabloid" style, focusing on crime (often grisly, bizarre), personal misfortune (marriage scams, Stevie Nicks' drug addiction), and socially charged political issues (siding with the NFL over Trump).
-
-This suggests, then, that the "departure" of Fox -- its monotonic rise in distinctiveness, the shift away from almost all other outlets -- is driven by a subtle shift in the "genre" coverage -- away from down-the-middle political and business reporting, in the direction of something like the National Enquirer.
+Which is a very distinctive list -- for lack of a better word, it's a sort of "tabloid" style, focusing on crime (often grisly, bizarre), misbehavior, personal misfortune, and socially charged political issues. This suggests, then, that the "departure" of Fox -- its monotonic rise in distinctiveness, the shift away from almost all other outlets -- is defined by a movement away from (relatively) centrist political and business reporting, in the direction of something like the National Enquirer.
 
 <img src="figures/ts-ova-fox.png" />
 
-- so, BuzzFeed spins off into quizzes; HuffPo stops producing listicles / advice, moves into more down-the-middle political reporting; Fox spins off into tabloids.
-- last big trend -- convergence of CNN, NYT, WaPo, and NPR -> DK. what's up here?
-- can get at this by taking, eg, (NYT beginning -> DK end), and finding closest NYT end articles to this difference vector.
-- in all cases -- everyone converging on covering Trump admin, which DK was apparently doing all along.
-- for CNN, NYT, and WaPo, this comes at the expense of international coverage; for NPR, music / art coverage. so, convergence on domestic political coverage.
+Last but not least -- a similar shift can be seen with The Daily Caller. Here are headlines distinctive of spring 2017:
+
+```
+# s record warmth brought record crop yields fewer storms
+astronomers may soon restore pluto to planet status
+millions of us jobs lost to trade with china study shows
+will the lewis gambit work
+watch the first ever robotic bee pollinate a flower
+a positive jobs report could mean interest rate hike
+trump s immigration order has investors buying prison bonds
+mulvaney set to tell agencies to prep for substantial cuts
+daywithoutimmigrants leads to immigrantswithoutjobs
+the tower may have fallen
+how dictators and dummies get started
+boys with vaginas cause confusion in emergency rooms
+trump files appeal to reverse judge s halt on immigration order
+bush twins to release joint memoir
+russia s trump problem
+snap chat just went public and
+signature solutions s# usa safety
+# us troops roll up at russia s doorstep
+first private fusion reactor to go online in #
+where should the apostrophe go in today s holiday
+```
+
+Which (with some exceptions) look broadly similar to the Fox headlines from the same time -- mostly political and foreign-affairs stories, often with an economic bent. By comparison, in summer of 2018:
+
+```
+black conservative activist stands with judge jeanine in viral video no group in america more bigoted than leftists
+candace owens trashes jim acosta for complaining about anti cnn chants after getting attacked
+donna brazile lays out how obama s obsession with his image leeched the democratic party of its vitality
+student charged with battery after ripping maga hat off classmate s head slapping teacher
+newt gingrich gets real with left wing illegal immigrants you must be an american citizen to vote
+dan bongino rips into war on cops so many officers have lost their lives to keep your neighborhoods safe
+nike has become a social justice corporation trying to mold colin kaepernick into the next malcolm x says michelle malkin
+maryland democrat attempted to shut down immigration conversation by urging the featured speaker to cancel appearance
+twitter suspends conservative commentator for opposing trans in military tying extreme muslim beliefs to honor killings
+liberal women s group ellison must resign drop out of ag race following domestic abuse allegations
+cis director twitter refuses to promote illegal aliens tweet despite it being used in supreme court rulings
+cnn anchor melts down after twitter user asks if he ll hold obama accountable for russian meddling
+white house blames biased media for omarosa s newfound popularity now that she s turned on trump
+dem senator claims the left has no equivalent to dark trump rallies he must have forgotten these incidents
+tucker carlson slams nike for using colin kaepernick as a pawn in its decadent scheme
+trump supporter paris dennard hits back against accusations of no black people in the trump administration cnn is peddling lies
+cnn s david gregory declares trump desperate to be loved and says he suffers from paranoia
+an organization behind massive super eid muslim celebration at minnesota vikings stadium labeled a terrorist organization
+liberals accuse woman sitting behind kavanaugh of being a white supremacist she s actually a hispanic descendent of holocaust survivors
+kellyanne conway reveals what the establishment media is doing and attacks them for it
+```
+
+Which share the sensational, tabloid style with the Fox headlines, though here the focus is more specifically on politically polarizing issues -- "black conservative activist[s]," "anti-CNN chants," "Obama's obsession with his image," Nike as a "social justice corporation," etc.
+
+Stepping back, and doubling back to the original idea of modeling a kind of linguistic "plate tectonics" of the media ecosystem -- this is just a start, but from these examples we can start to reason about some of the most significant changes. BuzzFeed has doubled down on clickbait, perhaps at the expense of political reporting; HuffPo has done the opposite, shifting away from clickbait and towards political reporting; and, Fox and The Daily Caller have drifted off in the direction of a sensationalized and hyper-partisan style of coverage.
 
 ## Shifting headlines, shifting audience?
 
