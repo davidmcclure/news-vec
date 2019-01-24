@@ -32,6 +32,7 @@ pygraphviz = "*"
 python-igraph = "*"
 pycairo = "*"
 cairocffi = "*"
+requests-html = "*"
 
 [dev-packages]
 
