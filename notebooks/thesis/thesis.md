@@ -973,3 +973,10 @@ kellyanne conway reveals what the establishment media is doing and attacks them 
 Which share the sensational, tabloid style with the Fox headlines, though here the focus is more specifically on politically polarizing issues -- "black conservative activist[s]," "anti-CNN chants," "Obama's obsession with his image," Nike as a "social justice corporation," etc.
 
 Stepping back, and doubling back to the original idea of modeling a kind of linguistic "plate tectonics" of the media ecosystem -- this is just a start, but from these examples we can start to reason about some of the most significant changes. BuzzFeed has doubled down on clickbait, perhaps at the expense of political reporting; HuffPo has done the opposite, shifting away from clickbait and towards political reporting; and, Fox and The Daily Caller have drifted off in the direction of a sensationalized and hyper-partisan style of coverage.
+
+## Problems, next steps
+
+- by modeling audience graph and historical graph, have cast language graph into relief -- can identify proximities that run against the grain, relative to past proximities and proximities in underlying audience graph.
+- though, new questions immediately arise, and this is really a start
+- for example -- here we model relationship with audience graph and historical changes independently, but obvious question -- to what extent do these two correspond? eg, as HuffPo becomes more similar to The Hill, do the audiences also converge?
+- also methodological questions that have emerged in this study. namely -- how to tease apart content, style, stance? and, how to unify the representations of meaning with the representations of change over time?
