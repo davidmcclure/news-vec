@@ -476,7 +476,7 @@ So, from digging into the embeddings produced by the neural models, we can get a
 
 Just eyeballing things on the UMAP projection -- some outlets clearly seem to occupy roughly similar regions of the reduced 2d space. For example, Bloomberg and WSJ -- both of which generate a lot of business and financial coverage -- both occupy a significant amount of space in the bottom left of the UMAP projection, around (-6,-4):
 
-<img src="figures/wsj-bloomberg.png" width="400" />
+<img src="figures/wsj-bloomberg.png" width="500" />
 
 How to add precision to this? How can we convert the behavior of the classifiers into a single "score"? Maybe the simplest and most natural way to model similarity, in a predictive setting, is just to look at the confusion matrix -- that is, for each permutation of outlets A and B, the number of headlines from A that the model incorrectly assigns to B. The higher this number, the more "confusable" the two outlets. Using test-set predictions from the LSTM:
 
@@ -629,7 +629,7 @@ So, a modal value of ~0.45, though with quite a bit of variation. (This is where
 
 So -- Bloomberg, Breitbart, and WSJ occupy very similar "locations" in the headline and audience graphs -- when Bloomberg "sounds like" another outlet, it generally also has a very high level of audience overlap with the outlet. To get a sense of what this looks like -- here are the broken-out content / audience similarities for these three:
 
-<img src="figures/ca-breitbart-composite.png" width="600" />
+<img src="figures/ca-breitbart-composite.png" width="500" />
 
 <img src="figures/ca-bloomberg-composite.png" width="600" />
 
