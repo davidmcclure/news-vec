@@ -677,37 +677,6 @@ Even here, of course, the alignment isn't perfect -- for WSJ, for example, the s
 - Though it would take quite a lot more study to put this on firm ground, this suggests the possibility that The Hill might be an example of a publication that -- at least to a modest extent -- is able to introduce competing viewpoints into a region of the media ecosystem that is otherwise highly homogeneous. By *sounding like* Breitbart and DC, it seems as if The Hill is able to gain access to Breitbart and DC audiences in a way that other left-leaning publications are not.
 - There's the possibility, in other words, that real people are also, to some extent, "confused" by this in the way that the classifiers are. Possible that audiences of DC/BB are more likely to engage with The Hill because of this shared attention / style, and in the process get meaningful exposure to viewpoints that might otherwise not circulate in their communities. Of course, also possible that The Hill is just legitimately centrist, and that it's a (relative) affinity of viewpoint that's driving this. To really know, we'd need access to various counterfactuals. Eg, if headlines from The Hill were written in a very down-the-middle, AP-esque style -- would they get the same update among BB / DC audiences? To get at this kind of question in a meaningful way, though, we would need to conduct active interventions / experiments.
 
-
-
-
-
-Meanwhile, at the other end of the spectrum -- AP, The Hill, and Huffington Post have significantly "misaligned" headline / audience graphs -- there are (many) places, in other words, where they produce headlines that sound very similar to another outlet, but the audience overlap between the two is low; or vice versa. Here are the broken-out similarities:
-
-<img src="figures/ca-apnews-composite.png" width="600" />
-
-<img src="figures/ca-thehill-composite.png" width="600" />
-
-<img src="figures/ca-washingtonpost-composite.png" width="600" />
-
-<img src="figures/ca-huffingtonpost-composite.png" width="600" />
-
-<img src="figures/ca-cnn-composite.png" width="600" />
-
-So, what's actually going on with these? Though the specifics are different, one interpretation is to say -- in each case, there is a high level of headline overlap with right-leaning outlets, but a high level of audience overlap with left-leaning outlets. For example, with AP -- the headlines sound most similar to Fox, by a large margin, but the audience overlap with Fox is very low; and, the highest audience overlaps are with WaPo, The Hill, and NYT. Likewise, with The Hill -- the headlines sound (comparatively) similar to The Daily Caller and Breitbart, but the higher audience overlaps are with WaPo, HuffPo, and CNN.
-
-Meanwhile, with HuffPo, the misalignment plays out a bit differently. Here, again, the discrepancy is with right-leaning outlets -- low audience correlation with The Daily Caller, Fox, and Breitbart, but higher headline similarity. But, it's not really that HuffPo sounds significantly similar to these outlets, relative to the whole field, but that -- it sounds much *less dissimilar* to them than we might expect, given the extreme negative correlations in audience. The audience overlap between HuffPo and Daily Caller / Fox / Breitbart is very low; but headline similarity is sort of middling.
-
-Stepping back -- with these 15 outlets, it seems that when content and audience misalign, the discrepancies represent a kind of one-way short circuit in the underlying audience graph -- outlets with generally left-leaning audiences are producing headlines that sound more typical of headlines produced by right-leaning outlets. Or -- AP and The Hill are exposing left-leaning readers to issues, stories, topics, or styles that are generally more typical of right-leaning news feeds. But, this seems to only happen in one direction, from left to right; there don't appear to be outlets, in this set of 15, that perform this bridging function in the other direction.
-
-- disaggregated pair deltas.
-- under the hood -- what's actually going on here? eg, when AP sounds like Fox, or DK like DC, what does that mean? what is/isn't the clf picking up?
-- how to find examples of "confusable" hls? not totally obvious -- can take hls from A that sound most like hls from B, but this will generally just tell something about most B-ish hls, not the specific A/B overlap.
-- instead -- like before, when measuring "diameter" of embedding families -- sample N hls from A, N from B, take pw cosine distances, then skim off N closest pairs; or, the matched A/B pairs that are closest in the high-dimensional space. by looking at these, can get a sense of why the model considers A/B to be similar.
-- mixed results
-- Fox/AP, Fox/CNN -- shared attention + shared viewpoint (crime, international)
-- DailyCaller/DailyKos, Breitbart/DailyKos -- shared attention, but different viewpoints
-- Hill/DailyCaller -- shared attention + *neutral* viewpoint -- (relatively) down-the-middle political reporting
-
 ## Headlines as a temporal process
 
 - So -- content and audience generally do align quite closely. But not always, and when they don't, evidence that there's a one-directional aspect to misalignments, left -> right
@@ -880,6 +849,7 @@ Lawyers Descend On Washington To Aid Trump Protesters
 So -- in aggregate, BuzzFeed's ratio of political-coverage-to-listicles has gone down; it seems as if the sudden surge in distinguishability in the summer of 2018 is caused by the quizzes, or other similar articles.
 
 - huffpo is the opposite of BF - moves away from listicle / advice headlines, towards political reporting, similar to hill, DK, CNN
+- and, notable that in this period, significant decrease in total article volume and total links / impressions on Twitter.
 
 What about Fox? Moving in chronological order, this time -- here are the 20 headlines that mark Fox in winter of 2017 relative to fall of 2018:
 
