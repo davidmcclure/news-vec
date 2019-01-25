@@ -667,7 +667,7 @@ Even here, of course, the alignment isn't perfect -- for WSJ, for example, the s
 
 - After AP, the second most misaligned outlet is The Hill:
 - [Hill CA]
-- Similar structure to AP, in a way -- high audience correlation with left-leaning outlets (WaPo, HuffPo, CNN), but relatively low content similarities with these outlets; but, higher content similarities with the (far) right-leaning DC and BB. What do these content similarities consist of? Like before, we randomly sample 1M headlines from The Hill and Daily Caller, then find the N pairs with the smallest cosine distances -- a sample of the most nearby pairs of embeddings across the two outlets. For The Hill and DC:
+- Similar structure to AP, in a way -- high audience correlation with left-leaning outlets (WaPo, HuffPo, CNN), but relatively low content similarities with these outlets; but, higher content similarities with the (far) right-leaning DC and BB; though, confusingly, highest similarity with MSNBC. What do these content similarities consist of? Like before, we randomly sample 1M headlines from The Hill and Daily Caller, then find the N pairs with the smallest cosine distances -- a sample of the most nearby pairs of embeddings across the two outlets. For The Hill and DC:
 - [Hill/DC overlaps]
 - And, with BB:
 - [Hill/BB overlaps]
