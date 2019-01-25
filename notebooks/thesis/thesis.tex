@@ -13,6 +13,7 @@
 \usepackage{float}
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage{wrapfig}
 
 % Main font
 \setmainfont{Baskerville}
@@ -1136,6 +1137,294 @@ An immediate question arises from this, though -- how "new" or "old" are the rel
 
 Intead of rolling up the data into a single unit -- what if we add back in the timestamps on the original links, and study the headline space as a diachronic system, unfolding over 625 days? This opens the door to an intriguing set of questions. Instead of just modeling the overall structure of the content/audience relations among outlets -- could we track the evolution or "drift" of these relations over time? How stable are they? Do they change at all? And if they do -- how? Are there pairs (or groups) of outlets that have become significantly more or less similar over time, at the level of the headline? Would it be possible to identify high-level patterns of convergence or divergence in the news media -- subsets of outlets that have drifted, over time, into higher or lower levels of "shared attention"? We can imagine a kind of "plate tectonics" of the media landscape, playing out at the level of textual distance -- a set of slow (or not so slow?) shifts, as news organizations shift into new regions of content / style, and into new configurations relative to each other.
 
-How to model this?
+How to model this? If the synchronic analysis produced a fully-connected graph over the set of 15 outlets, a weighted adjacency matrix -- how to unroll this over time? How to "unroll" each edge in the graph over the 625 days in the data window? One approach would be to simply take the outputs from models trained on synchronic data and reintroduce timestamps post-hoc during analysis. For example, we could take test-set predictions from the LSTM -- which is trained simultaneously on all data from across the full window of data -- and look at changes in the structure of the predictions according to the timestamps on the underlying tweets.
+
+This could be useful as a way to start reasoning about the actual contnt of changes over time -- for example, the types of headlines that are most typical of an outlet at one point in time relative to another. But, as a means of \textit{measuring} changes over time and identifying the most significant shifts, there are some potential risks with this. First, very simply -- as we saw earlier, a number of outlets have undergone large changes in the raw quantity of content that they have produced over the time period in question. For example, counting the number of unique articles that circulate on Twitter each day, HuffPo produced less than 50\% as much content in the summer of 2018 than in the spring of 2017. Because of this, a model trained on the full dataset would see significantly more examples of 2017 headlines from HuffPo than 2018 headlines, which would likely make it less accurate on the 2018 data. Which, then, if we take classification accuracy as a proxy for distance, might give the appearance that HuffPo is getting more similar to some other outlet(s) -- classification accuracy is falling -- when in fact the score is just proxying the underlying change in volume.
+
+We could guard against this by, for example, splitting the data into deciles and then downsampling each outlet to an equal size in each decile. But, even with this, there could be risks associated with trying to capture fine-grained changes over historical time from a model trained without any knowledge of temporal differences. To take an example from a similar domain -- Ted Underwood notes that topic models, when used to produce vectors that represent the topic distributions of texts, can produce misleading "banding" effects at the edges of the historical range of the corpus. For example, here, the Y-axis represents the angular distance between topic vectors for books published immediately before and after the year on the X-axis -- an attempt to model the "speed" at which the corpus is changing, taking each year as a pivot point.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/tm-banding-1.jpg}
+\end{figure}
+
+From this plot, it appears that the corpus changes very quickly at first, and then the rate levels off and starts to fall. But, Underwood notes, if you re-fit the model on data from different time spans that partially overlap -- for example, if you add or remove 25 years of data to the start of the corpus -- it turns out that this arc-shaped pattern crops up again and again, in a way that contradicts the results from the other slices of data. Clearly, this is some kind of modeling artifact -- all of these can't be true:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/tm-banding-2.jpg}
+\end{figure}
+
+Underwood doesn't pin down a cause for this. But, in a broad sense, it seems that the model is somehow optimizing around the "middle" of the data at the expense of the edges -- what looks like a meaningful historical change is probably just an artifact of how the model is solving the optimization problem.
+
+To my knowledge this kind of thing hasn't been systematically explored with neural classifiers, and it's possible that neural models would be less susceptible to this sort of thing. But, out of an abundance of caution -- how can we get an initial view on this that almost certainly avoids this type of problem? An easy route, which we take here, is just to train a very large battery of completely independent models on different historical slices of the data. The downside to this, of course, is that this become much more computationally expensive than just training a single model on all of the data at once -- ideally, we would do this with the strong neural models, but this would take many hundreds or thousands of hours of GPU time. But, like before with the A-vs-B comparisons between individual pairs of outlets, if we forgo the neural models and fall back to the non-neural baselines, these training runs can be easily parallelized on cheap commodity hardware, which makes it feasible to train a very large number of independent comparisons.
+
+Which particular model and similarity metric should we use for these comparisons? The linear SVC is particularly attractive in that (a) it's the strongest non-neural baseline, just 3\% off the LSTM, and (b) it fits very quickly, making it feasible to train hundreds of thousands or even millions of individual models. But -- how "trustworthy" are the similarity scores produced by the SVC? Conveniently, building on the large grid of similarity scores explored in section XX, we can quantify this by simply taking the mean squared error between the accuracy scores produced by the SVC and the mean value for all metrics, and then compare this score across all metrics. Sorting from lowest to highest error, we find that the SVC pairwise accuracy is close to the top of the list -- the similarity measured by the SVC is generally very close to the average score derived from all metrics. This gives confidence that we can use the SVC as an accurate (and, importantly, highly efficient) representation of similarity.
+
+So, using the SVC classification accuracy as a canonical signal for similarity -- how to measure historical changes in proximity across the 15 outlets? If we had an indefinite amount of data, we could simply split the data into a large number of non-overlapping buckets, and then fit models on data from each bucket independently. But, in this case, we're limited by the size of the dataset from the lowest-volume outlet, which defines the size of the data samples we pull from each outlet, since these always need to be held constant to ensure that the similarity scores are comparable. (Here, again, this is MSNBC, with 18k headlines in total.) If we split this over, say, 100 buckets, this falls to just ~180 headlines per bucket, which is very small. We could just split over fewer buckets -- say, 10 -- which would make it possible to train on 1800 headlines per outlet per bucket. This is better, but, 10 buckets also gives a much more blocky, discretized view of the historical interval, which, depending on where the bin boundaries happen to fall, might somewhat obscure interesting trends.
+
+To get a somewhat continuous approach, while still maintaining a decent quantity of data in each time slice, we take this approach -- first, split the data into 100 equally-sized bins, and then slide a 10-bin rolling window across these bins. So, the first window would include bins 1-10; the second, bins 2-11; the third, bins 3-12; and so on. This gives a total of 91 partially-overlapping windows across the data, each individually covering 10\% of the total temporal interval.
+
+As initial smoke test -- considering all outlets, has the overall "differentiability" across the 15 outlets changed over time? Here, we fit all-versus-all multiclass models on 100 random size-balanced samples across each of the 91 windows. In each window, we randomly sample 18k headlines from each outlet, split this sample of 270k headlines into standard 80/20 train-test splits, fit a SVC classifier on the training data, and then evaluate accuracy on the test set. And then repeat this sampling process 100 times for each window, giving a total of 9,100 all-vs-all accuracy scores:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ts-ava.png}
+\end{figure}
+
+Where, again, high classification accuracy can be interpreted as low similarity (the outlets are easier to tell apart) and low accuracy can be interpreted as high similarity (outlets are more difficult to distinguish).
+
+So, there seems to be some trend, though the error bands are fairly large here -- an early high-water mark of differentiability in the winter and spring of 2017 (immediately following Trump's inauguration), and then a fairly consistent falloff over the course of the next 18 months, and then a sudden spike in the summer and fall of 2018. But, this is a somewhat constrained view, since it's hard to make sense of what might be driving the change. When the accuracy suddenly spikes at the end of the window -- is that because all of the outlets are simultaneously becoming more differentiated from each other? Or, are these changes driven just by a smaller subset of outlets that become more distinguishable to the model, but which has the effect of pushing up the overall accuracy score?
+
+To get a clearer view of this, broken out by individual outlets -- we can do the same thing again, but this time training "one-vs-all" models for each outlet in each window. So, for example, for the New York Times in window 10 -- we first sample 18k random headlines from all outlets, like before; but then, holding out the 18k headlines from the New York Times -- the "foregrounded" outlet -- we randomly sample 18k headlines from across all of the other 14 outlets. This gives two sets of 18k headlines -- the "foreground" set, for the New York Times, and the "background" set, evenly sampled from everything else. We can then fit a regular binary model on these two splits, which will give a measurement for the degree to which that individual outlet is distinguishable with respect to all others at that particular moment in time. Like before, this is repeated on 100 random samples for each outlet in each window, giving a total of 136,500 accuracy scores, which can then be grouped by outlet. Here, sorted by the slope of a linear fit, sorted from most increasing to most decreasing:
+
+% \includegraphics[height=\textheight]{figures/ts-ova.png}
+
+Now, the shape of things starts to come into closer focus -- the sudden rise in accuracy at the end that was visible in the all-vs-all accuracies is clearly driven almost entirely by BuzzFeed, which becomes rapidly and dramatically more distinctive at the very end of the data window, the accuracy jumping by almost 10\% in just a couple of months. Fox, meanwhile, has the strongest overall linear trend, becoming consistently more differentiated over the 18-month window, maybe with something of a phase shift at the end of 2017. Meanwhile, at the other end of the spectrum, four outlets show consistent falloffs in differentiability -- The Hill, The Daily Kos, Huffington Post, and CNN.
+
+But -- falloffs relative to what? These trends make it possible to pick out the outlets that are driving the overall trend, but it's not clear how the individual changes relate to each other. For example, when The Hill falls from 72\% to 68\% accuracy, it's becoming more "confusable" with some combination of other outlets. But, which outlets? With everything else rolled into a single "other" category, it's hard to make sense of why this is happening. What we need, again, is to model the complete matrix of relationships among all outlets -- but here, the relationships represent the degree to which every outlet has become more or less similar over time, not just the overall similarity.
+
+To get at this -- in the same way that we could train a battery of individual A-vs-B models to get pairwise similarity scores when modeling the structure of the (synchronic) content graph, we can do the same thing again, but here broken out across each of the 91 temporal windows. For each of the 120 unique pairs over the 15 outlets, and in each of 91 windows, we sample 18k headlines from outlet A, 18k for outlet B, and then fit a binary model; and then repeat this 100 times, to get a distribution over 100 sampled classification accuracies for each pair of outlets in each window -- a total of 955,500 model fits.
+
+With this, we can break out a historical similarity trend for each individual pair. Again, sorting by the slope of a standard linear fit, here are the 10 pairs with the strongest increases in accuracy, pairs that have moved away from each other most significantly over the last 2 years:
+
+% \includegraphics[height=\textheight]{figures/ts-ab-rising.png}
+
+Most of these pairs include either BuzzFeed or Fox, paired with a number of different outlets, suggesting that these two outlets are becoming consistently more differentiated from a fairly wide range of other sources -- they drifting off into increasingly isolated, individually distinctive linguistic spaces. Meanwhile, in the other direction -- here are the 10 pairs with the strongest linear decreases in classification accuracy -- outlets that \textit{converged} most significantly over time:
+
+% \includegraphics[height=\textheight]{figures/ts-ab-falling.png}
+
+Here, again, we can spot a handful of outlets that crop up in a number of different pairs -- Huffington Post (in particular, present in each of the top three), The Daily Kos, and The Hill.
+
+Moving beyond just the 10 strongest trends in each direction -- from the full set of 120 pairwise relationships, we can assemble the fully connected graph for all 15 outlets. Here, we treat the slopes of the regression fits as signed edge weights between the outlets. The width of the edge represents the absolute magnitude of the slope -- the degree to which the relationship between the pair has changed over time -- and the color represents the direction -- blue for negative slopes, where outlets have become more similar over time (lower classification accuracies), and red for positive slopes, where outlets have become more dissimilar (higher classification accuracies).
+
+% \includegraphics{figures/ts-ab-radial.png}
+
+From this, a number of clear trends start to fall out. First, there seems to be a core group of outlets that have undergone a significant convergence over the last two years -- Huffington Post, The Hill, Daily Kos, CNN. (All left-of-center, it's worth noting.) And, to a lesser extent, AP, The Washington Post, The New York Times and NPR have all become more confusable with some combination of these four, though in a somewhat more patchy and inconsistent way (Daily Kos, in particular, has become more confusable with WaPo, NYT, and NPR). Meanwhile, BuzzFeed and Fox have moved in the opposite direction -- they have become more differentiated from \textit{almost every single other outlet}. (And, notably, Fox has diverged significantly from WSJ, second only to the movement away from BuzzFeed.) Finally, of all outlets, Huffington Post has maybe the most mixed and extreme pattern of movements -- it moves from BuzzFeed and converges with CNN, DK, and The Hill; but it also converges with the (right-leaning) Daily Caller.
+
+This makes it easier to reason about the full structure of all 105 pairwise accuracy changes, but, it still isn't a complete picture. One disadvantage to the classification metric is that it's undirected. We just know, for example, that CNN and HuffPo have become more "confusable" with each other. But, this could happen in a few different ways -- it could be that CNN has moved towards HuffPo; or, HuffPo towards CNN; or both towards each other; or some combination of all of these. In theory, we could try to get at this by looking under the hood at the decision functions learned by the SVM fits -- for example, look at headlines that were confused by the model in different periods, or look at what kinds of headlines get placed very far from the decision boundary. But, really, this calls out for the kinds of distributed representations learned by the neural models. The SVMs give a very controlled, highly-sampled snapshot of the pairwise changes in similarity over time; as a triangulation of this, could we explore the substance of these changes by treating them as movements in the vector space induced by the neural models?
+
+One very simple way to get at the "direction" of the movements is to just measure the \textit{degree} to which each individual outlet has moved in the vector space, independent of the pairwise classification scores. Which, in turn, can often make it possible to infer the direction -- for example, if outlets A and B become more similar, and outlet A moved significantly in the vector space but outlet B stayed mostly stable, this suggests that A is moving towards B. To get at this, we can look at the angular distance between the mean vectors for each outlet in different time periods. For example, to measure the degree to which NYT has changed over the last two years, we would take the average of the embeddings for all NYT headlines from, say, spring of 2017, and calculate the cosine distance between this vector and the average of all NYT embeddings from fall of 2018.
+
+To ensure that the headline embeddings are consistently sampled for all outlets in all time periods, we split the data into 10 deciles, and then sample an even number of headlines for each \texttt{(domain, decile)} pair. Then, we re-train the original all-vs-all models on this time-balanced corpus, which then gives a set of embeddings for each outlet in each temporal decile of the corpus. Then, to get a standardized score for the size of the shift for each outlet, we take the cosine distance between the mean embeddings for each outlet in the first and last deciles. Which, then, makes it possible to redraw the original graph, but this time with a signal for the relative sizes of the changes. The larger the node, the larger the historical shift:
+
+% \includegraphics{figures/ts-ab-radial-magnitude.png}
+
+From this, a clearer picture comes into view -- the largest individual shifts are HuffPo, Fox, BuzzFeed, and then Daily Caller and CNN. What's actually going on with these? To get a specific sense of this, we can find the individual headlines that are most characteristic of the geometric movements in the embedding space. For example, to find headlines that "typify" the movement of BuzzFeed between the beginning and end of the data, we can take \texttt{(BuzzFeed 2018) - (BuzzFeed 2017)}, and then query for the individual BuzzFeed headlines that are closest to this difference vector -- headlines that mark BuzzFeed in 2018, specifically in comparison to BuzzFeed in 2017. Here are the top 20:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    pick some colors and we ll tell you which disney movie you should watch
+    pick your favorite dcoms and we ll tell you which disney heartthrob you belong with
+    pick # movies and we ll tell you if you re a pessimist or optimist
+    shop at sportsgirl and we ll tell you which pet you should adopt
+    pick some fruits and we ll guess your favorite disney princess
+    pick a movie from each year and we ll tell you which comedy show you belong on
+    pick some disney movies and we ll reveal your disney soulmate
+    build your own disney storyline and we ll reveal your prince
+    choose some food combos and we ll reveal which iconic duo you and your bff are
+    choose some disney channel characters and we ll reveal if you re more extroverted or introverted
+    pick nine random things and we ll tell you which sex and the city girl you are
+    choose your favourite lyrics from the harry styles album and we ll tell you which of his suits you are
+    build your own spooky restaurant and we ll tell you what costume you should wear for halloween
+    eat a bunch of food and we ll tell you which spongebob character you are
+    shop at the disney store and we ll give you a cute disney movie to watch
+    which harry styles hair style are you
+    which harry styles body part are you
+    eat at taco bell and we ll tell you which avenger would be your best friend
+    build your dream home and we ll tell you which twice song you are
+    which disney cat are you
+\end{lstlisting}
+
+This suggests, then, that the rise in differentiability for BuzzFeed in the summer of 2018 is driven by a sudden explosion of this "quiz" genre, of the form "[Do a quiz], and [we'll tell you something about yourself]" -- which, evidently, is highly distinctive of BuzzFeed. Going in the other direction, though, gives a clearer sense of the overall shift. Here's \texttt{(BuzzFeed 2017) - (BuzzFeed 2018)}, things that mark the beginning of the corpus as compared to the end:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    congressmen seek to lift propaganda ban
+    as trump takes office birth control startups see demand spike
+    trump hotel contractor drops $ # million lawsuit
+    north carolina officials seek to stop special elections
+    guardian ditches move to kushner building after newsroom revolt
+    two key republicans express doubts over devos s nomination
+    trump warns republicans about botching obamacare repeal before thursday s climactic vote
+    clinton iowa volunteers train when to push backers to omalley to block bernie
+    prosecutors win back broad authority to charge supreme court protesters
+    libyan dissident wins right to sue ex foreign secretary jack straw over rendition
+    guardian announces layoffs after $ # kushner lease debacle
+    prosecutors charge protesters with rioting over inauguration day protests
+    newly designated national monuments highlight nation s civil rights struggle
+    president trump speaks at cpac conference
+    trump to address the nation tonight
+    trump administration keeps major news orgs out of closed press briefing
+    fear grips immigrants as enforcement raids sweep across us
+    governor senator call for investigation of troubled youth psych facility
+    prosecutors pursue rioting charges over inauguration day protests
+    congressman met with sanctioned putin friend in moscow
+\end{lstlisting}
+
+Which, in essence, is simply \textit{politics}. So, BuzzFeed's ratio of political-coverage-to-listicles has gone down; in terms of its overall content profile, BuzzFeed is moving away from political coverage, towards quizzes.
+
+What about Huffington Post, which, more than the other outlets, appears to have undergone a kind of "repulsive" shift relative to BuzzFeed? Moving in chronological order this time -- here's \texttt{(HuffPo 2017) - (HuffPo 2018)}, headlines that are distinctive of HuffPo at the beginning of the window:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    how many people are vegetarian
+    the rise of deaftalent
+    the problem with tickling
+    do women really need a yearly pelvic exam
+    your favorite book characters are as real as you feel they are
+    the genius trick for oatmeal that ll make your mornings easier
+    make your goals stick
+    start where you are
+    a life in transitions the firsts
+    shopping with an avatar
+    the future of food is black
+    the art of being kind
+    how to make vegan parmesan cheese and make your dreams come true
+    a lesson in organicology
+    how dieting makes you gain weight
+    tired of mid century modern try these cozy couches instead
+    the revolting reason you might want to avoid canned greens
+    why the floor is your friend
+    the most anticipated books of # thus far
+    the easiest salmon teriyaki you ve ever made
+\end{lstlisting}
+
+Which, though different, might be categorized alongside BuzzFeed's quizzes and listicles -- here, lifestyle and advice content, maybe with a particular focus on diet and food. Meanwhile, headlines that are distinctive of HuffPo at the end of the window are almost all politics:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    susan collins receives # coat hangers ahead of kavanaugh vote
+    tennessee man accused of burning black man alive was known white supremacist
+    karl rove likens trump to stalin tells him to tone down anti press rants
+    omarosa claims trump has mental decline that could not be denied
+    country star gretchen wilson arrested after altercation on american airlines flight
+    georgia cop suspended after liking racist kkk facebook posts
+    c span caller unleashes racist rant about barack obama on air
+    kathy griffin tells tomi lahren to go herself in scathing tweet
+    twitter users shred trump for attacking labor leader on labor day
+    gop rep duncan hunter wife indicted by grand jury in san diego
+    democrats denounce ivanka trump for hypocrisy after she touts american jobs
+    omarosa releases secret tape of lara trump discussing high paying campaign job
+    it s time to decriminalize immigration say top texas dems
+    maxine waters warns trump cabinet steel yourself for more public confrontations
+    trump supporter arrested for threatening to kill journalists at boston globe
+    statue of liberty protester trolls melania s i do nt care jacket
+    cindy mccain kisses husband john mccain s casket during arizona service
+    bob woodward fires back at eric trump over anti semitic slur
+    colbert mocks humiliating moron trump for still obsessing over obama
+    msnbc host mocks trump s phone call wishes for english to english translator
+\end{lstlisting}
+
+So, Huffington Post has undergone a kind of mirror-image version of BuzzFeed's evolution. BuzzFeed shifted away from politics and towards clickbait; HuffPo shifted away from clickbait and towards politics.
+
+What about Fox? Which, again, has shifted away from almost everything else -- WSJ, BuzzFeed, CNN, WSJ, NYT, WaPo, and even other conservative outlets like Breitbart and Daily Caller -- it appears to be drifting off into some largely unoccupied linguistic space, far from everything. Moving chronologically -- here are headlines that mark Fox in spring of 2017 relative to fall of 2018:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    are government leaders turning a blind eye toward debt
+    biggest movies to look forward to in #
+    bao bao ready for new life in china
+    mayim bialik to register as muslim
+    testing wearable sensors as check engine light for health
+    why outdated seat belts may be putting lives at risk
+    alitalia workers vote on cuts to stave off bankruptcy
+    eurozone economic sentiment at near decade highs
+    severe bolivian drought hurts crops threatens capital
+    # minutes to a flatter firmer belly
+    schools in rural areas shifting toward a # day week
+    swede who made numbers and facts entertaining dies at #
+    fewer fret over more focus on politics
+    seiu s fight for $ # a flop despite spending $ # million
+    winds from monster black holes can rapidly change their temperature
+    a crash course in creative destruction
+    dubai has new safety rules after high rise fires but few details
+    apple s new spaceship hq set to open
+    a former model starved to death but not from anorexia
+    nigerian governor aid agencies misusing refugee funds
+\end{lstlisting}
+
+Quite a bit of general political news -- often with an economic angle -- and international stories. In the other direction -- stories that mark 2018, compared to 2017:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    stars rally around liberal james gunn after offensive tweets unlike reaction to trump supporting roseanne barr
+    washington state store clerk left to die by teen robbers after suffering heart attack cops say
+    until the kneeling happened fl police union official backs call to return nfl tickets over protests
+    ocasio cortez claims solidarity with cab drivers while campaign buys rides from uber other alternatives fec data show
+    gunman shot by florida armed bystander still hospitalized nra says shooting example of good guy with a gun
+    papa john schnatter allegedly refused to work with kanye west because of n word in his lyrics
+    anne hathaway calls out white privilege in wake of black woman stabbed to death at bart station
+    abc news star joy behar finally apologizes for anti christian remarks vice president pence is right
+    trump predicts electoral doom for democrats with abolish ice push they re going to get beaten so badly
+    matt lauer complains he s an easy mark victim of misinformation in first interview since sex scandal
+    good times star jimmie walker reveals what went on behind the scenes and explains why he does nt mock trump
+    philadelphia checkers employee allegedly threw hot grease on customer in drive thru over order dispute
+    flip this seat red dem socialist ocasio cortez mixes up political colors on campaign trail
+    wwe legend jerry lawler s son reportedly on life support after attempting suicide in his jail cell
+    verbally abusive united airlines passenger caused massive delay after refusing to check bag leave aircraft
+    fbi left out important facts when presenting dossier to court to obtain fisa warrant jordan tells fox news
+    gold star wife nike kaepernick should visit arlington natl cemetery to see true sacrifice
+    anthony scaramucci rips traitors and cockroaches who wrote ny times op ed this is a disgusting day for america
+    delta passenger claims man sexually assaulted her on flight but was nt detained i was left devastated
+    hannity blasts nike kaepernick soldiers officers firefighters are the ones who sacrificed everything
+\end{lstlisting}
+
+Which is a very distinctive list -- for lack of a better word, it's a sort of "tabloid" style, focusing on crime (often grisly, bizarre), misbehavior, personal misfortune, and socially charged political issues. This suggests, then, that the "departure" of Fox -- its monotonic rise in distinctiveness, the shift away from almost all other outlets -- is defined by a movement away from (relatively) centrist political and business reporting, and in the direction of something like the National Enquirer.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ts-ova-fox.png}
+\end{figure}
+
+Last but not least -- a similar shift can be seen with The Daily Caller. Here are headlines distinctive of spring 2017:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    # s record warmth brought record crop yields fewer storms
+    astronomers may soon restore pluto to planet status
+    millions of us jobs lost to trade with china study shows
+    will the lewis gambit work
+    watch the first ever robotic bee pollinate a flower
+    a positive jobs report could mean interest rate hike
+    trump s immigration order has investors buying prison bonds
+    mulvaney set to tell agencies to prep for substantial cuts
+    daywithoutimmigrants leads to immigrantswithoutjobs
+    the tower may have fallen
+    how dictators and dummies get started
+    boys with vaginas cause confusion in emergency rooms
+    trump files appeal to reverse judge s halt on immigration order
+    bush twins to release joint memoir
+    russia s trump problem
+    snap chat just went public and
+    signature solutions s# usa safety
+    # us troops roll up at russia s doorstep
+    first private fusion reactor to go online in #
+    where should the apostrophe go in today s holiday
+\end{lstlisting}
+
+Which (with some exceptions) look broadly similar to the Fox headlines from the same time -- mostly political and foreign-affairs stories, often with an economic bent. By comparison, in summer of 2018:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    black conservative activist stands with judge jeanine in viral video no group in america more bigoted than leftists
+    candace owens trashes jim acosta for complaining about anti cnn chants after getting attacked
+    donna brazile lays out how obama s obsession with his image leeched the democratic party of its vitality
+    student charged with battery after ripping maga hat off classmate s head slapping teacher
+    newt gingrich gets real with left wing illegal immigrants you must be an american citizen to vote
+    dan bongino rips into war on cops so many officers have lost their lives to keep your neighborhoods safe
+    nike has become a social justice corporation trying to mold colin kaepernick into the next malcolm x says michelle malkin
+    maryland democrat attempted to shut down immigration conversation by urging the featured speaker to cancel appearance
+    twitter suspends conservative commentator for opposing trans in military tying extreme muslim beliefs to honor killings
+    liberal women s group ellison must resign drop out of ag race following domestic abuse allegations
+    cis director twitter refuses to promote illegal aliens tweet despite it being used in supreme court rulings
+    cnn anchor melts down after twitter user asks if he ll hold obama accountable for russian meddling
+    white house blames biased media for omarosa s newfound popularity now that she s turned on trump
+    dem senator claims the left has no equivalent to dark trump rallies he must have forgotten these incidents
+    tucker carlson slams nike for using colin kaepernick as a pawn in its decadent scheme
+    trump supporter paris dennard hits back against accusations of no black people in the trump administration cnn is peddling lies
+    cnn s david gregory declares trump desperate to be loved and says he suffers from paranoia
+    an organization behind massive super eid muslim celebration at minnesota vikings stadium labeled a terrorist organization
+    liberals accuse woman sitting behind kavanaugh of being a white supremacist she s actually a hispanic descendent of holocaust survivors
+    kellyanne conway reveals what the establishment media is doing and attacks them for it
+\end{lstlisting}
+
+Which share the sensational, tabloid style with the Fox headlines, though here the focus is more specifically on politically polarizing issues -- "black conservative activist[s]," "anti-CNN chants," "Obama's obsession with his image," Nike as a "social justice corporation," etc.
+
+Stepping back, and doubling back to the original idea of modeling a kind of linguistic "plate tectonics" of the media ecosystem -- this is just a start, but from these examples we can start to reason about some of the most significant changes. BuzzFeed has doubled down on clickbait, perhaps at the expense of political reporting; HuffPo has done the opposite, shifting away from clickbait and towards political reporting; and, Fox and The Daily Caller have drifted off in the direction of a sensationalized and hyper-partisan style of coverage.
+
+\section{Problems, questions, future directions}
 
 \end{document}
