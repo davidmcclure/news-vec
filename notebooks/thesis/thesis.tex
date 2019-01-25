@@ -10,6 +10,9 @@
 \usepackage{scrpage2}
 \usepackage{graphicx}
 \usepackage{titlesec}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{booktabs}
 
 % Main font
 \setmainfont{Baskerville}
@@ -102,7 +105,7 @@ Of course, doing this manually, it would be hard to scale beyond a few outlets a
 
 Most fundamentally, beyond this ability to "read" headlines at a scale that would otherwise be impossible -- these models make it possible to start filling in a kind of ground-truthed understanding of the degree to which different outlets are similar and different, where we might otherwise have to rely on intuition and anecdote. Modeling a complete matrix of pairwise similarities across 15 major media organizations, we can construct a kind of "content graph," a fully-connected representation how, and to what degree, outlets produce (dis)similar headlines:
 
-%\includegraphics[width=\textwidth]{figures/hl-graph.png}
+%\includegraphics{figures/hl-graph.png}
 
 Once we have this empirical view of the linguistic proximities among the outlets, though, there's a way in which this immediately generates a new set of questions. Most of which, really, are some version of just one -- where is this graph \textit{not what we would expect}? To return to the analogy of voice -- are there outlets that are "speaking" in ways that don't map onto assumptions about the role that they play in a broader political, commercial, or historical context?
 
@@ -153,5 +156,369 @@ We can then parse the raw URL string and extract the registered domain -- here, 
 Critically, though, our lab also has access to the "Enhanced URLs" add-on product available through Gnip, the vendor that distributes data from Twitter. The "Enhanced URLs" metadata provides two pieces of information that are essential to this study -- first, the "expanded" URL, which is formed by following redirects from the raw URL that appears on Twitter. This valuable here because a sizable percentage of links on Twitter are shortened by services like \texttt{bit.ly}, meaning that they have to be "unrolled" in order to identify out the real domain -- for example, \texttt{nytimes.com} instead of \texttt{bit.ly}. In theory, we could do this ourselves; but, especially when working with data that's more than a few weeks old, this can be difficult. Many shorteners like \texttt{bit.ly} automatically expire the links, meaning that, for example, if we tried to expand a link from spring of 2017, it would likely fail.
 
 Second, and most important, "Enhanced URLs" also provides scraped copies of the \href{http://ogp.me/}{Open Graph} \texttt{title} and \texttt{description} tags of the page that the link points to. At a product level, Twitter uses the title and description in the link "preview boxes" for the article that automatically get displayed with tweets that contain links.
+
+\begin{lstlisting}
+"gnip": {
+  "urls": [
+     {
+        "url": "https://t.co/MOZgWRzhRK",
+        "expanded_url": "https://www.nytimes.com/2017/09/27/us/politics/navy-orders-safety-operational-standards.html",
+        "expanded_status": 200,
+        "expanded_url_title": "Navy Returns to Compasses and Pencils to Help Avoid Collisions at Sea",
+        "expanded_url_description": "A top officer issued new orders to sailors worldwide as the Navy scrambled to make priorities of safety and maintenance after two deadly collisions in recent months."
+     }
+  ]
+},
+\end{lstlisting}
+
+In a sense, the headlines themselves aren't terribly hard to come by -- Twitter is just scraping them off the public web, and there's nothing to stop anyone from doing this independently. But, beyond just the convenience of it having them pre-scraped for tens of millions of pages, there are actually a number of interesting advantages to collecting this corpus "through" the Decahose, as it were, instead of trying to harvest it independently.
+
+First, Twitter provides an automatic signal for the "footprint" of the article. In the most minimal sense, just the fact that the article appears in the 10\% sample from the Decahose is evidence that it got some minimal level of circulation; and, we can also precisely measure the size of this circulation by counting the number of times it was tweeted, or, better, adding up the follower counts of all the users who tweeted the link -- the "impressions" count. This makes it possible to consistently model a sort of "effective footprint" of a media outlet, the body of content that is actually getting meaningful circulation. Second -- historical archives of Twitter data make it possible to collect consistent data at the scale of years, without having to maintain labor-intensive scrapers. And, last but not least -- headlines on Twitter are directly associated with unique user identifiers, which makes it possible to directly associate individual pieces of content at specific moments in time with specific audiences. This type of data would be almost impossible to assemble from the open web.
+
+Of course, there are also some downsides to the filter provided by Twitter, which, in a number of well-documented ways, is idiosyncratic and non-representative of broader patterns of media consumption. There's a tradeoff -- from Twitter we get a very consistent and very "deep" sample of news production and consumption; but at the cost of it being fairly "narrow."
+
+\section{5.65 billion links}
+
+So -- tweets with links, and links that point to headlines. Before diving into the headlines themselves -- what does that data look like in its native environment on Twitter? In this study, we work with an archive of the Decahose that was collected by Cortico, a non-profit organization affiliated with the Laboratory for Social Machines. Specifically, we focus on a 625-day window of data running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 21,219,935,342 total tweets. Of these, 5,243,960,217 (24.7\%) include at least one link.
+
+% \includegraphics{figures/decahose-tweet-link-vol.png}
+
+Though, interestingly, this ratio has actually fallen over time -- breaking out just the links, we can see that the volume has actually declined by ~40\% over this time period, falling from ~10M per day at the beginning of 2017 to ~6M in fall of 2018, even while the overall tweet volume has stayed mostly stable:
+
+% \includegraphics{figures/decahose-link-vol.png}
+
+Where do these links point? As an first step, we can parse the raw URL strings into component parts (protocol, subdomain, registered domain, path, etc.) and then count the total number of links to each registered domain. These are the 100 most frequently-occurring domains, before any filtering is applied:
+
+\begin{displayquote}
+\scriptsize \raggedright twitter.com, youtube.com, du3a.org, facebook.com, instagram.com, d3waapp.org, google.com, curiouscat.me, tistory.com, ghared.com, naver.com, zad-muslim.com, showroom-live.com, twittascope.com, ebay.com, fllwrs.com, vine.co, amazon.com, 7asnat.com, apple.com, channel.or.jp, blogspot.com, twitcom.com.br, soundcloud.com, nytimes.com, yahoo.co.jp, cnn.com, nicovideo.jp, pscp.tv, swarmapp.com, spotify.com, ameblo.jp, 7asnh.com, tumblr.com, line.me, wordpress.com, daum.net, washingtonpost.com, twitch.tv, twitcasting.tv, insurancepremium-wd.com, seesaa.net, shindanmaker.com, amazon.co.jp, dmm.co.jp, thehill.com, theguardian.com, etsy.com, imgur.com, bbc.co.uk, paper.li, foxnews.com, fc2.com, rakuten.co.jp, careerarc.com, gleam.io, reddit.com, ask.fm, monster-strike.com, quran.to, lawson.co.jp, reuters.com, staticflickr.com, globo.com, peing.net, billboard.com, soompi.com, grandesmedios.com, medium.com, hotpepper.jp, crowdfireapp.com, nhk.or.jp, twimg.com, vlive.tv, breitbart.com, alathkar.org, tuitutil.net, sinaimg.cn, huffingtonpost.com, go.com, buzzfeed.com, dailymail.co.uk, elpais.com, livedoor.com, change.org, utabami.com, livedoor.jp, vonvon.me, pixiv.net, rt.com, bbc.com, politico.com, daumcdn.net, yahoo.com, independent.co.uk, asahi.com, linkedin.com, naver.jp, nbcnews.com
+\end{displayquote}
+
+A majority of these, of course, don't represent "news" sources in a meaningful sense. Though, this isn't always clear-cut -- for example, links to Facebook might often point to content from news organizations that has been shared on Facebook. But, bracketing this, and just operating at the level of individual media brands -- if we take the 2,000 domains with overall largest link counts and then manually filter this list, we can pull out a long list of 87 major media organizations. Of course, "major" is somewhat subjective; here, we took all outlets that meet a minimum standard of name recognition and produce either "general-interest" news or political reporting / commentary; but not specialized outlets that focus on topics other than politics -- ESPN, TechCrunch, Rolling Stone, etc. Here are these 87, ordered here by the total number of links:
+
+\begin{displayquote}
+\scriptsize \raggedright nytimes.com, cnn.com, washingtonpost.com, thehill.com, theguardian.com, foxnews.com, bbc.co.uk, reuters.com, breitbart.com, huffingtonpost.com, buzzfeed.com, politico.com, rt.com, independent.co.uk, yahoo.com, nbcnews.com, bloomberg.com, forbes.com, wsj.com, thegatewaypundit.com, businessinsider.com, usatoday.com, cbsnews.com, apnews.com, dailycaller.com, rawstory.com, vice.com, npr.org, truepundit.com, thedailybeast.com, time.com, cnbc.com, telegraph.co.uk, newsweek.com, nypost.com, sputniknews.com, nydailynews.com, washingtonexaminer.com, cbc.ca, vox.com, thinkprogress.org, theatlantic.com, newyorker.com, msn.com, ft.com, slate.com, theroot.com, variety.com, inc.com, dailykos.com, judicialwatch.org, msnbc.com, motherjones.com, aljazeera.com, economist.com, washingtontimes.com, dailywire.com, infowars.com, theintercept.com, axios.com, theonion.com, politicususa.com, thetimes.co.uk, nymag.com, salon.com, qz.com, nationalreview.com, palmerreport.com, townhall.com, thefederalist.com, hbr.org, hannity.com, talkingpointsmemo.com, fortune.com, thenation.com, propublica.org, foreignpolicy.com, theblaze.com, pbs.org, foxbusiness.com, theconversation.com, conservativereview.com, fivethirtyeight.com, crooksandliars.com, jezebel.com, newrepublic.com, realclearpolitics.com
+\end{displayquote}
+
+% \includegraphics{figures/t87-link-counts.png}
+
+Which, collectively, account for 73,198,274 million individual links in the data. The total number of links, though, is very different from the number of \textit{unique articles} -- a single article might produce tens or hundreds of thousands of individual tweets linking to the same piece of content, each of which are counted separately here. One simple way to roll up the individual occurrences of the domains by article is just to group on the exact text of the URL. But, this is somewhat brittle, since it's not uncommon for links to get passed around with superfluous GET parameters added onto them (eg, trackers that flag the source of a click). This can cause the same "base" URL to appear in many different configurations, if just treated as a raw string, all of which in fact point to the same article.
+
+Instead, we group links into articles by combining three pieces of information -- the registered domain, the "path" component of the URL, and the cleaned tokens in the Open Graph title, as provided by Gnip. (This cleaning process is somewhat intricate, detailed below.) The URL path is taken into consideration since there are times when the same outlet will produce multiple articles with identical titles. For example, if The New York Times produces an article every week called "Your Monday morning roundup" -- by including the URL path as part of the grouping key, we can correctly identify these as legitimately separate pieces of content.
+
+Grouping links on these three pieces of information, we can count the number of unique articles (and, by extension, headlines) associated with each domain. Which, in this context, is the more salient number, since the headline is the basic unit of analysis. The largest outlets have produced many hundreds of thousands of individual articles in the last two years, though the volume falls off fairly quickly outside the top ~20:
+
+% \includegraphics{figures/t87-article-counts.png}
+
+Beyond these rolled-up link and article counts, we can also easily get a high-level sense of how the footprint of different outlets on Twitter has evolved over the 2-year data window. Using the \texttt{postedTime} timestamps on each tweet, we can group links from an outlet by day, for instance, and look at the historical volume trend. For The New York Times:
+
+% \includegraphics{figures/nyt-links-per-day.png}
+
+Or, rollup up links by article, the total number of unique NYT articles that appeared by day:
+
+% \includegraphics{figures/nyt-articles-per-day.png}
+
+Finally, digging deeper into the metadata provided by Twitter -- for each tweet, we also have information about the user account that posted the tweet, including the follower count of the user at the time the tweet was posted. This is very useful information, since follower counts vary significantly -- a link posted from an account with 1M followers will have vastly more reach than a link posted from an account with 100 followers. In a crude sense, we can use the follower count of the user account as a proxy for "impressions," the total number of times that the tweet was seen by individual twitter users. (Of course, this isn't literally true -- when a user posts a tweet, the percentage of her followers who actually see it is probably fairly low, since many of them won't be logged on, etc. But, if we assume that this percentage is roughly similar across the platform, the follower count can give a (relative) signal of the real-world "reach" of the tweet.)
+
+Taking the total impressions produced by all tweets with links to The New York Times, and grouping by day:
+
+% \includegraphics{figures/nyt-imp-per-day.png}
+
+Some of which, interestingly, show very significant changes over the 2-year data window. Modeling this as a linear trend, here are the 10 domains with the most significant decreases, in terms of links, articles, and impressions:
+
+% \includegraphics{figures/vol-dec.png}
+
+So, the number of unique articles from Huffington Post, on a per-day basis, has fallen by more than 50\%. In the other direction, domains with the strongest increases in volume:
+
+% \includegraphics{figures/vol-inc.png}
+
+Which has a striking partisan tilt: all of the four domains at the top of the three lists -- \texttt{hannity.com}, \texttt{truepundit.com}, \texttt{judicialwatch.com}, \texttt{thefederalist.com} -- represent (far) right-leaning political perspectives.
+
+Of course, we don't really care about the "performance" of the headlines per-se -- our focus here is on the structure of the linguistic relationships among outlets. But, these overall volume trends have important methodological implications, especially for the historical questions that emerge in the second half of the project. Namely, if we're interested in exploring changes in relative similarity between outlets over time, it's clear that we need to explicitly standardize for these changes in volume, to prevent them from getting artificially proxied by other measurements. For example, if we use classification accuracy as a measurement for similarity, a model trained on HuffPo data from 2018 will almost certainly be lower-performing than a model trained on 2017 data, just because the 2018 model will see far less evidence -- even though the actual coverage might not have changed in any meaningful way, just the quantity of coverage.
+
+But, there's only so much we can learn by just counting links, articles, users, impressions; what we really want is a meaningful understanding of the relationships among the outlets -- how similar are the headlines? How similar are the audiences? Where they differ -- how, exactly?
+
+\section{Modeling textual distance with classification}
+
+From the Decahose, then, we can extract a set of unique article headlines that have appeared in the Decahose over a ~2-year period from a set of 87 major US media brands, aggregated from a complete set of 73 million individual links posted on Twitter.
+
+Given just the raw headline strings pulled from the \texttt{og:title} tags -- how can we reason about the relative similarities and differences between the headlines from different outlets? For example, say we have 300k unique headlines from NYT, 200k from CNN, 50k from Daily Caller -- how similar or different, in a precise sense, is each pair of outlets? Or, considered as a group -- what does the overall matrix of similarities look like? What clusters with what? Which topics, styles, entities, textual features drive these similarities and differences? If we think of the full set of 1.1 million unique headlines as representing a kind of linguistically-instantiated landscape -- what's the shape of this space, what's the linguistic "topography" of headlines on Twitter?
+
+There are various we could model this. Here, though, we follow Underwood et al. in framing the question as a \textit{predictive} task -- we explore the structure of the data by studying the degree to which we can train models to learn accurate mappings between headlines and outlets. That is -- if we have headlines from outlets A and B, we can train a lexical classifier to predict whether a given headline was produced by A or B? If the model achieves a high accuracy on test data -- if it is able to learn significant structure across the two classes and perform well on unseen data -- then this can be interpreted as a signal that the two sets of headlines are highly "separable" or "distinctive," given the representational capability of the model. And, conversely, if the model achieves poor accuracy -- if it has a hard time telling the difference between A and B -- then we can interpret this as a signal that the headlines are relatively similar. At the extreme edges -- if the model achieves 100\% accuracy, then we can interpret this as being the maximum possible "distance" between outlets -- they are completely differentiable. And, if the model achieves 50\% accuracy, no better than random, then we can interpret this as the smallest possible distance between outlets, a distance of 0 -- they are effectively indistinguishable.
+
+(To the model at least; with interpretive projects like this, where we're trying to model "meaning" in text, in some way, we always have to keep in mind that there's a mismatch between what a machine learning model sees in a piece of text and what a real person would see. Sometimes the model will fail to pick up on something that would be obvious to a real reader; other times the model will latch onto details that might seem insignificant to us. But, if we're willing to accept this quotient of interpretive slippage -- computation makes it possible to "read" these kinds of large corpora with a level of scale and comprehensiveness that would otherwise be impossible.)
+
+There are various other ways we could go about this, but, there two big advantages to formulating the question as a predictive task. First, it provides a number of natural ways to extract a very simple and interpretable \textit{metric} that captures relative differences in similarity. For example, when predicting whether a headline comes from AP News or BuzzFeed, the model might get to 85\% accuracy; but just 60\% accuracy when comparing Bloomberg and WSJ.
+
+Second, in the context of modern neural architectures, the classification task provides a natural training objective for learning high-quality, corpus-specific \textit{representations} of the headlines. If we train custom deep learning models to predict an outlet given a headline, it's easy to then extract the underlying sentence embeddings that are induced by the model -- high dimensional vectors that represent the "meaning" of the headline, as operationalized by the classifier.
+
+These embeddings give a remarkable interpretive power -- they can be treated, essentially, as a set of coordinates that position each headline in a high dimensional space, and we can then study the "shape" of the linguistic landscape defined the headlines, both within individual outlets and among them. And, at a more pragmatic level -- the embeddings also make it possible to systematically find individual examples that are typical, in various ways, of salient changes that are observed at the level of corpus averages. For example -- if we identify some kind of smooth, gradual change in the similarity between two outlets over time, we can query the individual headline embeddings in various way to try to find examples that "mark" or "define" the conceptual essence of this movement. The embeddings open the door to a very rich mode of "distant reading," to borrow from Franco Moretti -- the ability to reason in nuanced ways about the meanings contained in very large corpora of text.
+
+\section{Headline differentiability}
+
+We take classification, then, as a modeling paradigm; to understand the headlines, we explore the degree to which we train models that map from headline to outlet. Which, in turn, provides a natural way to precisely measure the similarity between outlets, as well as a training objective that we can use to induce high-quality representations of the headlines.
+
+So -- how differentiable are headlines? Through a lens of statistical inference -- how "learnable" is the relationship between a news organization and the headlines it produces? Ideally, we could explore this question across the full set of 87 media organizations that were culled from the list of the 2,000 most frequently-appearing domains on Twitter. But, because of the fast falloff in the total number of articles associated with each outlet, it's not feasible to analyze all of them. Especially since, in this context, we generally have to downsample everything to the size of the *smallest* outlet -- eg, if we want to compare the accuracy of a model on headlines from outlet A vs outlet B, we have to make sure that the model sees exactly the same amount of "evidence" for each, or otherwise the comparison is unfair. So, if we have ~300,000 headlines from NYT, but only ~3,000 from Judicial Watch, we'd have to downsample NYT by two orders of magnitude -- which seems like a waste, and also starts to feel like something of an apples-to-oranges comparison.
+
+Instead, we pull out a hand-picked set of 15 major outlets, which were selected in an effort to get broad coverage across the largest US media brands and also diversity at the level of political orientation (left-leaning, right-leaning, centrist) and business model (cable news networks, print-and-web newspapers, web-only publications):
+
+\begin{enumerate}
+  \item AP News
+  \item Bloomberg
+  \item Breitbart
+  \item BuzzFeed
+  \item CNN
+  \item The Daily Caller
+  \item The Daily Kos
+  \item Fox News
+  \item The Hill
+  \item The Huffington Post
+  \item MSNBC
+  \item The New York Times
+  \item NPR
+  \item The Wall Street Journal
+  \item The Washington Post
+\end{enumerate}
+
+Second, after filtering on these outlets, we also just take articles that received at least 10,000 "impressions," as measured by the sum of the follower counts of the users who posted links to the article. (As mentioned before, this ensures a certain minimum "footprint" for the article, and protects from certain types of sample imbalance that could arise from automated activity on Twitter.) After filtering by domain and applying this minimum impressions threshold, this gives a working corpus of 1,081,790 unique articles, where the largest outlet in terms of volume is The Washington Post, with 122,197 articles, and smallest is MSNBC, with 18,808.
+
+As a first step, we train a series of multiclass models, in which the classifier is presented with headlines drawn from all 15 outlets and trained to predict which outlet produced the headline. To ensure exact comparability across the different architectures, for these benchmarks we freeze off a single downsampled training corpus that is used for all training runs -- 18,808 headlines are sampled from each outlet at the start, and then each model is trained on this frozen sub-corpus of 282,120 headlines.
+
+We compare seven models. First, two non-neural baselines, using standard implementations from the \texttt{sklearn} Python package:
+
+\begin{itemize}
+\item \textbf{Logistic regression} -- Standard logistic regression under L2 regularization, fit on TFIDF-scaled ngram count features (order 1-3). In the multiclass case, we use the \texttt{sag} solver.
+
+\item \textbf{Linear SVC} -- A standard SVM, fit on the same features.
+\end{itemize}
+
+Then, we explore five different neural architectures. All of these models share a common token embedding pipeline, and then implement different line encoders on top of the token embeddings. Tokens are encoded first with a CNN over individual characters -- characters are mapped to 15d embeddings, and then encoded with a CNN with six filter maps of widths 1-6, each with 25 units per character of width and with max-pooling over the feature maps, which produces a 525d embedding for each individual token. This character-level representation is then concatenated with a standard 300d pre-trained GloVe embedding for the token, where one is available, resulting in a composite 825d embedding for each token. then, these token sequences are handed to one of five different line encoders, with increasing levels of complexity:
+
+\begin{itemize}
+\item \textbf{CBOW} - Simply the unweighted, dimension-wise mean of all token embeddings in the headline.
+
+\item \textbf{CNN} - A standard CNN for sentence classification as described by Kim et al. Though, we use a larger set of filter widths (1-5), each with 500-unit feature maps.
+
+\item \textbf{LSTM} - A standard bidirectional LSTM, using a single 512-unit hidden layer for each direction. The top layers of the forward and backward pass are concatenated together to form a single 1024-unit embedding for the line.
+
+\item \textbf{LSTM + Attention} - Standard attention over the LSTM states, using a separate, two-hidden-layer FFNN to produce scores over the states. As described by Banadhu et al, these weights are interpreted as a probability distribution, which is then use to produce a weighted linear combination across the states, which is then concatenated with the final LSTM output to form a combined 2048-unit encoding.
+
+\item \textbf{LSTM + CNN} - Similar to attention, but instead of using a linear combination over the states, the states are instead treated as higher-order token embeddings and passed through the same convolutional layers used in the standard CNN encoder. Like with the attention network, the output of the CNN is concatenated with the regular LSTM output.
+\end{itemize}
+
+All models are all trained under a standard cross-entropy loss, using the Adam optimizer with a learning rate of \texttt{1e-4} and a batch size of 50. The implementation is in Pytorch, and models are trained on a single NVIDIA V100 GPU, running on a \texttt{p3.2xlarge} node on EC2.
+
+\section{Headline cleaning}
+
+Before comparing across the full set of seven models, though -- how difficult is the task? What kind of performance should we expect? As an initial smoke test -- if we apply a standard tokenization to the raw headline strings that come through the Decahose, and then fit the vanilla logistic regression, we get 50\% accuracy on the full 15-class model:
+
+\begin{lstlisting}
+                    precision    recall  f1-score   support
+
+        apnews.com       0.47      0.48      0.47      1909
+     bloomberg.com       0.51      0.58      0.54      1942
+     breitbart.com       0.77      0.75      0.76      1910
+      buzzfeed.com       0.57      0.79      0.67      1949
+           cnn.com       0.69      0.26      0.37      1854
+   dailycaller.com       1.00      0.86      0.92      1959
+      dailykos.com       0.47      0.69      0.56      1990
+       foxnews.com       0.35      0.37      0.36      1822
+huffingtonpost.com       0.35      0.30      0.32      1802
+         msnbc.com       0.46      0.57      0.51      1833
+           npr.org       0.38      0.37      0.37      1874
+       nytimes.com       0.45      0.34      0.39      1923
+       thehill.com       0.42      0.56      0.48      1884
+washingtonpost.com       0.59      0.45      0.51      1835
+           wsj.com       0.44      0.33      0.37      1879
+
+         micro avg       0.52      0.52      0.52     28365
+         macro avg       0.53      0.51      0.51     28365
+      weighted avg       0.53      0.52      0.51     28365
+\end{lstlisting}
+
+Where, for a some outlets, the model is almost perfect -- 100\% precision for The Daily Caller. Which, in a sense, almost seems \textit{too} good. It could be that The Daily Caller is just that distinctive, but, more likely, this suggests that there is some kind of unambiguous lexical signal in the headlines that's making the task trivial in some cases.
+
+To get a sense of which features are doing the heavy lifting, we can skim off ngrams with strongest chi-squared statistic for each outlet:
+
+\begin{itemize}
+\item \textbf{cnn.com} -- the bell, know before the, : live, before the bell, premarket :, premarket, : live updates, fast facts, trump - cnn, - cnn.com, cnn.com, ? -, ' - cnn, ? - cnn, -, video, cnn, cnn video, - cnn video, - cnn
+
+\item \textbf{dailycaller.com} -- ? via dailycaller, - the daily, ' [ video, caller, ' [, the daily caller, daily caller, ' via, ' via dailycaller, video ] via, [ video, video ], [ video ], ] via, ] via dailycaller, ], [, via, dailycaller, via dailycaller
+
+\item \textbf{breitbart.com} -- illegal, - ', nolte, illegal aliens, delingpole :, amnesty, delingpole, report :, : ', cartel, |, ', ' |, ' | breitbart, ' -, ' - breitbart, -, | breitbart, - breitbart, breitbart
+
+\item \textbf{dailykos.com} -- for night, round up :, night owls, for night owls, open thread for, thread for night, thread for, daily kos elections, kos elections, pundit, thread, cartoon :, abbreviated pundit, open thread, abbreviated, trumpcare, digest :, daily kos, kos, digest
+
+\item \textbf{npr.org} -- top stories, top stories :, on mountain, on mountain stage, mountain stage, listen :, first listen :, first listen, npr, on world, cafe, on world cafe, world cafe, listen, now :, listen now, listen now, listen, listen now :
+
+\item \textbf{msnbc.com} -- rep., ..., round up ,, 's campaign round, campaign round, campaign round up, report ,, joe :, lawrence, 's mini, 's mini report, mini report ,, mini report, lawrence :, mueller, matthews, matthews :, trump, fmr ., fmr
+
+\item \textbf{bloomberg.com} -- start your, bloomberg, know to, to know to, oil, five things you, to start your, know to start, start your day, stocks, billion, markets, wrap, said to,  , : markets, markets wrap, : markets wrap, brexit, u.k.
+
+\item \textbf{nytimes.com} -- in nyc this, nyc this, g.o.p., new york today, york today, york today :, california today, california today :, , dies at, , dies, evening briefing, review : ', recipe, opinion | the, briefing, today :, review :, : your, opinion, opinion |
+
+\item \textbf{washingtonpost.com} -- review |, opinion | the, | trump 's, | why, opinion | trump, d.c., 202 :, 202, analysis | trump, | trump, analysis | the, | the, ., perspective, opinion, perspective |, opinion |, analysis, |, analysis |
+
+\item \textbf{wsj.com} -- download :, the morning download, china, the morning risk, morning risk, morning risk report, risk report :, risk report, fed 's, ecb, opinion journal, opinion journal :, ', eurozone, ' review, ' review :, the morning, investors, fed, u.s.
+%
+\item \textbf{buzzfeed.com} -- that will, make you, your, we 'll reveal, 'll reveal, 19, you ?, tell you, are you ?, 'll tell you, 'll tell, are you, we 'll tell, which, we 'll, 'll, and we, and we 'll, you
+
+\item \textbf{apnews.com} -- 1st, check : trump, us, things to know, for today, apnewsbreak :, apnewsbreak, know for today, ap fact, ap fact check, 10 things, latest : trump, 10 things to, know for, to know for, ap, latest, the latest, the latest :, latest :
+
+\item \textbf{huffingtonpost.com} -- via dailycaller, marketing, from women this, tweets from women, 20 funniest tweets, 20 funniest, the 20 funniest, funniest, from parents this, parents this week, parents this, tweets from, tweets from parents, email :, 's morning email, morning email, morning email :, lgbtq, funniest tweets, funniest tweets from
+
+\item \textbf{thehill.com} -- dem :, dem senator :, memo :, : trump, ', :, dem lawmaker, gop senator, trump, healthcare, poll, the memo :, senator :, dem senator, gop, poll :, dems, report, dem, : report
+
+\item \textbf{foxnews.com} -- eric shawn, , reports say, via, dailycaller, via dailycaller, police, napolitano :, tucker, gingrich, report says, gutfeld :, , report says, gutfeld on, gingrich :, tucker :, , police, police say, , police say, gutfeld, hannity :
+\end{itemize}
+
+Which clearly shows the problem -- many headlines include "paratext," of different types, that correlates very strongly with a particular outlet, but doesn't have any meaningful connection to the substance of the headline, in the sense that we care about. For example, in the most clear-cut case -- some outlets add "call signs" to the outlets that literally just identify the outlet:
+
+\begin{itemize}
+\item Cost of war on Syrian children 's mental health \textbf{- CNN Video}
+\item \textbf{APNewsBreak :} US yanks funds from unbuilt windmill farm
+\item Trump Just Named Five New Possible Supreme Court Nominees \textbf{Via dailycaller}
+\item \textbf{WSJ :} Trump ignored advice to confront Putin over indictments
+\end{itemize}
+
+Or, more indirect -- some outlets add prefixes or suffixes to headlines that mark the "category" or "vertical" that the article belongs to:
+
+\begin{itemize}
+\item \textbf{OPINION |} Trump 's strategic incoherence is a recipe for war
+\item \textbf{ANALYSIS :} Michael Wolff Makes the Argument for Removing Trump Under 25th Amendment
+\end{itemize}
+
+Or, similarly, a number of outlets have independently named "blogs" or "series." Eg, the "Perspective" from The Washington Post, the "Morning Risk Report" from WSJ:
+
+\begin{itemize}
+\item \textbf{Perspective |} What Google and Facebook must do about one of their biggest problems
+\item \textbf{The Morning Risk Report :} Huawei Looks to Avoid ZTE 's Fate
+\end{itemize}
+
+Author names can also an issue, if they get systematically included with headlines. Eg, Breitbart has a habit of writing headlines of the format "\texttt{[NAME]: ...}". For example, James Deligpole shows up in about 100 headlines:
+
+\begin{itemize}
+\item \textbf{Delingpole :} Trump Pulls out of Paris; Internet Shrieks that End Is Nigh
+\item \textbf{Delingpole :} When Comedians Stop Being Funny
+\end{itemize}
+
+With these, the outlet isn't directly identified, but, if the bigram \texttt{Perspective} appears in hundreds of WaPo headlines and nowhere else, then the model is able to make a classification decision just on the basis of what is essentially a formatting decision. Of course -- the classifier can't be blamed for this. Its only objective is to minimize the cross-entropy loss over the output distribution. But from an interpretive standpoint, to the extent that we want to use the classifier as a modeling paradigm, as a means to the end of inducing intellectually useful representations of the content -- this is bad, since it essentially lets the model off the hook from having to produce a good representation of the "meaning" of the headline.
+
+We're in the funny position, then, of essentially wanting to make the model less accurate but more interesting -- we need to snip out these "giveaway" features, and force the model to only operate on the substance of the headline.
+
+It's worth noting, though, that beyond clear-cut cases like \texttt{CNN Video}, there's also a longer tail of more subtle textual features that might be thought of as elements of "house style," for lack of a better phrase -- a set of stylistic "ticks" that tend to mark particular outlets, but (debatably) don't really contribute in a meaningful way to the substance of the headline. For example, some outlets produce a number of headlines that include very short quotes -- often just a single word -- wrapped inside of quotation marks and inlined directly into the middle of an otherwise normal headline. For example, from Fox:
+
+\begin{itemize}
+\item Police say remains are \textbf{"consistent"} with missing Iowa boy
+\item Pakistani airline investigates \textbf{"extra passengers"} flown on fully booked plane
+\item \textbf{"Lost"} asteroid the size of the Statue of Liberty to buzz by Earth Tuesday
+\end{itemize}
+
+(This kind of pattern, incidentally, is precisely the kind of pattern that a strong, character-level neural model is very good at learning, which in turn can have a strong effect on the final representation produced by the encoder.)
+
+Are the quotes meaningful? Arguably not really, since they're generally being used as a functional part of an otherwise regular headline written by a reporter or editor at Fox. But, this is debatable. For example -- an argument could be made that the presence of the quotes changes the "positioning" of the headline -- by including the quote, the journalist somewhat disassociates herself from the phrasing of the quote. The quote holds the headline at arms length, in a sense; ownership is shifted away from the headline writer and towards the person being quoted.
+
+Another interesting case: a handful of outlets sometimes use a distinctive lexicon of slang words -- for example, The Hill, which often uses "dem" instead of "democrat."
+
+\begin{itemize}
+\item GOP sees omens of a \textbf{Dem} wave in Wisconsin
+\item House \textbf{Dem} calls for bipartisan talks to fund children's health care
+\end{itemize}
+
+In theory we could hide this from the model by unrolling "dem" into "democrat." But, this feels iffy; "dem," arguably, has a meaning that's distinct from "democrat" in a substantive way -- it implies a kind of professional perspective on politics, and inside-the-beltway sophistication.
+
+So -- how to clean the headlines, how to cut out the "paratext" without dipping too far into the meaningful "text" that we care about? For the purposes of this study, we take a simple, hands-off approach that errs in the direction of removing too much information instead of too little. First, tokens are cleaned to standardize over formatting differences at the level of capitalization and punctuation. Then, lines are split into segments marked by any kind of "break" character -- periods, semicolons, colons, question marks, exclamation marks, and things like \texttt{|} or \texttt{~}. Then, we identify segments that have very strong statistical associations with one or more outlets -- pieces of headlines like \texttt{CNN Video} and \texttt{via @dailycaller} that are exactly repeated across thousands of headlines for a subset of outlets. These segments are removed, and the classifiers are just shown the (cleaned) tokens that remain. In detail:
+
+\begin{enumerate}
+\item Standardize non-ASCII characters like curly quotes and em-dashes, to ensure consistent tokenization.
+
+\item Clean the tokens - downcase, strip punctuation. Keep \texttt{\$} and \texttt{\%}, but replace \texttt{[0-9]+} digits with a single \texttt{\#} character, since different outlets have different conventions for how numbers are reported and formatted.
+
+\item Break on any kind "separator" character that could mark a logical break between sections of a headline -- \texttt{:}, \texttt{|}, \texttt{-}, \texttt{~}, etc. As a special case, also break on the word "via," which is used by some outlets to identify the source ("... via @dailycaller"). This breaks each headline into a set of cleaned segments -- for example,
+
+\texttt{'Catching waves with top-ranked African surfer - CNN Video'}
+
+gets split into
+
+\texttt{('catching waves with top ranked african surfer', 'cnn video')}
+
+\item Treating these segments as higher-order "tokens," in effect -- take the chi-squared statistic between each segment and the response variable defined by the outlet labels. This makes it possible to identify the segments that have the strongest associations with some subset of outlets. For example, the 50 segments with the highest scores:
+
+\begin{displayquote}
+\small \raggedright dailycaller, breitbart, cnn video, the daily caller, listen now, analysis, video, opinion, perspective, the latest, report, ap news, cnn, cnncom, cartoon, the huffington post, d, markets wrap, exclusive, open thread for night owls, morning digest, matthews, abbreviated pundit round up, midday open thread, watch, review, joe, poll, cnnpolitics, lawrence, first listen, episode \#, delingpole, bloomberg, trump, bloomberg professional services, r, sign the petition, breaking, tiny desk concert, the morning download, top stories, chart, slideshow, police, the morning risk report, abbreviated pundit roundup, paid program, add your name, ap fact check
+\end{displayquote}
+
+\item Skim off segments where the p-value under the chi-squared test is under \texttt{0.0001}, which gives set of 1,719 segments with (very) strong associations with one or more outlets. Remove these from all headlines.
+\end{enumerate}
+
+This produces a highly standardized representation of each headline that basically consists of a stream of ASCII lexemes. For example, using some examples from before, with the original headline first, cleaned tokens second:
+
+\begin{itemize}
+\item Cost of war on Syrian children 's mental health - CNN Video\\
+cost of war on syrian children s mental health
+
+\item Delingpole : Trump Pulls out of Paris ; Internet Shrieks that End Is Nigh\\
+trump pulls out of paris internet shrieks that end is nigh
+
+\item Police say remains are " consistent " with missing Iowa boy\\
+police say remains are consistent with missing iowa boy
+
+\item Perspective | What Google and Facebook must do about one of their biggest problems\\
+what google and facebook must do about one of their biggest problems
+\end{itemize}
+
+\section{(Cleaned) differentiability}
+
+Now that we've scrubbed out these "giveaway" features, which would otherwise give a distorted sense of the distinctiveness of the headlines -- let's return to the basic question of how "learnable" the relationship is between headlines and outlets.
+
+As a first experiment, we train each of the seven architectures on the same class-balanced subset of headlines, breaking the corpus into 80/10/10\% train/dev/test splits. For the logistic regression and SVC, the dev set is ignored, and the model is simply fit on the training split and evaluated on test. For the neural models, we evaluate the performance on the dev set after every 100,000 training pairs, and implement an early-stopping rule that stops the training run when the loss on the dev set fails to improve over a 5-step window. The models achieve these accuracies, over 15 classes:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lr}
+ \toprule
+ Model & Accuracy\\
+ \midrule
+ LSTM + Attention & 41.35 \\
+ LSTM + CNN & 40.95 \\
+ LSTM & 40.35 \\
+ Linear SVC & 38.60 \\
+ Logistic Regression & 36.58 \\
+ CNN & 34.85 \\
+ CBOW & 33.59 \\
+ \bottomrule
+\end{tabular}
+\end{table}
+
+So, even after aggressively cleaning the headlines, the models are able to learn a large amount of structure across the 15 outlets -- a random baseline here would get 7\%. The strongest models are the enhanced LSTMs, though the improvement over the vanilla LSTM is minor, just about 1\%. (Which isn't surprising here, since the the headlines are relatively short -- about 8 words on average -- and these kinds of additions tend to help most with longer sequences.) Also notable is the quite strong performance of the non-neural baselines, which are just 4 points off the strong neural models, and better than the weakest two neural architectures. (And, it's worth noting, they also fit two orders of magnitude faster, on CPUs, than it takes to train the neural models on a GPU.) This suggests that a majority of the learnable structure across the outlets is a function of which words and phrases are being used -- information that can be captured in the bag-of-words ngram features exposed to the logistic regression and SVC -- and that syntagmatic structure of the headlines -- the sequence of combination, which can be modeled by the recurrent neural models -- is comparatively less important. To borrow categories from Jakobson -- the salient differences are largely in the axis of "selection" -- which words and phrases are being included -- and less in the axis of "combination," the patterns with which they are strung together into left-to-right sequences.
+
+Moving beyond the overall accuracy score -- we can also unroll the individual F1 scores for each of the outlets, which starts to give crude evidence that there could be interesting differences in the "structure" or "profile" of the content across the 15 outlets. Taking results from the LSTM with attention -- the precision and recall scores vary considerably. For example, the model is able to correctly identify 73\% of all BuzzFeed headlines; but just 23\% of CNN headlines, and 26\% of Fox:
+
+\begin{lstlisting}
+                    precision    recall  f1-score   support
+
+        apnews.com       0.42      0.59      0.49      1909
+     bloomberg.com       0.49      0.64      0.56      1942
+     breitbart.com       0.46      0.44      0.45      1910
+      buzzfeed.com       0.63      0.73      0.68      1949
+           cnn.com       0.26      0.23      0.24      1854
+   dailycaller.com       0.35      0.28      0.31      1959
+      dailykos.com       0.56      0.57      0.57      1990
+       foxnews.com       0.31      0.26      0.29      1822
+huffingtonpost.com       0.39      0.23      0.29      1802
+         msnbc.com       0.38      0.58      0.46      1833
+           npr.org       0.36      0.28      0.31      1874
+       nytimes.com       0.35      0.31      0.33      1923
+       thehill.com       0.35      0.41      0.37      1884
+washingtonpost.com       0.34      0.26      0.30      1835
+           wsj.com       0.40      0.35      0.37      1879
+
+         micro avg       0.41      0.41      0.41     28365
+         macro avg       0.40      0.41      0.40     28365
+      weighted avg       0.41      0.41      0.40     28365
+\end{lstlisting}
+
+Why? What does this correspond to, in the underlying content? Before we tackle the question of proximity between outlets -- trying to assign precise measurements for the degree to which outlets are similar and different, which will open the door to the comparison with the underlying audience graph -- how to get a birds-eye view of what the content from different outlets actually consists of? If we imagine that the 18k headlines from each outlet constitute a kind of linguistic "footprint" or "signature" -- how can we characterize these footprints? What do they consist of, how are they organized, how do they differ from outlet to outlet? How to "read" 200k headlines, without actually reading 200k headlines?
+
+\section{Mapping the "shape" of the headline space}
 
 \end{document}
