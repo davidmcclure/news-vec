@@ -850,26 +850,59 @@ Stepping back -- what can we say about the \textit{effect} of this mismatch? Whe
 
 \subsection{The Hill}
 
-- AP is somewhat of a special case, due to direct syndication. beyond this, most misaligned outlet is Hill, which, in many ways, has the weirdest mix of CA similarities, and seems to be the closest thing to a legitimately bipartisan / cross-partisan outlet
-- both high content and audience overlap with MSNBC, but breaks down after that -- high audience overlap with left-leaning WaPo, HuffPo, but low headline similarity; and, high headline sim with (far) right-leaning BB/DC
+Beyond the AP, which is something of an outlier due to the content syndication -- the most misaligned outlet is The Hill, which has a very strange mix of content and audience similarities, and seems to be the closest thing in this set of 15 outlets to a legitimately bipartisan (or maybe cross-partisan) news source. On the one hand, high content and audience similarity with (left-leaning) MSNBC:
 
+% TODO: Hill CA
 
-
-- After AP, the second most misaligned outlet is The Hill:
-
-- [Hill CA]
-
-- Similar structure to AP, in a way -- high audience correlation with left-leaning outlets (WaPo, HuffPo, CNN), but relatively low content similarities with these outlets; but, higher content similarities with the (far) right-leaning DC and BB. What do these content similarities consist of? Like before, we randomly sample 1M headlines from The Hill and Daily Caller, then find the N pairs with the smallest cosine distances -- a sample of the most nearby pairs of embeddings across the two outlets. For The Hill and DC:
+But, after that, things break down -- high audience overlap with other left-leaning outlets like WaPo, HuffPo, and CNN, but relatively low content similarities with these outlets; and, higher content similarities with the (far) right-leaning Daily Caller and Breitbart. What does this overlap with the far-right blogs look like? Like before, we randomly sample 1M headlines from The Hill and Daily Caller, then find the 20 pairs with the smallest cosine distances -- a sample of the most nearby pairs of embeddings across the two outlets. For The Hill and Daily Caller:
 
 - [Hill/DC overlaps]
 
-- And, with BB:
+- And, for The Hill and Breitbart:
 
 - [Hill/BB overlaps]
 
-- Where, it seems, the similarity is a mix of content (what's being covered) and specific stylistic markers. At the content level, focus on Capitol Hill news (not surpsiring, coming from The Hill), and also a number of headlines that are themselves about the media -- MSNBC, Jim Acosta, etc. And, at a stylistic level -- dems, gop, etc.
+Where, clearly, the overlap is largely driven by a particular \textit{style} of political reporting -- a kind of professional, inside-the-beltway view on politics; politics covered as a sport, a game that plays out across a stream of interactions, quarrels, gambits, moves, calculations. Specifically, the model is picking up on the use of a very distinctive set of abbreviations used by all three outlets -- namely \texttt{dems}, \texttt{gop}, \texttt{rep}.
 
-- The similarity here, in other words, appears to be an overlap of attention and style -- the topics / people / issues being covered, and the low-level linguistic style of the coverage -- the slang, the lexicon, the way of speaking, the journalistic "dialect," for lack of better word. But, in many cases, the partisan stance of the headlines is fairly clear, when comparing The Hill to DC/BB -- The Hill is covering similar issues as DC/BB and with a similar style, but the political viewpoint is often clearly different.
+which in a sense is just a orthographic decision; but also arguably some meaning to it -- positions reporting outside of either, a kind of third-party observer, both inside and outside of the game.
+
+likewise with MSNBC
+
+meanwhile, though the hill has highest audience overlaps with left-leaning outlets, it's also the one non-far-right outlet that makes inroads with the audiences of the far-right outlets -- with DC/BB, Hill is the one outlet outside of the Fox/DC/BB trio that cracks the top spots for audience similarity
+
+so,
+
+
+
+
+though, also not just these orthographic ticks that the model is getting -- eg, compare to the overlap hls between DC/BB, which show a very strong focus on immigration and terrorism:
+
+which is almost entirely missing with the overlaps with The Hill, which seem center fairly narrowly on politics per se -- trump administrator, capitol hill, congressional races.
+
+interesting to compare this with the relationship between DC/BB and HuffPo. HuffPo also among the more misaligned outlets, though the pattern is quite different -- low correlation is driven by very low audience overlap with the three most right-leaning outlets (Fox, BB, and DC), though the
+
+
+
+
+
+
+question of shared viewpoint is more complex -- does the hill/(dc/bb) overlap
+
+
+
+
+The similarity here, in other words, appears to be driven by an overlap of attention and style -- the topics, people, and issues being covered, as well as the low-level linguistic style of the coverage -- the slang, the lexicon, the way of speaking, the journalistic "dialect." But, not so much by an overlap in \textit{viewpoint} -- in many cases, the headlines from The Hill are clearly coming from a more left-leaning (or, at least, less right-leaning) perspective.
+
+
+The Hill: bush era nato ambassador do we need any more evidence that trump is unfit for office
+Breitbart: cher dems must win to stop gestapo tactics of ice and impeach trump
+
+
+
+
+
+
+in many cases, the partisan stance of the headlines is fairly clear, when comparing The Hill to DC/BB -- The Hill is covering similar issues as DC/BB and with a similar style, but the political viewpoint is often clearly different.
 
 - On the one hand, at a nuts-and-bolts NLP level, this tells us that there's room for improvement with the classifiers. If we can read these headlines and see differences in political "stance," then, in theory, so could the model. Which, in current form, seems to be getting somewhat fooled by the surface-level similarities in terms of the people / topics being covered and the lexicon being used to describe them. The model is picking up on shared attention and shared style, but missing differences in viewpoint / opinion.
 
