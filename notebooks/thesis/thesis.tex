@@ -740,17 +740,15 @@ Overall, then, content similarity tends to correlate positively with audience si
 
 Even here, of course, the alignment isn't perfect -- for WSJ, for example, the second-strongest audience correlation is with WaPo, but the linguistic similarity with WaPo is lower, right in the middle of the pack relative to the other 13 comparisons. But, overall, the correlation here is fairly tight -- if another outlet produces headlines that are similar to WSJ headlines, then it also tends to share audience with WSJ.
 
-To answer this definitively, we'd need to take a closer look at the specific types of content are being shared by the users who drive the correlations with other outlets. For example, for users who share articles from both WSJ and NYT, do they tend to share NYT articles of a particular type? We might guess that they would often be articles about business and financial issues, similar to WSJ. If this is the case, then one interpretation would be to say that these audiences interested in business news tend to have a kind of "functional" relationship with media outlets, grounded in a need for specific types of content -- the alliegance is to the articles, not the outlet. That is -- there's a segment of the audience on Twitter that wants business and financial news, but doesn't particularly care where it comes from. So if, for example, NYT produces business / financial articles, then the same readers who engage with WSJ content will also engage with these articles from NYT. Business reporting, in a sense, is a sort of fungible commodity in the attention marketplace of Twitter -- relative to other types of news, the source of a story is less important than the story itself?
+How to make sense of this? Why WSJ and Bloomberg? Both have a broad focus on business and financial news -- is there something about this content that lends itself to this kind of strong alignment of content and audience? To answer this with confidence, we'd probably need to look closer at the specific types of content from other outlets that are being shared by users who share WSJ articles. For example -- if a user tweets articles from both WSJ and NYT, do they tend to share NYT articles of a particular type, perhaps broadly related to business and financial issues? If this is the case then one interpretation could be to say that audiences interested in business news tend to have a kind of transactional relationship with media outlets, grounded in a need for a specific type of content rather than a loyalty to a particular media brand. That is -- there's a segment of the audience on Twitter that wants business and financial news, but doesn't particularly care where it comes from. So, if NYT produces articles about these issues, then the same readers who engage with WSJ content will a,so engage with these articles from NYT. Business reporting, perhaps, is a kind of "fungible" commodity in the attention marketplace of Twitter -- relative to other types of content, the \textit{article} is more important than the \textit{outlet}?
 
 Meanwhile, at the other end of the spectrum, AP and The Hill have the correlated weights in the content and audience graphs. Breaking out the full set of similarities for each:
 
 % TODO: AP / Hill CA
 
-\subsection{AP vs. Fox}
+For AP, then, the two largest content / audience mismatches are with Fox and WaPo -- AP headlines sound like Fox headlines, but the audience overlap is low; whereas, audience overlap is high with WaPo, but headline similarity is low. At first blush, then, this might suggest that AP is serving as a bridge that exposes WaPo readers to Fox-like content -- the headlines are similar to Fox, but the readership overlaps with AP. But, of course, AP is also anomalous, here, in the sense that it's in large part a wire service -- AP pushes out content through the apnews.com domain, but AP stories also get syndicated by other outlets. Including, to a large extent Fox. So, when AP "sounds like" Fox -- is that because AP is producing content that's similar to content produced in-house by Fox, or is it that Fox is literally running AP headlines -- in which case, it would just be AP sounding like itself?
 
-AP, then has a level of high content similarity with Fox, but low audience overlap; and, high audience overlap with WaPo. If we stopped here, and didn't dig further, we might say that AP is acting as a kind of one-way bridge between Fox (right) and WaPo (left) -- it's producing content that resembles Fox, but this content pushed to an audience that overlaps more with the left-leaning WaPo.
-
-What does this overlap actually consist of, though? When the model(s) have a hard time differentiating between AP and Fox, which headlines mark this space of overlap between the two outlets? To get at this, we can take an approach similar to the technique that we used before when measuring the "diameter" of the embedding families for each outlet -- we sample a large number of random pairs of headlines from AP and Fox, take the cosine distances between each pair, and then skim off the closest pairs -- headlines from Fox and AP that get mapped to very similar coordinates in the high-dimensional space. From a sample of 1M random pairs, here are the 20 closest:
+The answer turns out to be interestingly mixed. To get a sense of what the "overlap" between AP and Fox looks like, we can use an approach similar to the technique that we used before when measuring the "diameter" of the embedding families for each outlet -- sample a large number of random pairs of headlines from AP and Fox, take the cosine distances between each pair, and then skim off the closest pairs -- headlines from Fox and AP that get mapped to very similar coordinates in the high-dimensional space. From a sample of 1 million random headlines from each outlet, here are the 20 closest Fox/AP pairs:
 
 \begin{lstlisting}
 AP: trump targeting irs rule on churches
@@ -813,6 +811,23 @@ Fox: nepali climbers say outcrop near top of everest is intact
 AP: thousands stranded as floods submerge southern indian state
 Fox: magnitude # earthquake slams south central mexico
 \end{lstlisting}
+
+All of which, we can see, have a distinctly AP flavor to them, though the content appears to focus on particular areas. Namely -- foreign affairs ("German police," "Ukranian rebels"), crime and terrorism ("Walmart shooting," "deadly Sinai attack"), and US news that's anchored by references to particular states ("Arkansas inmate," "Minnesota sheriff," "Oregon boy.") The closest pair, though, is literally a duplicate headline -- which, indeed is an AP story that's getting directly syndicated by Fox. Here, on foxnews.com, with the byline pointing back to AP:
+
+\href{https://www.foxnews.com/us/trump-targeting-irs-rule-on-churches}{https://www.foxnews.com/us/trump-targeting-irs-rule-on-churches}
+
+And here on AP:
+
+\href{https://apnews.com/02692b5d6d684e529287396df1017877}{https://apnews.com/02692b5d6d684e529287396df1017877}
+
+But, just spot-checking a few other headlines, there are some here from Fox that aren't AP, that are getting produced in-house by Fox. For example, "Man reunited with baby he saved with CPR on side of highway" was written by Alexandria Hein for Fox's health section:
+
+\href{https://www.foxnews.com/health/man-reunited-with-baby-he-saved-with-cpr-on-side-of-highway}{https://www.foxnews.com/health/man-reunited-with-baby-he-saved-with-cpr-on-side-of-highway}
+
+What's the ratio here of in-house Fox vs AP-syndicated content, among the headlines that are getting linked back to \texttt{foxnews.com}? This is a key question, in the sense that the answer significantly affects the interpretation of AP as a content "bridge." If Fox is producing most of these stories, then 
+
+
+
 
 - All of which have a kind of traditional, distinctly AP-esque flavor, focusing on sports, international news, and crime/natural disaster, presented in a concise, straightforward, just-the-facts style.
 
