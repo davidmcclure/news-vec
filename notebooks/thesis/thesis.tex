@@ -1,0 +1,103 @@
+
+
+\documentclass{scrartcl}
+
+\usepackage{hyperref}
+\usepackage{fontspec}
+\usepackage{csquotes}
+\usepackage{abstract}
+
+% Main font
+\setmainfont{Baskerville}
+
+% Section numbers
+\usepackage{titlesec}
+\titleformat*{\section}{\Large\centering}
+
+% Margins
+\usepackage[top=3cm, left=3cm, right=3cm, bottom=3cm]{geometry}
+
+\usepackage{titling}
+
+\usepackage{scrpage2}
+\pagestyle{scrheadings}
+\ohead{McClure}
+
+% Image scaling
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+\setkeys{Gin}{width=\maxwidth,height=7cm,keepaspectratio}
+
+% Paragraph indents
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\parindent}{0pt}
+
+% Footnotes
+\usepackage[hang,flushmargin]{footmisc}
+\interfootnotelinepenalty=10000
+\setlength{\footnotesep}{0.5cm}
+
+% Curly quotes
+\newif\ifquoteopen
+\catcode`\"=\active
+\DeclareRobustCommand*{"}{%
+   \ifquoteopen
+     \quoteopenfalse ''%
+   \else
+     \quoteopentrue ``%
+   \fi
+}
+
+
+\begin{document}
+
+\title{%
+  \vspace{-2cm}Headlines as networked language\vspace{1ex} \\
+  \large A study of content and audience across 73 million links on Twitter
+}
+
+\author{David McClure}
+
+\date{January 25, 2019}
+
+\maketitle
+
+\begin{abstract}
+  Abstract.
+\end{abstract}
+
+\section{Introduction}
+
+Imagine that someone showed you a headline from a news article, but in complete isolation, stripped of all context -- just a sequence of words. All you were told is that the headline came from either the New York Times or Fox, and you were asked to guess which one. In some cases, this might be fairly easy. For example, if it's a recipe -- we might remember that The New York Times has a large cooking section:
+
+\begin{itemize}
+  \item Chicken Thighs With Cumin, Cayenne and Citrus
+\end{itemize}
+
+Or, if it's about (both) New York baseball teams:
+
+\begin{itemize}
+  \item In Early Going, the Yankees Steal the Mets' Thunder
+\end{itemize}
+
+(Though, of course, Fox also does plenty of sports reporting.) Meanwhile, we might associate a story about MS 13 with Fox, to the extent that right-leaning outlets have focused attention on immigration and crime:
+
+\begin{itemize}
+  \item East Coast MS 13 gang leader admits racketeering conspiracy
+\end{itemize}
+
+But, other things might be significantly harder. For example -- one of these headlines came from Fox, the other from The New York Times:
+
+\begin{itemize}
+  \item Zambia's 1st female fighter pilot says she "doesn't feel like a woman" in her job
+  \item 4 freed from Thailand cave, but rescuers face "war with water and time" to get to others
+\end{itemize}
+
+Here, to my eye, there aren't any obvious "tells" -- there are certainly things that might seem to tip the scaled one direction or the other, but it's not clear.\footnote{The answer -- NYT, Fox.} In trying to guess where the headline came from, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, locations, people that the outlet tends to focus on. And, beyond the raw content of what's being -- \textit{how} it's being covered, the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
+
+It also, indirectly, gives a way to reason about the degree to which they're similar or different. Now, imagine that instead of just doing this once, we did it for 100 headlines, and counted up the number of correct guesses. We'd likely do better than random -- but how much better? 60\%, 70\%, 95\%? How differentiable are NYT and Fox, at a purely linguistic level? And, how does this compare to other pairs of outlets? What if we took headlines from NYT and CNN, instead of NYT and Fox, for example, and repeated the experiment. We might guess that NYT and CNN are more similar, and thus harder to tell apart. But, how true is this, exactly? Say we got 80 headlines right when guessing between NYT and Fox comparison -- would we get, perhaps, 70 right for NYT and CNN? Or 60, 55? In a rough sense, we could start to reason about the relative proximities between different pairs of outlets.
+
+\end{document}
