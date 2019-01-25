@@ -53,6 +53,8 @@
 
 \hypersetup{linkcolor=blue,urlcolor=blue}
 
+\newfontfamily\hlfont{Menlo}
+
 \begin{document}
 
 \title{%
@@ -762,66 +764,66 @@ And, here's Fox and AP, where we can see that the entire cluster of Fox headline
 
 What are these headlines? To get a sense of what this overlap between AP and Fox looks like, we can use an approach similar to the technique that we used before when measuring the "diameter" of the embedding families for each outlet -- sample a large number of random pairs of headlines from AP and Fox, take the cosine distances between each pair, and then skim off the closest pairs -- headlines from Fox and AP that get mapped to very similar coordinates in the high-dimensional space. From a sample of 1 million random headlines from each outlet, here are the 20 closest Fox/AP pairs:
 
-\begin{lstlisting}
-AP: trump targeting irs rule on churches
-Fox: trump targeting irs rule on churches
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    AP: trump targeting irs rule on churches
+    Fox: trump targeting irs rule on churches
 
-AP: oregon boy # found in car trunk critically injured
-Fox: indiana father charged with neglect in sons drownings
+    AP: oregon boy # found in car trunk critically injured
+    Fox: indiana father charged with neglect in sons drownings
 
-AP: egypt gunmen attack christians killing at least #
-Fox: egypt church bombing kills at least #
+    AP: egypt gunmen attack christians killing at least #
+    Fox: egypt church bombing kills at least #
 
-AP: dad who dragged teen daughter through school avoids prison
-Fox: man reunited with baby he saved with cpr on side of highway
+    AP: dad who dragged teen daughter through school avoids prison
+    Fox: man reunited with baby he saved with cpr on side of highway
 
-AP: iran detains ex prosecutor convicted in # torture case
-Fox: pakistani army says indian fire kills # soldiers in kashmir
+    AP: iran detains ex prosecutor convicted in # torture case
+    Fox: pakistani army says indian fire kills # soldiers in kashmir
 
-AP: iran s revolutionary guard says hit syria for tehran attacks
-Fox: egypt s islamic state affiliate claims deadly sinai attack
+    AP: iran s revolutionary guard says hit syria for tehran attacks
+    Fox: egypt s islamic state affiliate claims deadly sinai attack
 
-AP: honduras president says open to review of disputed vote
-Fox: saudi arabia says corruption probe detainees will face trial
+    AP: honduras president says open to review of disputed vote
+    Fox: saudi arabia says corruption probe detainees will face trial
 
-AP: parents baby girl attacked by raccoon inside apartment
-Fox: mom investigating soldier son s death uncovers new evidence
+    AP: parents baby girl attacked by raccoon inside apartment
+    Fox: mom investigating soldier son s death uncovers new evidence
 
-AP: # officers killed in palestinian attack
-Fox: # men believed migrants killed in greece
+    AP: # officers killed in palestinian attack
+    Fox: # men believed migrants killed in greece
 
-AP: man jumps from car saves elderly woman from oncoming train
-Fox: dirt bike gang brutally beats driver on california highway
+    AP: man jumps from car saves elderly woman from oncoming train
+    Fox: dirt bike gang brutally beats driver on california highway
 
-AP: uk police arrest #nd man in london subway attack case
-Fox: turkish pop star journalists on trial over failed coup
+    AP: uk police arrest #nd man in london subway attack case
+    Fox: turkish pop star journalists on trial over failed coup
 
-AP: # dead # injured in kentucky school shooting suspect held
-Fox: # on thunderbirds jet in ohio accident taken to hospital
+    AP: # dead # injured in kentucky school shooting suspect held
+    Fox: # on thunderbirds jet in ohio accident taken to hospital
 
-AP: minnesota sheriff # injured when school van semi collide
-Fox: colorado walmart shooting leaves # dead # injured
+    AP: minnesota sheriff # injured when school van semi collide
+    Fox: colorado walmart shooting leaves # dead # injured
 
-AP: germany confirms that # germans killed in egypt stabbing
-Fox: china reports # alleged assailants killed in far northwest
+    AP: germany confirms that # germans killed in egypt stabbing
+    Fox: china reports # alleged assailants killed in far northwest
 
-AP: arkansas inmate attempting to halt nov # execution
-Fox: minnesota firefighters rescue saint bernard stuck on roof
+    AP: arkansas inmate attempting to halt nov # execution
+    Fox: minnesota firefighters rescue saint bernard stuck on roof
 
-AP: german police brace for rival protests after man killed
-Fox: ukrainian rebels say commander killed in car bombing
+    AP: german police brace for rival protests after man killed
+    Fox: ukrainian rebels say commander killed in car bombing
 
-AP: couple who prayed for healing plead guilty in baby s death
-Fox: # including boy dead in murder suicide amid custody battle
+    AP: couple who prayed for healing plead guilty in baby s death
+    Fox: # including boy dead in murder suicide amid custody battle
 
-AP: officer takes dying woman to beach to fulfill her last wish
-Fox: man reunited with baby he saved with cpr on side of highway
+    AP: officer takes dying woman to beach to fulfill her last wish
+    Fox: man reunited with baby he saved with cpr on side of highway
 
-AP: uneasy calm after # die in india riots over guru verdict
-Fox: nepali climbers say outcrop near top of everest is intact
+    AP: uneasy calm after # die in india riots over guru verdict
+    Fox: nepali climbers say outcrop near top of everest is intact
 
-AP: thousands stranded as floods submerge southern indian state
-Fox: magnitude # earthquake slams south central mexico
+    AP: thousands stranded as floods submerge southern indian state
+    Fox: magnitude # earthquake slams south central mexico
 \end{lstlisting}
 
 All of which, we can see, have a distinctly AP flavor to them, though the content appears to focus on particular areas. Namely -- foreign affairs ("German police," "Ukranian rebels"), crime and terrorism ("Walmart shooting," "deadly Sinai attack"), and US news that's anchored by references to particular states ("Arkansas inmate," "Minnesota sheriff," "Oregon boy.") The closest pair, though, is an exact duplicate -- which, indeed is an example of an AP story that's getting syndicated by Fox. Here, on \texttt{foxnews.com}, with the byline pointing back to AP:
@@ -856,67 +858,263 @@ Beyond the AP, which is something of an outlier due to the content syndication -
 
 But, after that, things break down -- high audience overlap with other left-leaning outlets like WaPo, HuffPo, and CNN, but relatively low content similarities with these outlets; and, higher content similarities with the (far) right-leaning Daily Caller and Breitbart. What does this overlap with the far-right blogs look like? Like before, we randomly sample 1M headlines from The Hill and Daily Caller, then find the 20 pairs with the smallest cosine distances -- a sample of the most nearby pairs of embeddings across the two outlets. For The Hill and Daily Caller:
 
-- [Hill/DC overlaps]
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    The Hill: dem candidate for va governor is fighting for ms #
+    Daily Caller: dem donor network wants reparations on agenda by #
 
-- And, for The Hill and Breitbart:
+    The Hill: dems kick off unity commission
+    Daily Caller: house dems want comey tapes
 
-- [Hill/BB overlaps]
+    The Hill: dem senator throws cold water on impeachment talk
+    Daily Caller: dem rep slams party leadership or lack thereof
 
-Where, clearly, the overlap is largely driven by a particular \textit{style} of political reporting -- a kind of professional, inside-the-beltway view on politics; politics covered as a sport, a game that plays out across a stream of interactions, quarrels, gambits, moves, calculations. Specifically, the model is picking up on the use of a very distinctive set of abbreviations used by all three outlets -- namely \texttt{dems}, \texttt{gop}, \texttt{rep}.
+    The Hill: dems push leaders to talk less about russia
+    Daily Caller: dem reads trump tweets during sessions hearing
 
-which in a sense is just a orthographic decision; but also arguably some meaning to it -- positions reporting outside of either, a kind of third-party observer, both inside and outside of the game.
+    The Hill: dems up # points in party affiliation
+    Daily Caller: dem candidates racking in record breaking donations
 
-likewise with MSNBC
+    The Hill: gop senator puts hold on trump energy nominee
+    Daily Caller: gop reps lash out at mnuchin after meeting
 
-meanwhile, though the hill has highest audience overlaps with left-leaning outlets, it's also the one non-far-right outlet that makes inroads with the audiences of the far-right outlets -- with DC/BB, Hill is the one outlet outside of the Fox/DC/BB trio that cracks the top spots for audience similarity
+    The Hill: scaramucci out as wh communications director
+    Daily Caller: acosta i brought heat to wh press briefing
 
-so,
+    The Hill: dem backed candidate wins wisconsin supreme court race
+    Daily Caller: moderate dems fear lack of support from national party
 
+    The Hill: dem calls for trump impeachment on house floor
+    Daily Caller: dem candidate compares trump victory to terror attacks
 
+    The Hill: dems prepare for fight over trump s cia pick
+    Daily Caller: ny dems to protest against confederate street names
 
+    The Hill: no surprise dem memo was nt released
+    Daily Caller: dem mayor vetoes $ # min wage bill
 
-though, also not just these orthographic ticks that the model is getting -- eg, compare to the overlap hls between DC/BB, which show a very strong focus on immigration and terrorism:
+    The Hill: tapper on michelle wolf backlash do trump supporters really want to talk about decency
+    Daily Caller: ryan on trump s govt shutdown tweet i understand the president s frustration
 
-which is almost entirely missing with the overlaps with The Hill, which seem center fairly narrowly on politics per se -- trump administrator, capitol hill, congressional races.
+    The Hill: dem rep demands answers on niger attack
+    Daily Caller: top dem on # strategy it s being worked on
 
-interesting to compare this with the relationship between DC/BB and HuffPo. HuffPo also among the more misaligned outlets, though the pattern is quite different -- low correlation is driven by very low audience overlap with the three most right-leaning outlets (Fox, BB, and DC), though the
+    The Hill: sanders supporters cancel clinton protest
+    Daily Caller: mccain sides with media with over trump
 
+    The Hill: senate intel dem rips twitter over deeply disappointing briefing
+    Daily Caller: senate dems targeting rep price are getting richer #x faster
 
+    The Hill: dems step up efforts to avoid california primary shutouts
+    Daily Caller: dems floats public option as solution to obamacare woes
 
+    The Hill: watch cnn anchor s disbelief that clinton aides destroyed phones with hammer
+    Daily Caller: gen hertling shoots down cnn s jim sciutto having been in the military
 
+    The Hill: alabama rep i m still backing moore because he ll vote right in the senate
+    Daily Caller: morgan freeman i m holding out hope that trump will be a good president
 
+    The Hill: trump will not approve release of dem counter to nunes memo
+    Daily Caller: rnc ad campaign targets vulnerable dems over gorsuch obstruction
 
-question of shared viewpoint is more complex -- does the hill/(dc/bb) overlap
+    The Hill: sanders to campaign in iowa with former aide
+    Daily Caller: mccain sides with media with over trump
+\end{lstlisting}
 
+And, for The Hill and Breitbart:
 
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    The Hill: nazareth mayor cancels christmas celebration over trump s jerusalem decision
+    Breitbart: public broadcaster admits to increasing booing sounds during trump davos speech
 
+    The Hill: bush era nato ambassador do we need any more evidence that trump is unfit for office
+    Breitbart: cher dems must win to stop gestapo tactics of ice and impeach trump
 
-The similarity here, in other words, appears to be driven by an overlap of attention and style -- the topics, people, and issues being covered, as well as the low-level linguistic style of the coverage -- the slang, the lexicon, the way of speaking, the journalistic "dialect." But, not so much by an overlap in \textit{viewpoint} -- in many cases, the headlines from The Hill are clearly coming from a more left-leaning (or, at least, less right-leaning) perspective.
+    The Hill: house dems raised record $ # million in march
+    Breitbart: dem staffers boo trump at unity baseball game
 
+    The Hill: pot state dems want federal regulation of marijuana
+    Breitbart: dems say guerrilla tactics for gun control coming
 
-The Hill: bush era nato ambassador do we need any more evidence that trump is unfit for office
-Breitbart: cher dems must win to stop gestapo tactics of ice and impeach trump
+    The Hill: meghan mccain to cpac head why is nt there a modicum of respect for my family
+    Breitbart: kirsten gillibrand if dems win midterms first thing we should do is abolish ice
 
+    The Hill: dem mega donor steyer runs ads calling on hoyer to support impeaching trump
+    Breitbart: dem rep introduces bill to block trump from using federal funds to pay for border wall
 
+    The Hill: graham rips trump over anti muslim videos the antidote to terrorism is not racism
+    Breitbart: cher dems must win to stop gestapo tactics of ice and impeach trump
 
+    The Hill: dem memo does nt change anything proves intel abuse occurred
+    Breitbart: dems willing to be flexible on funding for trump s wall
 
+    The Hill: al sharpton trump on course to win in # because dems are too tame to deal with him
+    Breitbart: kirsten gillibrand if dems win midterms first thing we should do is abolish ice
 
+    The Hill: gop lawmaker rips mueller if he were more biased we d have to give him credentials for mainstream media
+    Breitbart: trump slams fbi for double standard regarding dnc manafort i wo nt be involved i may change my mind
 
-in many cases, the partisan stance of the headlines is fairly clear, when comparing The Hill to DC/BB -- The Hill is covering similar issues as DC/BB and with a similar style, but the political viewpoint is often clearly different.
+    The Hill: expect trump s state of the union to celebrate america and provide a roadmap to the future
+    Breitbart: progressives despise trump so much they ve begun to dislike the country that elected him
 
-- On the one hand, at a nuts-and-bolts NLP level, this tells us that there's room for improvement with the classifiers. If we can read these headlines and see differences in political "stance," then, in theory, so could the model. Which, in current form, seems to be getting somewhat fooled by the surface-level similarities in terms of the people / topics being covered and the lexicon being used to describe them. The model is picking up on shared attention and shared style, but missing differences in viewpoint / opinion.
+    The Hill: seattle seahawks player trump is an idiot for saying protesting nfl players should nt be in the country
+    Breitbart: maajid nawaz i m suing the splc for defamation for putting me on anti muslim extremist list
 
-- It's interesting to note, though, that in spite of these fairly easy-to-see differences in opinion, The Hill is the one left-leaning publication that appears to have had some success in cracking into the audience network of the far-right political outlets. For example, for DC -- extremely high audience overlaps with BB / Fox, and uniformly low for everything other than The Hill, which is the one point of middle-ground -- high language similarity, and middling (but not low) audience overlap.
+    The Hill: secret service stops man who tried to meet ivanka trump armed with throwing knives
+    Breitbart: american wrestler in mexico infuriates fans with pro trump rants in the ring
 
-- [DC CA]
+    The Hill: gay us olympians continue feud with vice president eat your heart out pence
+    Breitbart: obamacare mandate repeal is the most important civil rights victory in years
 
-- And, the story is roughly similar with Breitbart -- again, extremely strong audience / language similarities with DC and Fox; and then The Hill in third place in terms of language, with an audience similarity that's significantly less low than for all of the other left-leaning outlets.
+    The Hill: pittsburgh mayor fires back at trump my city will follow paris agreement
+    Breitbart: celebrities to join women s march la on anniversary of trump inauguration
 
-- [BB CA]
+    The Hill: billy bush hits trump over access hollywood tape denials stop playing around with people s lives
+    Breitbart: alabama accuser deletes anti moore postings from facebook rants about removing trump from office
 
-- Though it would take quite a lot more study to put this on firm ground, this suggests the possibility that The Hill might be an example of a publication that -- at least to a modest extent -- is able to introduce competing viewpoints into a region of the media ecosystem that is otherwise highly homogeneous. By *sounding like* Breitbart and DC, it seems as if The Hill is able to gain access to Breitbart and DC audiences in a way that other left-leaning publications are not.
+    The Hill: keith olbermann i am retiring from political commentary
+    Breitbart: toby keith i wo nt apologize for playing trump inauguration
 
-- There's the possibility, in other words, that real people are also, to some extent, "confused" by this in the way that the classifiers are. Possible that audiences of DC/BB are more likely to engage with The Hill because of this shared attention / style, and in the process get meaningful exposure to viewpoints that might otherwise not circulate in their communities. Of course, also possible that The Hill is just legitimately centrist, and that it's a (relative) affinity of viewpoint that's driving this. To really know, we'd need access to various counterfactuals. Eg, if headlines from The Hill were written in a very down-the-middle, AP-esque style -- would they get the same update among BB / DC audiences? To get at this kind of question in a meaningful way, though, we would need to conduct active interventions / experiments.
+    The Hill: liberal group launches database to track corporations response to tax law
+    Breitbart: administration wants tax bill to pass with or without repeal of obamacare mandate
+
+    The Hill: mattis tillerson warned trump of security concerns in israel embassy move
+    Breitbart: mcconnell insider says majority leader would back garland for fbi director
+
+    The Hill: cnn s stelter blasts trump hannity relationship let s just underscore how weird this is
+    Breitbart: cnn s stelter questions trump s mental fitness is he suffering from some kind of illness
+\end{lstlisting}
+
+Where, clearly, the overlap is largely driven by a particular \textit{style} of political reporting -- a kind of professional, inside-the-beltway view on politics; politics covered as a sport, a game that plays out across a stream of interactions, quarrels, gambits, moves, calculations, confrontations. Specifically, the model is picking up on the use of a very distinctive set of abbreviations used by all three outlets -- namely \texttt{dems}, \texttt{gop}, \texttt{rep}. Likewise for MSNBC:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    The Hill: trump has abdicated his responsibility as president
+    MSNBC: trump has the worst lawyers of any president
+
+    The Hill: dems wonder can gop even pass a budget
+    MSNBC: dems need more than anti trump message
+
+    The Hill: senate dem sees looming constitutional crisis
+    MSNBC: female dems plan more political engagement
+
+    The Hill: dems will cave if republicans go
+    MSNBC: dem leadership is old and creaky
+
+    The Hill: dems fundraising off of trump comments attacking lewis
+    MSNBC: dem senator vows to expose medicaid cuts in gop plan
+
+    The Hill: trump doubles down on merck attack
+    MSNBC: trump backs down repeatedly
+
+    The Hill: cohen tape is powerful exculpatory evidence
+    MSNBC: cohen wiretapping was unjustified
+
+    The Hill: dems will oppose short term spending bill
+    MSNBC: dems plan filibuster to block gorsuch
+
+    The Hill: senate dem to intel chief answer my surveillance question publicly
+    MSNBC: dem candidate for ny ag open to prosecute trump aides if pardoned
+
+    The Hill: intel committee dems to trump read torture report
+    MSNBC: dems hold lead going into # can gop rebound
+
+    The Hill: mueller agrees to some limits on trump interview
+    MSNBC: kushner downplays meeting with russians
+
+    The Hill: nyt issues correction to giffords editorial
+    MSNBC: dems shut out of immigration meeting
+
+    The Hill: dems put squeeze on ryan over chaplain controversy
+    MSNBC: dem congresswoman offers path forward for party
+
+    The Hill: dems flip seat in florida state special election
+    MSNBC: dems see record early voting numbers in texas primary
+
+    The Hill: dem candidate for va governor is fighting for ms #
+    MSNBC: dem rep has full confidence in fbi director comey
+
+    The Hill: gop should remove nunes as intel chairman
+    MSNBC: trump must give intel unambiguous praise
+
+    The Hill: dems announce unity commission members
+    MSNBC: media clamp down at white house press briefings
+
+    The Hill: midterms pose dilemma for mueller
+    MSNBC: new proposed legislation would protect mueller
+
+    The Hill: dems step up attacks on gop obamacare bill
+    MSNBC: dems demand nunes evidence by friday
+
+    The Hill: dems hit trump on national coming out day
+    MSNBC: dems have emergency plan if trump fires mueller
+\end{lstlisting}
+
+Though, it's also not just this lexicon of political slang words that's driving these pairings. To put this into relief -- if we use the same procedure to identify headlines that mark the overlap of The Daily Caller and Breitbart, a very different portrait of these outlets emerges:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+  DC: illegal alien arrested for allegedly sexually assaulting # young girls
+  BB: illegal alien charged for alleged rape and murder of sanctuary city woman
+
+  DC: cnn s chris cuomo tries to justify antifa s violent tactics are they equally wrong
+  BB: cnn s jim sciutto spreads fake news about trump revoking brennan s security clearance
+
+  DC: illegal alien arrested for allegedly sexually assaulting # young girls
+  BB: previously deported illegal alien accused of raping # year old thousands of times
+
+  DC: ice arrests two criminal illegal immigrants after nj county declines detainers
+  BB: ice operations collar nearly # criminal illegal immigrants in two states
+
+  DC: german leaders propose bringing refugees to visit concentration camps to combat anti semitism
+  BB: truckers claim french switching off uk funded equipment intended to stop illegal calais migrants
+
+  DC: migration expert more than # million muslims would support terrorists
+  BB: fatah marks anniversary by celebrating terrorists who murdered israelis
+
+  DC: brennan implies trump could start a war to divert negative media attention from himself
+  BB: david lynch responds directly to trump you could be a great president if you reverse course
+
+  DC: baltimore sun media critic david zurawik calls for nbc to investigate joy reid
+  BB: hannity predicts book deal msnbc contributorship and maddow colbert maher bookings for comey
+
+  DC: california college tuition going up but not for illegal alien students
+  BB: children cry on tape after border apprehension illegal alien mother convicted
+
+  DC: milo s dangerous incinerates the left confounds the gop and trolls everyone in between
+  BB: john kirby it bothers me that trump s afghanistan speech is being given at fort myer
+
+  DC: cartel thugs who murdered ice agent get life in prison
+  BB: media ignore americans killed by illegal alien dreamers
+
+  DC: dem response to trump s immigration plan is wildly out of touch with american voters
+  BB: dem strategist james devine launches hashtag huntrepublicancongressmen after steve scalise shooting
+
+  DC: jennifer rubin melts down asks if people against amnesty are raised by wolves
+  BB: maxine waters leftist bullies and their media enablers want to disarm us
+
+  DC: dem candidate compares trump victory to terror attacks
+  BB: biden warns dems do nt walk out of kavanaugh hearings
+
+  DC: dhs spokesman we re allowed to arrest deport illegal alien crime victims at courthouses
+  BB: nationwide manhunt for three illegal aliens accused of kidnapping raping teen sisters
+
+  DC: exclusive tucker report carter page contacted trump campaign after fisa warrant was granted
+  BB: former wasserman schultz it staffer allegedly uploaded terabits of information to dropbox
+
+  DC: muslim leaders march throughout europe in protest of islamic terrorism
+  BB: east london murder suspect used welfare benefits to join islamic state
+
+  DC: jeff sessions announces zero tolerance policy following surge in illegal border crossings
+  BB: left s narrative trump administration pro rape for scrapping obama campus sex policies
+
+  DC: mitch mcconnell gave trump a present after passing tax reform it s too perfect
+  BB: nancy pelosi called the tax cut worst bill in history here s why that s ridiculous
+
+  DC: obama state department let clinton and huma make off with boxes of muslim engagement docs
+  BB: schumer fake news women turn to planned parenthood for mammograms maternity care
+\end{lstlisting}
+
+Focused heavily on (Mexican, Central American) "illegal aliens" and (Islamic) terrorism; often invoked in racially charged and xenophobic contexts. Which, looking back at the overlap between these outlets and The Hill, is (almost) entirely absent. So, it seems as if The Hill overlaps with a particular aspect of these right-leaning outlets -- what might be thought of as the "sport of politics," for lack of a better phrase -- politics as a kind of drama, a competitive arena; but stripped, in large part, of the charged ideological substance that marks the headlines at the overlap of Breitbart and The Daily Caller.
+
+In different ways, then, can think of AP and The Hill as marking scraps of common ground in the media ecosystem -- we can look to these sites of mismatch as indicators for the types of coverage that attract attention from outlets that occupy disparate regions of the audience graph. From AP -- foreign political instability and crime; from The Hill -- politics as sport.
 
 \section{Headlines as a historical process}
 
