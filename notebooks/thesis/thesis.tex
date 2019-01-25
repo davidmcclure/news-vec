@@ -183,12 +183,6 @@ Of course, there are also some downsides to the filter provided by Twitter, whic
 
 So -- tweets with links, and links that point to headlines. Before diving into the headlines themselves -- what does that data look like in its native environment on Twitter? In this study, we work with an archive of the Decahose that was collected by Cortico, a non-profit organization affiliated with the Laboratory for Social Machines. Specifically, we focus on a 625-day window of data running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 21,219,935,342 total tweets. Of these, 5,243,960,217 (24.7\%) include at least one link.
 
-% \includegraphics{figures/decahose-tweet-link-vol.png}
-
-Though, interestingly, this ratio has actually fallen over time -- breaking out just the links, we can see that the volume has actually declined by ~40\% over this time period, falling from ~10M per day at the beginning of 2017 to ~6M in fall of 2018, even while the overall tweet volume has stayed mostly stable:
-
-% \includegraphics{figures/decahose-link-vol.png}
-
 Where do these links point? As an first step, we can parse the raw URL strings into component parts (protocol, subdomain, registered domain, path, etc.) and then count the total number of links to each registered domain. These are the 100 most frequently-occurring domains, before any filtering is applied:
 
 \begin{displayquote}
@@ -1116,6 +1110,16 @@ Focused heavily on (Mexican, Central American) "illegal aliens" and (Islamic) te
 
 In different ways, then, can think of AP and The Hill as marking scraps of common ground in the media ecosystem -- we can look to these sites of mismatch as indicators for the types of coverage that attract attention from outlets that occupy disparate regions of the audience graph. From AP -- foreign political instability and crime; from The Hill -- politics as sport.
 
+beyond these two most dramatic misalignments, a number of other interesting patterns with other outlets that at times seem to suggest a kind of taxonomy for the content-audience fit, diffrent ways that an outlet can occupy these graphs. eg, huffpo notable for extremely low audience correlations with Fox/DC/BB, even though the content distances are right around average; suggesting a very strong ideological aversion between HuffPo and these outlets, even though the headline distance is par for the course. WaPo is notable for having very high audience correlations with a number of other left-leaning outlets (NYT, MSBC, The Hill), even though the headline similarities are relatively low; suggesting Wapo represents a voice that is both consistently different from other left-leaning outlets but also consistently interesting to other left-leaning outlets. (perhaps a function of WaPo's unusual double-status as national political newspaper and DC local?) last but not least -- the three farthest-right outlets, Fox/BB/DC, all have very similar profiles -- very strong audience correlations with each other, low audience overlap with everyone else; but a much more continuous distribution over headline similarities, with AP and The Hill creeping unexpectedly high for Fox and DC respectively.
+
 \section{Headlines as a historical process}
+
+By measuring the \textit{distinguishability} of headlines, then, we were able to construct a precise representation of the relative similarities and differences among media outlets. Then, we compared these content-level similarities to similarities at the level of audience, which makes it possible to identify sites of misalignment between these graphs -- Fox distributes large quantites of "AP-style" content that otherwise doesn't fit into Fox's linguistic niche; The Hill occupies an unusual middle-ground in the landscape of political reporting, producing headlines that the classifiers alternatively mistake for both the center-left MSNBC and the far-right Breitbart and Daily Caller.
+
+So far, though, we've been treating the headlines as a completely synchronic slice of data -- we're rolling up
+
+In a sense, though, this represents a fairly radical
+
+makes sense in the context of trying to assemble a kind of holistic model of different outlets since, say, the beginning of the Trump presidency. but it also suggests that there could be some very interesting information that's getting thrown out when we average
 
 \end{document}
