@@ -14,6 +14,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{wrapfig}
+\usepackage{cite}
 
 % Main font
 \setmainfont{Baskerville}
@@ -284,7 +285,7 @@ Second, after filtering on these outlets, we also just take articles that receiv
 
 As a first step, we train a series of multiclass models, in which the classifier is presented with headlines drawn from all 15 outlets and trained to predict which outlet produced the headline. To ensure exact comparability across the different architectures, for these benchmarks we freeze off a single downsampled training corpus that is used for all training runs -- 18,808 headlines are sampled from each outlet at the start, and then each model is trained on this frozen sub-corpus of 282,120 headlines.
 
-We compare seven models. First, two non-neural baselines, using standard implementations from the \texttt{sklearn} Python package:
+We compare seven models. First, two non-neural baselines, using standard implementations from the \texttt{sklearn}\cite{scikit-learn} Python package:
 
 \begin{itemize}
 \item \textbf{Logistic regression} -- Standard logistic regression under L2 regularization, fit on TFIDF-scaled ngram count features (order 1-3). In the multiclass case, we use the \texttt{sag} solver.
@@ -297,7 +298,7 @@ Then, we explore five different neural architectures. All of these models share 
 \begin{itemize}
 \item \textbf{CBOW} - Simply the unweighted, dimension-wise mean of all token embeddings in the headline.
 
-\item \textbf{CNN} - A standard CNN for sentence classification as described by Kim et al. Though, we use a larger set of filter widths (1-5), each with 500-unit feature maps.
+\item \textbf{CNN} - A standard CNN for sentence classification as described by Kim.\cite{D14-1181} Though, we use a larger set of filter widths (1-5), each with 500-unit feature maps.
 
 \item \textbf{LSTM} - A standard bidirectional LSTM, using a single 512-unit hidden layer for each direction. The top layers of the forward and backward pass are concatenated together to form a single 1024-unit embedding for the line.
 
@@ -306,7 +307,7 @@ Then, we explore five different neural architectures. All of these models share 
 \item \textbf{LSTM + CNN} - Similar to attention, but instead of using a linear combination over the states, the states are instead treated as higher-order token embeddings and passed through the same convolutional layers used in the standard CNN encoder. Like with the attention network, the output of the CNN is concatenated with the regular LSTM output.
 \end{itemize}
 
-All models are all trained under a standard cross-entropy loss, using the Adam optimizer with a learning rate of \texttt{1e-4} and a batch size of 50. The implementation is in Pytorch, and models are trained on a single NVIDIA V100 GPU, running on a \texttt{p3.2xlarge} node on EC2.
+All models are all trained under a standard cross-entropy loss, using the Adam optimizer with a learning rate of \texttt{1e-4} and a batch size of 50. The implementation is in Pytorch,\cite{paszke2017automatic} and models are trained on a single NVIDIA V100 GPU, running on a \texttt{p3.2xlarge} node on EC2.
 
 \section{Headline cleaning}
 
@@ -544,7 +545,7 @@ Whereas, for CNN -- the model almost never gives more than 0.5 weight to the tru
 
 %\includegraphics{figures/ptrue-cnn.png}
 
-But, beyond the performance of the model -- how can we dig into the representations learned by the model, the content of the actual headlines? Under the hood, the raw sentence embeddings produced by the model are 512-dimension vectors, which are hard to make sense of. A simple first step is to project these down to 2 dimensions, which can then be visualized directly. Here, we use UMAP to transform these into a 2-dimensional embedding, in a way that tries to preserve the relative proximities among the headlines.
+But, beyond the performance of the model -- how can we dig into the representations learned by the model, the content of the actual headlines? Under the hood, the raw sentence embeddings produced by the model are 512-dimension vectors, which are hard to make sense of. A simple first step is to project these down to 2 dimensions, which can then be visualized directly. Here, we use UMAP\cite{mcinnes2018umap-software} to transform these into a 2-dimensional embedding, in a way that tries to preserve the relative proximities among the headlines.
 
 %\includegraphics{figures/umap.png}
 
@@ -1426,5 +1427,8 @@ Which share the sensational, tabloid style with the Fox headlines, though here t
 Stepping back, and doubling back to the original idea of modeling a kind of linguistic "plate tectonics" of the media ecosystem -- this is just a start, but from these examples we can start to reason about some of the most significant changes. BuzzFeed has doubled down on clickbait, perhaps at the expense of political reporting; HuffPo has done the opposite, shifting away from clickbait and towards political reporting; and, Fox and The Daily Caller have drifted off in the direction of a sensationalized and hyper-partisan style of coverage.
 
 \section{Problems, questions, future directions}
+
+\bibliography{thesis}{}
+\bibliographystyle{plain}
 
 \end{document}
