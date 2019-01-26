@@ -1442,19 +1442,42 @@ The results are very mixed, and in many ways create more questions than they ans
 
 But, in other cases, there appears to be a strong \textit{negative} correlation. For example, again with Fox -- headlines from Fox and Breitbart have become steadily less similar, but the audience correlation has consistently increased over this time:
 
-% \includegraphics{figures/breitbart-fox-corr.png}
+% % \includegraphics{figures/breitbart-fox-corr.png}
+%
+% Both of these involve roughly monotonic trends, but in other cases this also holds in the context of up-and-down fluctuations. For example, for Bloomberg and The Hill:
+%
+% % \includegraphics{figures/bloomberg-thehill-corr.png}
+%
+% When headlines are similar, they're less likely to be shared by the same users; and vice versa. Meanwhile, in other cases, the direction of the correlation itself seems to change over time. For example, HuffPo / BuzzFeed seems to be an interesting case -- for the majority of the data window, content and audience seem to be negatively correlated -- the headlines were drifting apart, but audience was genrally increasing, though inconsistently. But then, at the end, when the headline similarity dramatically falls off (this is the BuzzFeed "quiz" explosion), the audience correlation also falls off:
+%
+% % \includegraphics{figures/buzzfeed-huffingtonpost-corr.png}
 
-Both of these involve roughly monotonic trends, but in other cases this also holds in the context of up-and-down fluctuations. For example, for Bloomberg and The Hill:
+Indeed, these are actually the two strongest overall relationships -- the full set of 105 pairs distribute fairly continuously between these extremes, though with more positive correlations than negative:
 
-% \includegraphics{figures/bloomberg-thehill-corr.png}
+% \includegraphics{figures/ts-ca-corrs.png}
 
-When headlines are similar, they're less likely to be shared by the same users; and vice versa. Meanwhile, in other cases, the direction of the correlation itself seems to change over time. For example, HuffPo / BuzzFeed seems to be an interesting case -- for the majority of the data window, content and audience seem to be negatively correlated -- the headlines were drifting apart, but audience was genrally increasing, though inconsistently. But then, at the end, when the headline similarity dramatically falls off (this is the BuzzFeed "quiz" explosion), the audience correlation also falls off:
+And, zooming in on a larger set of the strongest pairs in each direction:
 
-% \includegraphics{figures/buzzfeed-huffingtonpost-corr.png}
+% \includegraphics{figures/ts-ca-pos-corrs.png}
 
-at minimum, suggests a kind of typology of relationships between outlets? eg, for pairs with negative correlations -- maybe they are
+% \includegraphics{figures/ts-ca-neg-corrs.png}
+
+What to make of this? It's somewhat mysterious, and in many ways, it generates more questions than it answers. At minimum, it seems suggests (at least) two types of basic relationships between outlets? For the positive correlations -- maybe it makes sense to think of these outlets as producing "fungible" content -- there's a market for a particular type of content, and as two outlets start to produce more of it, readers intersted in that content will tweet more links to both outlets. Whereas, maybe, other outlets exist in a kind of "slotted" relationship with each other? For example, with Fox and Breitbart -- maybe there's a group of users who will tweet links
 
 \section{Problems, questions, future directions}
+
+
+clear that the models are able to pick up on differencs at the level of topic and style, but less clear how much they are able to model what might be thought of as stance; the ideological positioning / implications / suggestions of a headline. eg, with DC -- when models say that DK is similar, not entirely clear how to interpret this. likely that the model is picking up that there's a high level of "shared attention" between the two -- both focus on political issues, similar set of topics, names, issues, keywords -- eg, maybe both had lots of headlines with the word "kavanaugh". but, not clear if, or to what degree, models are able to model the political stance of the two outlets, which is very different. the model might say that two headlines are very similar, but a human reader might recognize that the same issue is being depicted in very different way, and score the headlines as very dissimilar. which of these is "better" or "correct"? this gets back to the basic difficulties of measuring textual distance described by Underwood -- there are different ways that headlines can be similar and dissimilar, and modeling question in terms of prediction / distinguishability might mix these together in a way that makes them difficult to pull back apart at an interpretive level.
+
+though, also not clear that the models have no notion of stance. eg, "trump is the best president of the modern era" vs "trump is not the best president of the modern era"
+
+ultimately, to really understand this, would be interesting to ground it at an experimental / psycholinguistic level. returning to the thought experiment at the beginning, where we're shown a headline and have to guess the outlet -- what if we literally did this, and then compared human performance on, eg, the DK/DC comparison to the model's performance?
+
+second, at a less theoretical and more brass-tacks level -- this thesis at times mixes model architectures. namely, in the analysis of change over time, we first use the SVCs to model trends, then switch back to neural models to understand / interpret trends. this is just due to resource constraints -- ideally everything would use the stronger neural models, but simply not possible with availble GPU resources to train hundreds of thousands of independent LSTM models.
+
+independent of these methodological questions about how measure / interpret textual distance -- at a conceptual level, next big step is to move, essentially, from correlation to causation. this thesis describes content and audience in media ecosystems in a number of ways; but thhis kind of post-hoc analysis run up against fundamental difficulties at the level of explaining why we see what we do. ultimately,
+
+for example -- say a media organization that generally doesn't use any kind of slang / shortenings swapped out the word "democrats" with "dems" in a headline, but left everything else unchanged. would this cause an uptick in engagement from readers of BB / DC, which often use these shortenings?
 
 \bibliography{thesis}{}
 \bibliographystyle{plain}
