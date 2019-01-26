@@ -1,0 +1,17 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}
+\contentsline {section}{\numberline {2}Headlines on Twitter}{6}{section.2}
+\contentsline {section}{\numberline {3}5.65 billion links}{7}{section.3}
+\contentsline {section}{\numberline {4}Modeling textual distance with classification}{9}{section.4}
+\contentsline {section}{\numberline {5}Headline differentiability}{10}{section.5}
+\contentsline {section}{\numberline {6}Headline cleaning}{12}{section.6}
+\contentsline {section}{\numberline {7}(Cleaned) differentiability}{17}{section.7}
+\contentsline {section}{\numberline {8}Mapping the \csqQQ {34}shape\csqQQ {34} of the headline space}{18}{section.8}
+\contentsline {section}{\numberline {9}Modeling the headline graph}{20}{section.9}
+\contentsline {section}{\numberline {10}Modeling the audience graph}{22}{section.10}
+\contentsline {section}{\numberline {11}Headlines vs. audience}{24}{section.11}
+\contentsline {subsection}{\numberline {11.1}AP}{25}{subsection.11.1}
+\contentsline {subsection}{\numberline {11.2}The Hill}{28}{subsection.11.2}
+\contentsline {subsection}{\numberline {11.3}Taxonomies of (mis)match}{31}{subsection.11.3}
+\contentsline {section}{\numberline {12}Headlines as a historical process}{31}{section.12}
+\contentsline {section}{\numberline {13}Problems, questions, future directions}{40}{section.13}
