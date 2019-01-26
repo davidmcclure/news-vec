@@ -12,18 +12,15 @@ from news_vec import logger
 
 @click.command()
 @click.argument('headline_root', type=click.Path())
-@click.option('--skim', type=int)
-@click.option('--line_enc', type=str, default='lstm')
+@click.option('--domains', '-d', multiple=True)
+@click.option('--line_enc', type=str, default='lstm-attn')
 @click.option('--pred_root', type=click.Path())
-def main(headline_root, skim, line_enc, pred_root):
-    """Train all-vs-all.
+def main(headline_root, domains, line_enc, pred_root):
+    """Train LR.
     """
     corpus = Corpus(headline_root)
 
-    dataset = HeadlineDataset.from_df(corpus.sample_ava_ts_deciles())
-
-    if skim:
-        dataset = dataset.skim(skim)
+    dataset = HeadlineDataset.from_df(corpus.sample_lr(domains), 'label')
 
     model = Classifier.from_dataset(dataset, line_enc=line_enc)
 
