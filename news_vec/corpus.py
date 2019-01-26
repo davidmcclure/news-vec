@@ -1,5 +1,6 @@
 
 
+import numpy as np
 import pandas as pd
 import pickle
 import random
@@ -162,6 +163,42 @@ class Corpus:
         balanced['label'] = [
             f'{domain}.{decile}'
             for domain, decile in zip(balanced.domain, balanced.decile)
+        ]
+
+        return balanced
+
+    def sample_lr(self, domains=None, num_windows=20):
+        """Sample beginning / end.
+        """
+        df = self.df.copy()
+
+        max_window = max(chain(*df.windows))
+
+        def lr(ws):
+            ws = np.array(ws)
+            if any(ws < num_windows):
+                return 0
+            elif any(ws > max_window - num_windows):
+                return 1
+            else:
+                return -1
+
+        df['lr'] = df.windows.apply(lr)
+
+        df = df[df.lr.isin([0, 1])]
+
+        if domains:
+            df = df[df.domain.isin(domains)]
+
+        min_size = df.groupby(['domain', 'lr']).size().min()
+
+        balanced = (df
+            .groupby(['domain', 'lr'])
+            .apply(lambda x: x.sample(min_size)))
+
+        balanced['label'] = [
+            f'{domain}.{lr}'
+            for domain, lr in zip(balanced.domain, balanced.lr)
         ]
 
         return balanced
