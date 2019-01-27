@@ -109,7 +109,10 @@ Of course, doing this manually, it would be hard to scale beyond a few outlets a
 
 Most fundamentally, beyond this ability to reason about the content of headlines at a scale that would otherwise be impossible -- these models make it possible to start filling in a precise understanding of the degree to which different outlets are similar and different, where we might otherwise have to rely on intuition and anecdote. Analyzing a complete matrix of pairwise similarities across 15 major media organizations, we can construct a kind of "content graph," a representation of how, and to what degree, outlets produce (dis)similar headlines:
 
-%\includegraphics{figures/hl-graph.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.5\textheight]{figures/hl-graph-radial-all-metrics.png}
+\end{figure}
 
 This question of the \textit{distinguishability} or \textit{separability} of headlines touches on question that sits at the core of a number of recent studies that have explored processes of fragmentation and polarization in the media ecosystem. Building generally on the widely-popularized notions of "filter bubbles" and "echo chamgers" developed Pariser\cite{pariser2011filter} and Sunstein,\cite{sunstein2003republic} a rich line of work has started to document the degree to which new patterns of news production and consumption have pushed audiences into more isolated spaces where they're less likely to encounter counter-attitudinal views. Flaxman et al. analyzed a large dataset of web browsing histories (volunteered by users of a browser extension) and explored the degree to which different patterns of content discovery push readers towards more or less ideologically polarized content, finding interestingly mixed results -- social media and search results expose users to more polarized content, but also expose them to a wider range of views.\cite{flaxman2016filter} Meraz studied the structure of hyperlinks among a set of political blogs during the 2012 presidental election, finding that left-leaning sources were more densely connected than right-leaning sources.\cite{meraz2015quantifying} And, most recently, Benkler et al. explored the outsized influence of right-leaning blogs -- particularly Breitbart -- on media coverage during the 2016 presidental election, building on a map of the media ecosystem derived from correlations in sharing patterns on Twitter and Facebook.\cite{benkler2017study} (The same technique used to model audience-level similarity later in this study).
 
@@ -127,7 +130,7 @@ Second -- by precisely quantifying the (dis)similarity among outlets, it becomes
 
 In other words -- by \textit{quantifying} similarities at the level of content in precise ways, we can then \textit{contextualize} those differences in meaningful and actionable ways.
 
-This thesis, then, explores three questions: (1) How different, precisely, is the content produced by different media organizations? (2) How do (or don't) these similarities at the level of content align with similarities at the level of audience? Does similarly of content correlate with similarity of audience? Where, if ever, does this break down? What could we learn from these sites of mismatch, where audiences are being exposed to issues, styles, viewpoints that they otherwise would be unlikely to encounter? And (3) separate from the regular churn of news coverage from day to day - how have outlets changed over time in terms of the type of coverage they produce? What has changed, what's changing?
+This thesis, then, explores three questions: (1) How different, precisely, is the content produced by different media organizations? (2) How do (or don't) these similarities at the level of content align with similarities at the level of audience? Does similarly of content correlate with similarity of audience? Where, if ever, does this break down? What could we learn from these sites of mismatch, where audiences are being exposed to issues, styles, viewpoints that they otherwise would be unlikely to encounter? And (3) separate from the regular churn of news coverage from day to day -- how have outlets changed over time in terms of the type of coverage they produce? What has changed, what's changing?
 
 In summary, we find:
 
@@ -210,7 +213,7 @@ Like these studies, we approach headlines from a standpoint of prediction -- in 
 
 \section{5.65 billion links}
 
-So -- tweets with links, and links that point to headlines. Before diving into the headlines themselves -- what does that data look like in its native environment on Twitter? In this study, we work with an archive of the Decahose that was collected by Cortico, a non-profit organization affiliated with the Laboratory for Social Machines. Specifically, we focus on a 625-day window of data running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 21,219,935,342 total tweets. Of these, 5,243,960,217 (24.7\%) include at least one link.
+So -- tweets with links, and links that point to headlines. Before diving into the headlines themselves -- what does this data look like in its native environment on Twitter? In this study, we work with an archive of the Decahose that was collected by Cortico, a non-profit organization affiliated with the Laboratory for Social Machines. Specifically, we focus on a 625-day window of data running from January 1, 2017 through September 17, 2018. Over that period, the Decahose emitted 21,219,935,342 total tweets. Of these, 5,243,960,217 (24.7\%) include at least one link.
 
 Where do these links point? As an first step, we can parse the raw URL strings into component parts (protocol, subdomain, registered domain, path, etc.) and then count the total number of links to each registered domain. These are the 100 most frequently-occurring domains, before any filtering is applied:
 
@@ -224,7 +227,10 @@ A majority of these, of course, don't represent "news" sources in a meaningful s
 \scriptsize \raggedright nytimes.com, cnn.com, washingtonpost.com, thehill.com, theguardian.com, foxnews.com, bbc.co.uk, reuters.com, breitbart.com, huffingtonpost.com, buzzfeed.com, politico.com, rt.com, independent.co.uk, yahoo.com, nbcnews.com, bloomberg.com, forbes.com, wsj.com, thegatewaypundit.com, businessinsider.com, usatoday.com, cbsnews.com, apnews.com, dailycaller.com, rawstory.com, vice.com, npr.org, truepundit.com, thedailybeast.com, time.com, cnbc.com, telegraph.co.uk, newsweek.com, nypost.com, sputniknews.com, nydailynews.com, washingtonexaminer.com, cbc.ca, vox.com, thinkprogress.org, theatlantic.com, newyorker.com, msn.com, ft.com, slate.com, theroot.com, variety.com, inc.com, dailykos.com, judicialwatch.org, msnbc.com, motherjones.com, aljazeera.com, economist.com, washingtontimes.com, dailywire.com, infowars.com, theintercept.com, axios.com, theonion.com, politicususa.com, thetimes.co.uk, nymag.com, salon.com, qz.com, nationalreview.com, palmerreport.com, townhall.com, thefederalist.com, hbr.org, hannity.com, talkingpointsmemo.com, fortune.com, thenation.com, propublica.org, foreignpolicy.com, theblaze.com, pbs.org, foxbusiness.com, theconversation.com, conservativereview.com, fivethirtyeight.com, crooksandliars.com, jezebel.com, newrepublic.com, realclearpolitics.com
 \end{displayquote}
 
-% \includegraphics{figures/t87-link-counts.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/t87-link-counts.png}
+\end{figure}
 
 Which, collectively, account for 73,198,274 million individual links in the data. The total number of links, though, is very different from the number of \textit{unique articles} -- a single article might produce tens or hundreds of thousands of individual tweets linking to the same piece of content, each of which are counted separately here. One simple way to roll up the individual occurrences of the domains by article is just to group on the exact text of the URL. But, this is somewhat brittle, since it's not uncommon for links to get passed around with superfluous GET parameters added onto them (eg, trackers that flag the source of a click). This can cause the same "base" URL to appear in many different configurations, if just treated as a raw string, all of which in fact point to the same article.
 
@@ -232,29 +238,47 @@ Instead, we group links into articles by combining three pieces of information -
 
 Grouping links on these three pieces of information, we can count the number of unique articles (and, by extension, headlines) associated with each domain. Which, in this context, is the more salient number, since the headline is the basic unit of analysis. The largest outlets have produced many hundreds of thousands of individual articles in the last two years, though the volume falls off fairly quickly outside the top ~20:
 
-% \includegraphics{figures/t87-article-counts.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/t87-article-counts.png}
+\end{figure}
 
 Beyond these rolled-up link and article counts, we can also easily get a high-level sense of how the footprint of different outlets on Twitter has evolved over the 2-year data window. Using the \texttt{postedTime} timestamps on each tweet, we can group links from an outlet by day, for instance, and look at the historical volume trend. For The New York Times:
 
-% \includegraphics{figures/nyt-links-per-day.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/nyt-links-per-day.png}
+\end{figure}
 
 Or, rollup up links by article, the total number of unique NYT articles that appeared by day:
 
-% \includegraphics{figures/nyt-articles-per-day.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/nyt-articles-per-day.png}
+\end{figure}
 
 Finally, digging deeper into the metadata provided by Twitter -- for each tweet, we also have information about the user account that posted the tweet, including the follower count of the user at the time the tweet was posted. This is very useful information, since follower counts vary significantly -- a link posted from an account with 1M followers will have vastly more reach than a link posted from an account with 100 followers. In a crude sense, we can use the follower count of the user account as a proxy for "impressions," the total number of times that the tweet was seen by individual twitter users. (Of course, this isn't literally true -- when a user posts a tweet, the percentage of her followers who actually see it is probably fairly low, since many of them won't be logged on, etc. But, if we assume that this percentage is roughly similar across the platform, the follower count can give a (relative) signal of the real-world "reach" of the tweet.)
 
 Taking the total impressions produced by all tweets with links to The New York Times, and grouping by day:
 
-% \includegraphics{figures/nyt-imp-per-day.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/nyt-imp-per-day.png}
+\end{figure}
 
 Some of which, interestingly, show very significant changes over the 2-year data window. Modeling this as a linear trend, here are the 10 domains with the most significant decreases, in terms of links, articles, and impressions:
 
-% \includegraphics{figures/vol-dec.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.6\textheight]{figures/vol-dec.png}
+\end{figure}
 
 So, the number of unique articles from Huffington Post, on a per-day basis, has fallen by more than 50\%. In the other direction, domains with the strongest increases in volume:
 
-% \includegraphics{figures/vol-inc.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.6\textheight]{figures/vol-inc.png}
+\end{figure}
 
 Which has a striking partisan tilt: all of the four domains at the top of the three lists -- \texttt{hannity.com}, \texttt{truepundit.com}, \texttt{judicialwatch.com}, \texttt{thefederalist.com} -- represent (far) right-leaning political perspectives.
 
@@ -548,33 +572,47 @@ Why? What does this correspond to, in the underlying content? Before we tackle t
 
 Digging a bit deeper into the differences in "distinctiveness" that seem to rise to the surface in the F1 scores -- to get a better view of this, one very simple way to characterize the "shape" of each outlet is to look at the \textit{distribution over the weights that the model assigns to the correct class}. So, for a given headline, if the true label is \texttt{wsj.com}, we just record the probability mass that the model put on \texttt{wsj.com}; and then plot out the distribution over these weights. Here's what this looks like for the whole test set, with everything rolled together:
 
-%\includegraphics{figures/ptrue-all.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ptrue-all.png}
+\end{figure}
 
 This gives a view of the degree to which the model "committed" to the correct answer, essentially. To put this in context -- if the model were perfect, and always put 100\% of its mass on the right label, we'd just see a single vertical bar at 1.0. So, in the modal case, the model just doesn't really know, and spreads an even ~0.06 of weight on each of the 15 classes. But, we can think of all of the mass to the right of 0.06 as representing meaningful structure learned by the classifier.
 
 Interestingly, though, this varies significantly for individual outlets. Here, the same data, but faceted out for each label:
 
-%\includegraphics{figures/ptrue-multiples.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.5\textheight]{figures/ptrue-multiples.png}
+\end{figure}
 
 Where, we can see two basic groups. Bloomberg, BuzzFeed, and Daily Kos all have a spike of very easily-identifiable headlines where the model put ~100\% of its weight on the correct answer. BuzzFeed is the huge outlier -- the model is completely positive a majority of the time.
 
-%\includegraphics{figures/ptrue-buzzfeed.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ptrue-buzzfeed.png}
+\end{figure}
 
-To get a sense of what these headlines actually are, we can query out the 10 headlines for each where the model gave the highest weight to the true label:
+Whereas, for CNN -- the model almost never gives more than 0.5 weight to the true label. There are very few headlines, in other words, that are \textit{obviously} from CNN in the eyes of the model.
 
-% TODO: Top headlines for each label, by p-true.
-
-Whereas, for CNN -- the model almost never gives more than 0.5 weight to the true label. There are almost no headlines, in other words, that are \textit{obviously} from CNN, in the eyes of the model.
-
-%\includegraphics{figures/ptrue-cnn.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ptrue-cnn.png}
+\end{figure}
 
 But, beyond the performance of the model -- how can we dig into the representations learned by the model, the content of the actual headlines? Under the hood, the raw sentence embeddings produced by the model are 512-dimension vectors, which are hard to make sense of. A simple first step is to project these down to 2 dimensions, which can then be visualized directly. Here, we use UMAP\cite{mcinnes2018umap-software} to transform these into a 2-dimensional embedding, in a way that tries to preserve the relative proximities among the headlines.
 
-%\includegraphics{figures/umap.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.8\textheight]{figures/umap.png}
+\end{figure}
 
 With everything together, this is a bit hard to make sense of. Foregrounding each outlet individually, we can start to pick out what seem to be coherent "regions" in the projected space:
 
-%\includegraphics{figures/umap-multiples.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.8\textheight]{figures/umap-multiples.png}
+\end{figure}
 
 Though it's important not to read too much into these types of visualizations, at a high level this suggests that there could be significant differences in the basic "shape" of the embedding space across the different outlets. For example, compare BuzzFeed -- which looks very focused, tightly-packed -- to CNN -- which looks much more scattered and evenly diffused. Or, compare NPR, which, in this projection, seems to have ~2 salient "clusters," to Fox, which has perhaps has 3-4.
 
@@ -582,11 +620,17 @@ There seem to be fairly large differences, in other words, in what might be thou
 
 How to be more precise about this? One simple way to measure this is just to look at the \textit{distribution over pairwise cosine distances} for each outlet. At an intuitive level -- if we randomly select two headlines from CNN -- how far apart would we expect them to be? And, how does this compare to the typical distance for The New York Times, Breitbart, BuzzFeed, and so on? Here, we randomly sample (with replacement) 1 million pairs from each outlet, and then build up the distributions over the set of cosine distances between each pair:
 
-%\includegraphics{figures/pwd-hist.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/pwd-hist.png}
+\end{figure}
 
 Or, broken out vertically by outlet:
 
-%\includegraphics{figures/pwd-violins.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.6\textheight]{figures/pwd-violins.png}
+\end{figure}
 
 We can see differences, then, along two axes. First, the modal value of these distributions varies significantly across the 15 outlets -- smallest for BuzzFeed, at ~0.3, and largest for CNN, at just shy of 0.9. Other very "narrow" outlets include Bloomberg and the Daily Kos, which seems fairly easy to make sense of (Bloomberg is heavy on business and financial reporting; Daily Kos on left-leaning politics); Maybe most surprising is AP, which lands as the third most-focused outlet. (The reasons for this become clearer below, when digging into the internal geometries of the embeddings for each outlet -- basically, AP stories broadly cluster into two nearby clusters, which basically map onto a domestic / international divide.)
 
@@ -594,11 +638,14 @@ Meanwhile, at the other end of the spectrum, along with CNN are Fox, The Washing
 
 Another related (though also somewhat different) way of thinking about this is to say that different outlets have different numbers of clusters. Looking at the per-outlet UMAP visualizations, again -- we might say, roughly, that BuzzFeed has 1 cluster; Breitbart has 2-3, depending on how you squint at it; Fox has two groups, one fairly focused and the other more diffuse; CNN seems to be scattered all over the place.
 
-Can we formalize this? Clustering, especially in high dimensions, is kind of a dark art, and it's hard to really produce a definitive result; so all of this should be taken with a grain of salt. But, as an experiment -- here, we do a basic agglomerative cluster over the embeddings based on pairwise cosine distances, using an "average" linkage rule when deciding whether to join groups. The one hyperparameter here is the cluster merging threshold -- the cosine distance at which, if two (groups of) embeddings are farther apart than this value, they get broken out as flat clusters in the final result. For this value, we simply use the modal value of the complete distribution over pairwise distances, across all outlets (0.63).
+Can we formalize this? Clustering, especially in high dimensions, is kind of a dark art, and it's hard to really produce a definitive result; so all of this should be taken with a grain of salt. But, as an experiment, we can do a basic agglomerative cluster over the embeddings based on pairwise cosine distances, using an "average" linkage rule when deciding whether to join groups. The one hyperparameter here is the cluster merging threshold -- the cosine distance at which, if two (groups of) embeddings are farther apart than this value, they get broken out as flat clusters in the final result. For this value, we simply use the modal value of the complete distribution over pairwise distances, across all outlets (0.63).
 
-%\includegraphics{figures/cluster-multiples.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.6\textheight]{figures/cluster-multiples.png}
+\end{figure}
 
-These clusters, then, can give a kind of triangulated view onto internal structure of the content produced by each outlet.
+This gives another triangulation on the "shapes" of the outlets. For BuzzFeed and Bloomberg, almost all headlines get put into a single, huge cluster; whereas, for CNN and WaPo, they get spread out over a larger number of more equally-sized clusters.
 
 % TODO: Fox clusters (?)
 
@@ -608,13 +655,19 @@ So, from digging into the embeddings produced by the neural models, we can get a
 
 Just eyeballing things on the UMAP projection -- some outlets clearly seem to occupy roughly similar regions of the reduced 2d space. For example, Bloomberg and WSJ -- both of which generate a lot of business and financial coverage -- both occupy a significant amount of space in the bottom left of the UMAP projection, around (-6,-4):
 
-%\includegraphics{figures/wsj-bloomberg.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/wsj-bloomberg.png}
+\end{figure}
 
 How to add precision to this? How can we convert the behavior of the classifiers into a single "score"? Maybe the simplest and most natural way to model similarity, in a predictive setting, is just to look at the confusion matrix -- that is, for each permutation of outlets A and B, the number of headlines from A that the model incorrectly assigns to B. The higher this number, the more "confusable" the two outlets. Using test-set predictions from the LSTM:
 
-%\includegraphics{figures/lstm-cm.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/lstm-cm.png}
+\end{figure}
 
-Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, ignoring the diagonal (where the model is correct), the two most frequently "confused" headlines are from WSJ $\rightarrow$ Bloomberg, where the model makes 353 mistakes; and the two least confused are from AP $\rightarrow$ BuzzFeed, where the model only makes 7 mistakes. (Important to note that the confusion counts are \textit{asymmetric} -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
+Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, ignoring the diagonal (where the model is correct), the two most frequently "confused" headlines are from WSJ $\rightarrow$ Bloomberg, where the model makes 353 mistakes; and the two least confused are from AP $\rightarrow$ BuzzFeed, where the model only makes 7 mistakes. (It's important to note that the confusion counts are \textit{asymmetric} -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
 
 This can also be directly interpreted as a graph -- just treat the confusion matrix as an adjacency matrix, and the confusion counts as weights on directed edges. For example, just rendering the outlets in a circular layout, where the ordering in the circle is arbitrary, we can get a quick sense of what's similar to what, and how different subsets of outlets cluster together into cohorts. (Thicker edges correspond to high confusion counts.)
 
@@ -729,7 +782,10 @@ Or as a literal graph, with the edge weights based on the modal score for each p
 
 At this point, we've got all the raw ingredients in place to start to explore the question of how similarities at the level of content correspond (or don't correspond) to similarities at the level of audience. To recap -- we've induced two sets of weights over the 15 outlets, one representing similarity at the level of headlines, and the other representing correlations in the set of users who tweet the content:
 
-%\includegraphics{figures/hl-graph-radial-all-metrics.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.3\textheight]{figures/hl-graph-radial-all-metrics.png}
+\end{figure}
 
 % TODO: Audience radial graph.
 
