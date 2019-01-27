@@ -15,7 +15,7 @@
 \usepackage{booktabs}
 \usepackage{wrapfig}
 \usepackage{cite}
-\usepackage{sectsty}
+\usepackage{subcaption}
 
 % Main font
 \setmainfont{Baskerville}
@@ -177,7 +177,6 @@ This is where data from centralized services becomes very valuable -- from platf
 
 For example, working with the Decahose, a 10\% sample of Twitter -- if someone posts a tweet with a link to a New York Times article, Twitter detects the link and provides structured information about it in the JSON payload that appears in the Decahose:
 
-% TODO: highlighting?
 \begin{lstlisting}
 "urls": [
     {
@@ -785,7 +784,10 @@ And, if user B has tweeted 2 links to NYT, 20 to NPR, and 5 to CNN, we'd have:
 
 These count vectors can be assembled for all 8M users who have ever tweeted at least one link to any of the 15 analysis domains. Then, from these, we can calculate correlations between the counts for all unique pairs of domains -- which gives, for each pair, the degree to which users tend to share links from both of them. Thinking of it as a huge actor / count matrix, just take correlations over all pairs of columns, each of which represents one of the outlets. Here, like before, we tabulate the Pearson, Spearman, and Kendall-Tau correlations for each pair of outlets. Here, sorting by the Kendall-Tau correlation:
 
-%\includegraphics{figures/user-graph-bars-all.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/user-graph-bars-all.png}
+\end{figure}
 
 Overall these paint a fairly consistent picture, with Breitbart and Daily Caller as the most highly audience-correlated outlets under all three metrics. Though, there are places where the Pearson correlation diverges significantly from the Spearman and Kendall-Tau -- especially with CNN / WSJ, where the Pearson correlation is extremely high, but Spearman and Kendall-Tau are middling. This is a function of the fact that Spearman and Kendall-Tau are based on the rank-ordering of the counts, whereas Pearson operates on the actual counts; and, here, there's clearly a small set of users (or even just a single user) that have posted an \textit{extremely} large number of links from both CNN and WSJ, which has the effect of cranking up the overall Person correlation.
 
@@ -798,26 +800,40 @@ Indeed, looking more closely at the number of links posted by each user, we can 
 
 To be sure that these two extremes -- "undersampled" accounts that only appear a handful of times, and "oversampled" accounts that are incredibly prolific -- aren't skewing the relationships in problematic ways, we can calculate a second set of correlations for each pair of outlets, but this time just considering users who appear between 10 and 100 times in the dataset. Here, the same set of 3 correlation metrics:
 
-%\includegraphics{figures/user-graph-bars-10-100.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/user-graph-bars-10-100.png}
+\end{figure}
 
-Like with the headlines, the idea here is to pull out a "grid" of measurements using different techniques and hyperparameters, to be sure that we don't over-interpret a noisy or idiosyncratic result from a single type of measurement. Here, all six scores for each outlet pair:
+Like with the headlines, the idea here is to pull out a "grid" of measurements using different techniques and hyperparameters, to be sure that we don't over-interpret a noisy or idiosyncratic result from a single type of measurement. Here, as a literal graph, with the edge weights based on the average score for each pair:
 
-% TODO: All correlations, grouped bars.
-
-Or as a literal graph, with the edge weights based on the modal score for each pair:
-
-% TODO: Radial graph.
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.5\textheight]{figures/user-graph-radial-all-metrics.png}
+  \caption{Pairwise audience similarities, averaging across all metrics and both directions for each pair. To make it easy to see the strongest pairs, in this figure the edge weights are mapped to a 0-1 scale and then cubed.}
+\end{figure}
 
 \section{Headlines vs. audience}
 
 At this point, we've got all the raw ingredients in place to start to explore the question of how similarities at the level of content correspond (or don't correspond) to similarities at the level of audience. To recap -- we've induced two sets of weights over the 15 outlets, one representing similarity at the level of headlines, and the other representing correlations in the set of users who tweet the content:
 
 \begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
   \centering
-  \includegraphics[height=0.3\textheight]{figures/hl-graph-radial-all-metrics.png}
+  \includegraphics[width=0.8\linewidth]{figures/hl-graph-radial-all-metrics.png}
+  % \caption{Scaled headline similarity scores.}
+  % \label{fig:sub1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=0.8\linewidth]{figures/user-graph-radial-all-metrics.png}
+  % \caption{Scaled audience similarity scores.}
+  % \label{fig:sub2}
+\end{subfigure}
+\caption{Scaled headline and audience similarities.}
+% \label{fig:test}
 \end{figure}
-
-% TODO: Audience radial graph.
 
 Zooming down to the level of an individual outlet, for example, The New York Times -- we can represent the full linguistic "signature" of NYT as a set of pairwise scores with all other outlets, where each score is actually a family of individual metrics that represent different ways of modeling the linguistic similarity. So, for example, for the LSTM Kendall-Tau probability correlations (\texttt{lstm\_pcorr\_kt}), we get 14 values, each representing the linguistic similarity between NYT and one of the other outlets. These 14 scores are then normalized to zero-mean and unit-variance, which makes it possible to compare across measurements with different units. So, here, we can see that NYT is most similar to NPR, when averaged across all metrics, and least similar to The Hill:
 
