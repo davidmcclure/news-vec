@@ -645,7 +645,7 @@ Can we formalize this? Clustering, especially in high dimensions, is kind of a d
   \includegraphics[height=0.6\textheight]{figures/cluster-multiples.png}
 \end{figure}
 
-This gives another triangulation on the "shapes" of the outlets. For BuzzFeed and Bloomberg, almost all headlines get put into a single, huge cluster; whereas, for CNN and WaPo, they get spread out over a larger number of more equally-sized clusters.
+This gives another view on the "shapes" of the outlets. For BuzzFeed and Bloomberg, almost all headlines get put into a single, huge cluster; whereas, for CNN and WaPo, they get spread out over a larger number of more equally-sized clusters.
 
 % TODO: Fox clusters (?)
 
@@ -653,7 +653,7 @@ This gives another triangulation on the "shapes" of the outlets. For BuzzFeed an
 
 So, from digging into the embeddings produced by the neural models, we can get a high-level conceptual "map" of the types of headlines produced by the 15 outlets. But, if the ultimate goal here is to explore the degree to which this structure at the level of language / style / content corresponds (or doesn't) to the underlying audience graph, we need to explicitly model \textit{proximity} or \textit{similarity} -- which outlets are most similar, which are most dissimilar? Or, more precisely -- given a pair of outlets, how can we assign a score that represents the similarity of the headlines from those two outlets, in a way that allows us to compare across the full set of 105 unique pairs of outlets?
 
-Just eyeballing things on the UMAP projection -- some outlets clearly seem to occupy roughly similar regions of the reduced 2d space. For example, Bloomberg and WSJ -- both of which generate a lot of business and financial coverage -- both occupy a significant amount of space in the bottom left of the UMAP projection, around (-6,-4):
+Just eyeballing things on the UMAP projection -- some outlets clearly seem to occupy roughly similar regions of the two-dimensional space. For example, Bloomberg and WSJ -- both of which generate a lot of business and financial coverage -- both occupy a significant amount of space in the bottom left of the UMAP projection, around (-6,-4):
 
 \begin{figure}[H]
   \centering
@@ -667,25 +667,25 @@ How to add precision to this? How can we convert the behavior of the classifiers
   \includegraphics[height=0.4\textheight]{figures/lstm-cm.png}
 \end{figure}
 
-Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, ignoring the diagonal (where the model is correct), the two most frequently "confused" headlines are from WSJ $\rightarrow$ Bloomberg, where the model makes 353 mistakes; and the two least confused are from AP $\rightarrow$ BuzzFeed, where the model only makes 7 mistakes. (It's important to note that the confusion counts are \textit{asymmetric} -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
+Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, ignoring the diagonal (where the model is correct), the two most frequently "confused" headlines are from WSJ $\rightarrow$ Bloomberg, where the model makes 320 mistakes; and the two least confused are from AP $\rightarrow$ Daily Kos, where the model makes just 1 mistake. (It's important to note that the confusion counts are \textit{asymmetric} -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
 
 This can also be directly interpreted as a graph -- just treat the confusion matrix as an adjacency matrix, and the confusion counts as weights on directed edges. For example, just rendering the outlets in a circular layout, where the ordering in the circle is arbitrary, we can get a quick sense of what's similar to what, and how different subsets of outlets cluster together into cohorts. (Thicker edges correspond to high confusion counts.)
 
 % TODO: Confusion matrix as radial graph.
 
-But, this is just one way to do this among many others. For example, instead of counting literal misclassification -- places where the model actually makes an incorrect prediction -- a somewhat more relaxed version of this would be to look at correlations in the assignments of probability mass by the model. For example, if we're comparing WSJ and Bloomberg, we would take the ordered list of probability masses assigned to WSJ for all headlines:
+But, this is just one way to do this among many others. For example, instead of counting literal misclassification -- places where the model actually makes an incorrect prediction -- a somewhat more relaxed version of this would be to look at correlations in the assignments of probability mass by the model. For example, if we're comparing WSJ and Bloomberg, we can take the ordered list of probability masses assigned to WSJ for all headlines:
 
 \begin{lstlisting}
 [0.00619, 0.17596, 0.03041, 0.01991, 0.00007, 0.01776, 0.01682, 0.00010, 0.00626, 0.09664 ...]
 \end{lstlisting}
 
-And the the probability masses assigned to Bloomberg for the same headlines, keeping order constant:
+And the the probability masses assigned to Bloomberg for the same headlines:
 
 \begin{lstlisting}
 [0.00279, 0.49098, 0.00894, 0.00222, 0.00005, 0.00449, 0.00378, 0.00012, 0.00284, 0.02261 ...]
 \end{lstlisting}
 
-And then just calculate the correlation between these two sets of weights -- that is, when the model puts more weight on WSJ, does it also tend to put more weight on Bloomberg? Just taking the Pearson correlation:
+And then simply calculate the correlation between these two sets of weights -- when the model puts more weight on WSJ, does it also tend to put more weight on Bloomberg? Just taking the Pearson correlation:
 
 % TODO: Radial graph of Pearson correlations between weights.
 
