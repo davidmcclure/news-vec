@@ -604,7 +604,7 @@ These clusters, then, can give a kind of triangulated view onto internal structu
 
 \section{Modeling the headline graph}
 
-So, from digging into the embeddings produced by the neural models, we can get a high-level conceptual "map" of the types of headlines produced by the 15 outlets. But, if the ultimate goal here is to explore the degree to which this structure at the level of language / style / content corresponds (or doesn't) to the underlying audience graph, we need to explicitly model \textit{proximity} or \textit{similarity} -- which outlets are most similar, which are most dissimilar? Or, more precisely -- given a pair of outlets, how can we assign a score that represents the similarity of the headlines from those two outlets, in a way that allows us to compare across the full set of 120 unique pairs of outlets?
+So, from digging into the embeddings produced by the neural models, we can get a high-level conceptual "map" of the types of headlines produced by the 15 outlets. But, if the ultimate goal here is to explore the degree to which this structure at the level of language / style / content corresponds (or doesn't) to the underlying audience graph, we need to explicitly model \textit{proximity} or \textit{similarity} -- which outlets are most similar, which are most dissimilar? Or, more precisely -- given a pair of outlets, how can we assign a score that represents the similarity of the headlines from those two outlets, in a way that allows us to compare across the full set of 105 unique pairs of outlets?
 
 Just eyeballing things on the UMAP projection -- some outlets clearly seem to occupy roughly similar regions of the reduced 2d space. For example, Bloomberg and WSJ -- both of which generate a lot of business and financial coverage -- both occupy a significant amount of space in the bottom left of the UMAP projection, around (-6,-4):
 
@@ -654,11 +654,11 @@ The point being -- for almost any metric, we can imagine both ideal and pathalog
 
 Yet another approach to this -- so far, we've been training models under a multiclass objective -- the model is handed a headline, and makes a prediction across all 15 outlets. But, we could also formulate this as a large battery of completely independent, A-vs-B comparisons -- NYT vs WSJ, NYT vs. Bloomberg, NYT vs. Breitbart, and all other 117 unique combinations that can be formed from the 15 outlets. As long as the training samples are size-balanced across all pairs, so that they always see exactly the same number of headlines from each outlet -- we can directly compare the classification accuracies from these binary models. Because of resource constraints, it's not feasible to re-train the strongest neural models on pairwise samples (which are very slow without GPUs, and we don't currently have access to massively parallel GPU compute). But, the non-neural baselines, which are only a few percentage points off the neural models in the multi-class benchmark, can be fit very efficiently on standard CPUs, which makes it possible to parallelize these models across thousands or even millions of separate comparisons using commodity cloud hardware.
 
-For example, using the linear SVC, the stronger of the two non-neural baselines -- we can take all 120 unique pairwise combinations from the 15 outlets, and, for each pair, fit 100 models on randomly sampled headlines for that pair. For example, for the first comparison -- say, NYT vs. WSJ -- we would sample 18k headlines from NYT, 18k from WSJ, break these 36k headlines on an 80/20 train-test split, fit a model, and evaluate the accuracy on the test set. And then, do this 99 more times for NYT vs. WSJ, each time sampling a new random subset of 18k/18k headlines. For all 120 pairs, this gives a total of 12,000 independent model fits, all of which are totally independent of each other, and can be easily parallelized -- here, using Spark, on a 320-core cluster on AWS, which can run this in about an hour. We can then use these 12,000 accuracy scores to form very tight confidence interval over the pairwise accuracies for each comparison:
+For example, using the linear SVC, the stronger of the two non-neural baselines -- we can take all 105 unique pairwise combinations from the 15 outlets, and, for each pair, fit 100 models on randomly sampled headlines for that pair. For example, for the first comparison -- say, NYT vs. WSJ -- we would sample 18k headlines from NYT, 18k from WSJ, break these 36k headlines on an 80/20 train-test split, fit a model, and evaluate the accuracy on the test set. And then, do this 99 more times for NYT vs. WSJ, each time sampling a new random subset of 18k/18k headlines. For all 105 pairs, this gives a total of 10,500 independent model fits, all of which are totally independent of each other, and can be easily parallelized -- here, using Spark, on a 320-core cluster on AWS, which can run this in about an hour. We can then use these 10,500 accuracy scores to form very tight confidence interval over the pairwise accuracies for each comparison:
 
 %\includegraphics{figures/svc-ab-acc.png}
 
-These per-pair scores can simply be averaged, to get a set of 120 scores, which can then be scaled to zero-mean-unit-variance and plugged in with the previously developed scores:
+These per-pair scores can simply be averaged, to get a set of 105 scores, which can then be scaled to zero-mean-unit-variance and plugged in with the previously developed scores:
 
 % TODO: A-B accuracies with confusion counts + probability corrs, grouped bars.
 
@@ -1212,7 +1212,7 @@ Now, the shape of things starts to come into closer focus -- the sudden rise in 
 
 But -- falloffs relative to what? These trends make it possible to pick out the outlets that are driving the overall trend, but it's not clear how the individual changes relate to each other. For example, when The Hill falls from 72\% to 68\% accuracy, it's becoming more "confusable" with some combination of other outlets. But, which outlets? With everything else rolled into a single "other" category, it's hard to make sense of why this is happening. What we need, again, is to model the complete matrix of relationships among all outlets -- but here, the relationships represent the degree to which every outlet has become more or less similar over time, not just the overall similarity.
 
-To get at this -- in the same way that we could train a battery of individual A-vs-B models to get pairwise similarity scores when modeling the structure of the (synchronic) content graph, we can do the same thing again, but here broken out across each of the 91 temporal windows. For each of the 120 unique pairs over the 15 outlets, and in each of 91 windows, we sample 18k headlines from outlet A, 18k for outlet B, and then fit a binary model; and then repeat this 100 times, to get a distribution over 100 sampled classification accuracies for each pair of outlets in each window -- a total of 955,500 model fits.
+To get at this -- in the same way that we could train a battery of individual A-vs-B models to get pairwise similarity scores when modeling the structure of the (synchronic) content graph, we can do the same thing again, but here broken out across each of the 91 temporal windows. For each of the 104 unique pairs over the 15 outlets, and in each of 91 windows, we sample 18k headlines from outlet A, 18k for outlet B, and then fit a binary model; and then repeat this 100 times, to get a distribution over 100 sampled classification accuracies for each pair of outlets in each window -- a total of 955,500 model fits.
 
 With this, we can break out a historical similarity trend for each individual pair. Again, sorting by the slope of a standard linear fit, here are the 10 pairs with the strongest increases in accuracy, pairs that have moved away from each other most significantly over the last 2 years:
 
@@ -1224,7 +1224,7 @@ Most of these pairs include either BuzzFeed or Fox, paired with a number of diff
 
 Here, again, we can spot a handful of outlets that crop up in a number of different pairs -- Huffington Post (in particular, present in each of the top three), The Daily Kos, and The Hill.
 
-Moving beyond just the 10 strongest trends in each direction -- from the full set of 120 pairwise relationships, we can assemble the fully connected graph for all 15 outlets. Here, we treat the slopes of the regression fits as signed edge weights between the outlets. The width of the edge represents the absolute magnitude of the slope -- the degree to which the relationship between the pair has changed over time -- and the color represents the direction -- blue for negative slopes, where outlets have become more similar over time (lower classification accuracies), and red for positive slopes, where outlets have become more dissimilar (higher classification accuracies).
+Moving beyond just the 10 strongest trends in each direction -- from the full set of 105 pairwise relationships, we can assemble the fully connected graph for all 15 outlets. Here, we treat the slopes of the regression fits as signed edge weights between the outlets. The width of the edge represents the absolute magnitude of the slope -- the degree to which the relationship between the pair has changed over time -- and the color represents the direction -- blue for negative slopes, where outlets have become more similar over time (lower classification accuracies), and red for positive slopes, where outlets have become more dissimilar (higher classification accuracies).
 
 % \includegraphics{figures/ts-ab-radial.png}
 
@@ -1463,21 +1463,19 @@ Methodologically, it's not hard to get a preliminary snapshot of this. In the sa
 
 The results are very mixed, and in many ways create more questions than they answer. In some cases, movements in content / audience appear to be very tightly correlated. For example, Bloomberg and Fox have moved in almost perfect lockstep over the last two years -- as the headlines have become less similar, the audience has also become less similar:
 
-% \includegraphics{figures/bloomberg-fox-corr.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/bloomberg-fox-corr.png}
+\end{figure}
 
 But, in other cases, there appears to be a strong \textit{negative} correlation. For example, again with Fox -- headlines from Fox and Breitbart have become steadily less similar, but the audience correlation has consistently increased over this time:
 
-% % \includegraphics{figures/breitbart-fox-corr.png}
-%
-% Both of these involve roughly monotonic trends, but in other cases this also holds in the context of up-and-down fluctuations. For example, for Bloomberg and The Hill:
-%
-% % \includegraphics{figures/bloomberg-thehill-corr.png}
-%
-% When headlines are similar, they're less likely to be shared by the same users; and vice versa. Meanwhile, in other cases, the direction of the correlation itself seems to change over time. For example, HuffPo / BuzzFeed seems to be an interesting case -- for the majority of the data window, content and audience seem to be negatively correlated -- the headlines were drifting apart, but audience was genrally increasing, though inconsistently. But then, at the end, when the headline similarity dramatically falls off (this is the BuzzFeed "quiz" explosion), the audience correlation also falls off:
-%
-% % \includegraphics{figures/buzzfeed-huffingtonpost-corr.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{figures/breitbart-fox-corr.png}
+\end{figure}
 
-Indeed, these are actually the two strongest overall relationships -- the full set of 105 pairs distribute fairly continuously between these extremes, though with more positive correlations than negative:
+These are two of the strongest relationships -- the full set of 105 pairs distribute fairly continuously between these extremes, though with more positive correlations than negative:
 
 \begin{figure}[H]
   \centering
