@@ -707,11 +707,16 @@ The point being -- for almost any metric, we can imagine both ideal and pathalog
 
 Yet another approach to this -- so far, we've been training models under a multiclass objective -- the model is handed a headline, and makes a prediction across all 15 outlets. But, we could also formulate this as a large battery of completely independent, A-vs-B comparisons -- NYT vs WSJ, NYT vs. Bloomberg, NYT vs. Breitbart, and all other 117 unique combinations that can be formed from the 15 outlets. As long as the training samples are size-balanced across all pairs, so that they always see exactly the same number of headlines from each outlet -- we can directly compare the classification accuracies from these binary models. Because of resource constraints, it's not feasible to re-train the strongest neural models on pairwise samples (which are very slow without GPUs, and we don't currently have access to massively parallel GPU compute). But, the non-neural baselines, which are only a few percentage points off the neural models in the multi-class benchmark, can be fit very efficiently on standard CPUs, which makes it possible to parallelize these models across thousands or even millions of separate comparisons using commodity cloud hardware.
 
-For example, using the linear SVC, the stronger of the two non-neural baselines -- we can take all 105 unique pairwise combinations from the 15 outlets, and, for each pair, fit 100 models on randomly sampled headlines for that pair. For example, for the first comparison -- say, NYT vs. WSJ -- we would sample 18k headlines from NYT, 18k from WSJ, break these 36k headlines on an 80/20 train-test split, fit a model, and evaluate the accuracy on the test set. And then, do this 99 more times for NYT vs. WSJ, each time sampling a new random subset of 18k/18k headlines. For all 105 pairs, this gives a total of 10,500 independent model fits, all of which are totally independent of each other, and can be easily parallelized -- here, using Spark, on a 320-core cluster on AWS, which can run this in about an hour. We can then use these 10,500 accuracy scores to form very tight confidence interval over the pairwise accuracies for each comparison:
+For example, using the linear SVC, the stronger of the two non-neural baselines -- we can take all 105 unique pairwise combinations from the 15 outlets, and, for each pair, fit 100 models on randomly sampled headlines for that pair. For example, for the first comparison -- say, NYT vs. WSJ -- we would sample 18k headlines from NYT, 18k from WSJ, break these 36k headlines on an 80/20 train-test split, fit a model, and evaluate the accuracy on the test set. And then, do this 99 more times for NYT vs. WSJ, each time sampling a new random subset of 18k/18k headlines. For all 105 pairs, this gives a total of 10,500 independent model fits, all of which are totally independent of each other, and can be easily parallelized -- here, using Spark, on a 320-core cluster on AWS, which can run this in about an hour. We can then use these 10,500 accuracy scores to form very tight confidence interval over the pairwise accuracies for each comparison (Figure \ref{svc-ab-acc}).
 
-%\includegraphics{figures/svc-ab-acc.png}
+\begin{figure}
+  \centering
+  \includegraphics[height=\textheight]{figures/svc-ab-acc.png}
+  \caption{Pairwise SVC accuracies on size-balanced samples, 100 per pair.}
+  \label{svc-ab-acc}
+\end{figure}
 
-These per-pair scores can simply be averaged, to get a set of 105 scores, which can then be scaled to zero-mean-unit-variance and plugged in with the previously developed scores:
+These per-pair scores can simply be averaged, to get a set of 105 scores, which can then be scaled to zero mean and unit variance and plugged in with the previously developed scores:
 
 % TODO: A-B accuracies with confusion counts + probability corrs, grouped bars.
 
@@ -732,9 +737,12 @@ Which gives a total of 16 different representations of headline similarity for e
 
 And, averaging over the metrics, and converting into a literal graph -- here, for visual clarity, collapsing the bidirectional edges into a single undirected edge, averaging over the two scores:
 
-%\includegraphics{figures/hl-graph-radial-all-metrics.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.5\textheight]{figures/hl-graph-radial-all-metrics.png}
+\end{figure}
 
-So -- WSJ / Bloomberg take the cake for the single strongest link, followed by HuffPo / Buzzfeed, Daily Caller / Breitbart, MSNBC / The Hill, and NYT / NPR.
+So -- WSJ / Bloomberg take the cake for the single strongest link, followed by NPR / NYT, The Hill / MSNBC, and Daily Caller / Breitbart.
 
 \section{Modeling the audience graph}
 
@@ -764,7 +772,10 @@ Overall these paint a fairly consistent picture, with Breitbart and Daily Caller
 
 Indeed, looking more closely at the number of links posted by each user, we can see that this distribution is highly skewed -- out of 8.1 million users, 5.5 million (68\%) have only posted a single link. And, a handful of users have posted a \textit{massive} number of links -- 23 users have over 10,000 links. (These are likely organizational accounts or bots.)
 
-%\includegraphics{figures/links-per-user.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/links-per-user.png}
+\end{figure}
 
 To be sure that these two extremes -- "undersampled" accounts that only appear a handful of times, and "oversampled" accounts that are incredibly prolific -- aren't skewing the relationships in problematic ways, we can calculate a second set of correlations for each pair of outlets, but this time just considering users who appear between 10 and 100 times in the dataset. Here, the same set of 3 correlation metrics:
 
