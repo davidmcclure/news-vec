@@ -667,11 +667,12 @@ How to add precision to this? How can we convert the behavior of the classifiers
   \includegraphics[height=0.4\textheight]{figures/lstm-cm.png}
 \end{figure}
 
-Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, ignoring the diagonal (where the model is correct), the two most frequently "confused" headlines are from WSJ $\rightarrow$ Bloomberg, where the model makes 320 mistakes; and the two least confused are from AP $\rightarrow$ Daily Kos, where the model makes just 1 mistake. (It's important to note that the confusion counts are \textit{asymmetric} -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.)
+Since the class sizes are balanced across the 15 outlets, these counts are directly comparable. So, ignoring the diagonal (where the model is correct), the two most frequently "confused" headlines are from WSJ $\rightarrow$ Bloomberg, where the model makes 320 mistakes; and the two least confused are from AP $\rightarrow$ Daily Kos, where the model makes just 1 mistake. (It's important to note that the confusion counts are \textit{asymmetric} -- eg, the model might misclassify 50 headlines from A as belonging to B, but only 10 headlines from B as belonging to A. So, in building up the set of similarities among the outlets, we need to keep track of the full set of ordered permutations of all pairs.) Skimming off the 10 pairs with the highest and lowest counts:
 
-This can also be directly interpreted as a graph -- just treat the confusion matrix as an adjacency matrix, and the confusion counts as weights on directed edges. For example, just rendering the outlets in a circular layout, where the ordering in the circle is arbitrary, we can get a quick sense of what's similar to what, and how different subsets of outlets cluster together into cohorts. (Thicker edges correspond to high confusion counts.)
-
-% TODO: Confusion matrix as radial graph.
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/hlg-cc-tb10.png}
+\end{figure}
 
 But, this is just one way to do this among many others. For example, instead of counting literal misclassification -- places where the model actually makes an incorrect prediction -- a somewhat more relaxed version of this would be to look at correlations in the assignments of probability mass by the model. For example, if we're comparing WSJ and Bloomberg, we can take the ordered list of probability masses assigned to WSJ for all headlines:
 
@@ -685,19 +686,14 @@ And the the probability masses assigned to Bloomberg for the same headlines:
 [0.00279, 0.49098, 0.00894, 0.00222, 0.00005, 0.00449, 0.00378, 0.00012, 0.00284, 0.02261 ...]
 \end{lstlisting}
 
-And then simply calculate the correlation between these two sets of weights -- when the model puts more weight on WSJ, does it also tend to put more weight on Bloomberg? Just taking the Pearson correlation:
+And then just calculate the correlation between these two sets of weights -- when the model puts more weight on WSJ, does it also tend to put more weight on Bloomberg? We can't directly compare these correlations to the confusion counts, since the units are different -- probability masses vs. counts. But, we can simply standard-scale them -- subtract out the mean, scale to unit variance -- and then compare the adjusted scores. Here, the confusion counts alongside Pearson, Spearman, and Kendall-Tau correlations on the probability masses, again skimming off the 10 strongest and weakest pairs:
 
-% TODO: Radial graph of Pearson correlations between weights.
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/hlg-cc-pcorr-tb10.png}
+\end{figure}
 
-Or also, also plausible, the Spearman or Kendall-Tau:
-
-% TODO: Spearman + KT radials.
-
-Which, at first glance, look broadly similar to the confusion counts. But, how true is this? We can't directly compare the two types scores, since the units are fundamentally different -- probability masses vs raw counts. But, to get around this, we can simply normalize them -- subtract out the mean, scale to unit variance -- and then directly compare these adjusted scores. Here, sorting by the scaled confusion counts, we can see that they generally agree. (To be precise, the Spearman correlation is XX):
-
-% TODO: Confusion counts vs pcorr, grouped bars.
-
-Though, the correlation also isn't perfect -- eg, for X and Y, high confusion count, but comparatively low probability mass correlation; and by a fairly large margin, which is a bit troubling.
+So, these generally correlate, though far from perfectly. For example, with the HuffPo $\rightarrow$ BuzzFeed comparison -- the confusion count is ~3 standard deviations above the mean for all pairs, but the Pearson correlation over the probability mass assignments is just over 1 standard deviation above the mean.
 
 Why the difference? Is one more "true" or "real"? This is debatable, but probably the least wrong thing is to say that they operationalize different types of similarity. For example, thinking about the classifier graphically, as a decision boundary in a 2-dimensional space -- the high confusion counts mean that there are a large number of headlines (relative to other pairs) that sit very close to (and just on the wrong side of) this boundary. But, this doesn't tell us anything about the rest of the headlines. For example, it could be that a large majority of headlines from both outlets are very far from the decision boundary -- the outlets are generally very distinctive -- but that there is a particular subset of headlines, maybe about one particular topic, that happen to be very difficult for the model to tell apart. In which case, the probability correlation might seem like a better metric -- it might capture the fact that, overall, the outlets focus on significantly different types of coverage, and not get swayed as much by the minority of headlines that look very similar.
 
@@ -712,13 +708,16 @@ For example, using the linear SVC, the stronger of the two non-neural baselines 
 \begin{figure}
   \centering
   \includegraphics[height=\textheight]{figures/svc-ab-acc.png}
-  \caption{Pairwise SVC accuracies on size-balanced samples, 100 per pair.}
+  \caption{Pairwise SVC accuracies on size-balanced samples, 100 models per pair.}
   \label{svc-ab-acc}
 \end{figure}
 
 These per-pair scores can simply be averaged, to get a set of 105 scores, which can then be scaled to zero mean and unit variance and plugged in with the previously developed scores:
 
-% TODO: A-B accuracies with confusion counts + probability corrs, grouped bars.
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/hlg-cc-pcorr-acc-tb10.png}
+\end{figure}
 
 (With the classification accuracies, to make them comparable with the confusion counts and mass correlations, we simply flip the signs on the scaled scores, since a high accuracy corresponds to low similarity.)
 
@@ -733,7 +732,10 @@ So, what does the full set of available metrics look like? There's a kind of com
 
 Which gives a total of 16 different representations of headline similarity for each pair of outlets. Then, joining all of these together and applying standard scaling, we can represent the similarity between each pair of outlets as a collection over these 16 independently calculated scores:
 
-%\includegraphics{figures/hl-graph-bars-all-metrics.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.4\textheight]{figures/hlg-all-tb10.png}
+\end{figure}
 
 And, averaging over the metrics, and converting into a literal graph -- here, for visual clarity, collapsing the bidirectional edges into a single undirected edge, averaging over the two scores:
 
