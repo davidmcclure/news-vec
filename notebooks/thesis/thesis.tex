@@ -107,13 +107,22 @@ It also, indirectly, gives a way to reason about the \textit{degree} to which th
 
 Of course, doing this manually, it would be hard to scale beyond a few outlets and a couple hundred headlines. But -- what if we could do this at a much larger scale, across dozens of different media organizations and millions of headlines? This thesis explores this question as a \textit{language engineering task}, working with a corpus of 73,198,274 tweets harvested from the Decahose over an 18 month period -- to what degree is it possible to train machine learning models to differentiate between headlines produced by different news outlets? Unlike other studies that have explored the tractability of language inference tasks on news data, though, goal here isn't to solve a applied engineering task (flagging "clickbait" headlines, optimizing click-through rates) -- instead, we use the predictive models as a descriptive and interpretive tool. By training models to differentiate between content from different sources, we can then examine the representations that are induced by the models, making it possible to "map" headlines as a kind of conceptual space.
 
-Most fundamentally, beyond this ability to "read" headlines at a scale that would otherwise be impossible -- these models make it possible to start filling in a kind of ground-truthed understanding of the degree to which different outlets are similar and different, where we might otherwise have to rely on intuition and anecdote. Modeling a complete matrix of pairwise similarities across 15 major media organizations, we can construct a kind of "content graph," a fully-connected representation how, and to what degree, outlets produce (dis)similar headlines:
+Most fundamentally, beyond this ability to reason about the content of headlines at a scale that would otherwise be impossible -- these models make it possible to start filling in a precise understanding of the degree to which different outlets are similar and different, where we might otherwise have to rely on intuition and anecdote. Analyzing a complete matrix of pairwise similarities across 15 major media organizations, we can construct a kind of "content graph," a representation of how, and to what degree, outlets produce (dis)similar headlines:
 
 %\includegraphics{figures/hl-graph.png}
 
+- This question of the \textit{distinguishability} or \textit{separability} of headlines touches on question that sits at the core of a number of recent studies that have explored processes of fragmentation and polarization in the media ecosystem. Building generally on the widely-popularized notions of "filter bubbles" and "echo chamgers" developed Parisier and Sunstein, a rich line of work has started to document the degree to which new patterns of news production and consumption have pushed audiences into more isolated spaces where they're less likely to encounter counter-attitudinal views. Flaxman et al. analyzed a large dataset of web browsing histories (volunteered by users of a browser extension) and explored the degree to which different patterns of content discovery push readers towards more or less ideologically polarized content, finding interestingly mixed results -- social media and search results expose users to more polarized content, but also expose them to a wider range of views. Meraz studied the structure of hyperlinks among a set of political blogs during the 2012 presidental election, finding that left-leaning sources were more densely connected than right-leaning sources. And, most recently, Benkler et al. explored the influence of
+
+(the same technique used to model audience-level similarity later in this project)
+
+volunteered of a large panel of ~50,000 users of the Bing
+
+tracked the degree to which different patterns of content discovery correlate with higher levels of ideological segregation
+
+polarized and isolated
 
 
-- this question of the distinguishability of headlines, the degree to which they are similar and different -- lies at the core of recent studies that have explored processes of media fragmentation and polarization. building generally on the widely popularized notions of "filter bubbles" and "echo chamgers" developed sunstein and parisier -- benkler, flaxman, meraz. generally, though these have focused primarily on relationships among outlets at the level of audience composition. content-level similarities are often derived from audience composition -- eg, \% of audience who follows trump on twitter, voted republican in last election; which assumes that differences at the level of content are one-in-the-same with differences in audience. some work has gone beyond this, namely work via MC -- chuang et al with topic models in articles, Benkler with analysis of issues during 2016 election; and, long tradition of content analysis in media studies / polisci, though usually vis-a-vis specific issues and relatively small datasets.
+ -- benkler, flaxman, meraz. generally, though these have focused primarily on relationships among outlets at the level of audience composition. content-level similarities are often derived from audience composition -- eg, \% of audience who follows trump on twitter, voted republican in last election; which assumes that differences at the level of content are one-in-the-same with differences in audience. some work has gone beyond this, namely work via MC -- chuang et al with topic models in articles, Benkler with analysis of issues during 2016 election; and, long tradition of content analysis in media studies / polisci, though usually vis-a-vis specific issues and relatively small datasets.
 
 - generally, though, less is known, empirically about content graph than audience graph. one reason, perhaps, is that measuring textual distance is fundamentally more complex and open-ended than measuring audience similarity / overlap, where a literal multiple-membership structure can be directly analyzed; whereas with text, Underwood notes, the question how scoring the similarity between two pieces of text opens up into a large and complex question. at the same time, though, this question of textual distance in the media landscape is fundamental, and plays at least as much of a role in processes of fragmentation and polarization as does the question of audience distance -- if all outlets produced identical content, then audience fragmentation wouldn't matter. concerns about filter bubbles / echo chambers are fundamentally about an interaction between the "audience graph" and "content graph" -- specifically, when they become both highly fragmented and also highly aligned, when isolated audiences are being exposed to isolated content.
 
@@ -178,6 +187,29 @@ Second, and most important, "Enhanced URLs" also provides scraped copies of the 
   ]
 },
 \end{lstlisting}
+
+
+
+
+this gives us eactly what we need -- a representation of content (headlines), directly linked to a representation of audience (twitter users, tweets)
+what are the impliations of using headlines though?
+some clear downsides
+but -- headlines are also highly complex and rich textual objects -- a difficult-to-pin-down mix of summary, advertisement, metonymy, provocation; beyond the linguistic and literary interest of hls, some more intellectually pragmatic advantages to focusing on hls in this context
+first, to the extent that we're interested in studying the interplay between content and audience, hls are generally the content with highest level of "colocation" with audience activity on twitter -- when someone tweets a link, hl is usually literally displayed with the tweet. a sort of "physical" proximity between hls and reader behavior.
+second, far from being a kind of afterthought, way in which headlines just are the content of the news, in a constituitive sense -- ~60\% of readers only read hls. on a per-word basis, hls have
+
+if we imagine placing different types of textual objects on a continuum that represents the level of social, political, economic "stopping power" -- then hls, on a per-word basis, would sit at the highest end of this
+if interested in the sites at which language acts on the world in manifest ways -- headlines
+
+also a rich line of work in (computational) linguistics on headlines. at a more theoretical register, Dor describes headlines in the context of linguistic notions of "relevance optimization" -- they try to maximize contextual effects for a reader with a certain set of expectations and assumptions, while also being short and easy to read. (and in this sense represent an ideal context for the question here about the iterplay between content and audience --5Dor essentially describes them as highly condensed sites of negotiation between content and audience, between what's being said who (it's assumed) is reading it.)
+more concret, in the content analysis tradition in sociology / media studies, long series of studies that have examined the ways that specific topis and issues are represented in hls.
+
+meanwhile, in NLP, two very active lines of work on headlines -- first, a series of studies that treat hls as evidence about the future, in different ways -- in quantative finance, exploring correlations between hls and price movements in stocks and corporate bonds; and, in the context of the journalism industry, predicting the "performance" of a headline -- CTR, shares, etc. meanwhile, another line of work on what might be thought of as "pathalogical" headlines -- eg, classifying if a hl is "clickbait" or "sensational," or identifying cases where the headline doesn't match the actual article content.
+like these studies, we approach headlines from a standpoint of prediction; but here, instead of trying to solve an applied engineering / product problem, treat prediction as an interpretive paradigm -- a way to measure the similarities between headlines, and a way to induce representations of what the headlines say as a way to "read" the news ecosystem at a scale that would otherwise be impossible.
+
+
+
+
 
 In a sense, the headlines themselves aren't terribly hard to come by -- Twitter is just scraping them off the public web, and there's nothing to stop anyone from doing this independently. But, beyond just the convenience of it having them pre-scraped for tens of millions of pages, there are actually a number of interesting advantages to collecting this corpus "through" the Decahose, as it were, instead of trying to harvest it independently.
 
