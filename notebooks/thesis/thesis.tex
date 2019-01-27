@@ -15,6 +15,7 @@
 \usepackage{booktabs}
 \usepackage{wrapfig}
 \usepackage{cite}
+\usepackage{sectsty}
 
 % Main font
 \setmainfont{Baskerville}
@@ -57,6 +58,18 @@
 
 \newfontfamily\hlfont{Menlo}
 
+\usepackage[tocflat]{tocstyle}
+\usetocstyle{standard}
+\setcounter{tocdepth}{1}
+
+\makeatletter
+\renewcommand\tableofcontents{%
+  \null\hfill\textbf{\Large\contentsname}\hfill\null\par
+  \@mkboth{\MakeUppercase\contentsname}{\MakeUppercase\contentsname}%
+  \@starttoc{toc}%
+}
+\makeatother
+
 \begin{document}
 
 \title{%
@@ -69,6 +82,9 @@
 \date{January 25, 2019}
 
 \maketitle
+
+\tableofcontents
+\newpage
 
 \begin{abstract}
   Abstract.
@@ -742,6 +758,7 @@ And, averaging over the metrics, and converting into a literal graph -- here, fo
 \begin{figure}[H]
   \centering
   \includegraphics[height=0.5\textheight]{figures/hl-graph-radial-all-metrics.png}
+  \caption{Pairwise headline similarities, averaging across all metrics and both directions for each pair. To make it easy to see the strongest pairs, in this figure the edge weights are mapped to a 0-1 scale and then cubed.}
 \end{figure}
 
 So -- WSJ / Bloomberg take the cake for the single strongest link, followed by NPR / NYT, The Hill / MSNBC, and Daily Caller / Breitbart.
