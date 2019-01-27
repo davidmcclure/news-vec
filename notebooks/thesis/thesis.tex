@@ -1479,13 +1479,24 @@ But, in other cases, there appears to be a strong \textit{negative} correlation.
 
 Indeed, these are actually the two strongest overall relationships -- the full set of 105 pairs distribute fairly continuously between these extremes, though with more positive correlations than negative:
 
-% \includegraphics{figures/ts-ca-corrs.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ts-ca-corrs.png}
+\end{figure}
 
 And, zooming in on a larger set of the strongest pairs in each direction:
 
-% \includegraphics{figures/ts-ca-pos-corrs.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.6\textheight]{figures/ts-ca-pos-corrs.png}
+  \caption{Pairs of outlets with the strongest positive content-audience correlations.}
+\end{figure}
 
-% \includegraphics{figures/ts-ca-neg-corrs.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.6\textheight]{figures/ts-ca-neg-corrs.png}
+  \caption{Pairs of outlets with the strongest negative content-audience correlations.}
+\end{figure}
 
 What to make of this? It's somewhat mysterious, and in many ways, it generates more questions than it answers. With the positive correlations, if we posit that the headline similarity is driving the audience similarity, then the interpretation seems fairly straightforward -- these outlets produce content that is "fungible," in a sense? That is -- there's a market for a particular type of content, and as two outlets start to produce more of it, readers intersted in that content will tweet more links to both outlets. But, are the headlines actually leading the audience changes? Sometimes it looks like yes, but other times, the opposite. Another possible complication -- there's some possibility that changes in the audience composition could directly affect the same of headlines that we get, since the corpus emerges from reader behavior. For example, if some external pressure causes the audience composition of NYT to shift torwards a group that's intersted in, say, foreign affairs, then this new audience might then tweet more foreign affairs articles, which in turn might cause more of these headlines to make it into the Decahose sample. (At the same time, though, this would likely be buffered by the fact that the headline-level similarities just based on the set of \textit{unique} articles associated with each outlet, and ignore the "performance" of the individual articles. The question, really, is whether changes in audience would affect the long tail of less popular content that gets lifted into the decahose.) The causality, in other words, could run in either direction, and could play out at different levels; and, there could be feedback loops between content-driven and audience-driven effects.
 
@@ -1500,9 +1511,13 @@ We started by modeling a very precise representation of the "content graph," the
 Along the way, we encounted a handful of uncertainties and challenges that could be addressed by future treatments of these questions. In particular:
 
 \begin{enumerate}
-\item It's clear that the classifiers are able to pick up on differencs at the level of topic and word choice -- what's being covered, which words are being used. But, it's less clear how much they are able to model what might be thought of as the \textit{stance} of the coverage -- the ideological positioning, implications, suggestions of a headline. For example, with the The Daily Caller -- a number of different models agreed that The Daily Caller sounds similar to the Daily Kos:
+\item It's clear that the classifiers are able to pick up on differencs at the level of topic and word choice -- what's being covered, which words are being used. But, it's less clear how much they are able to model what might be thought of as the \textit{stance} of the coverage -- the ideological positioning, implications, suggestions of a headline. For example, with the The Daily Caller -- a number of different models agreed that The Daily Caller sounds (comparatively) similar to the Daily Kos, about one standard deviation above the average score for all permutations of outlets:
 
-% TODO: DC CA
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ca-dailycaller-composite.png}
+  \caption{Content and audience similarities between The Daily Caller and all other outlets.}
+\end{figure}
 
 Which is perhaps unintuitive, in the sense that The Daily Caller is (very) right-leaning, and The Daily Kos is (very) left-leaning; it's not entirely clear how to make sense of this, and it seems possible that a human reader might disagree, depending on the framing of the question.\footnote{Though, of course, it's also possible that this is evidence that our expectations are wrong, not the model -- that The Daily Caller and The Daily Kos are less ideologically separated that we might think. Such is the epistemological push-and-pull of this type of large-scale text analysis -- we only trust the method if the results are broadly intuitive, but the intellectual payoff often lies in the anomalies, places where the analysis surfaces something surprising.} More likely than not, the model is picking up on a high level of "shared attention" between the two -- The Daily Kos and The Daily Caller both focus mainly on political issues, which results in a highly overlapping set of topics, names, and keywords in the headlines. For example, maybe both produced a large number of headlines with the token "kavanaugh" in them, during the Supreme Court confirmation hearings.
 
