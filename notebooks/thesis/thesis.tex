@@ -1143,15 +1143,35 @@ In different ways, then, can think of AP and The Hill as marking scraps of commo
 
 Beyond these two most dramatic misalignments, there are a number of other intersting patterns that can be seen with other outlets that at times seem to suggest different "taxonomies" for the content-audience fit, the range of diffrent ways that an outlet can occupy these graphs. For example, Huffington Post has extremely low audience correlations with Fox, Daily Caller and Breitbart, even though the content distances are right around average; suggesting, perhaps, a very strong ideological aversion between the audiences of HuffPo and these outlets, even though the headline distance is par for the course.
 
-% TODO: HuffPo CA.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ca-huffingtonpost-composite.png}
+\end{figure}
 
 The Washington Post, meanwhile, is notable for having very high audience correlations with a number of other left-leaning outlets -- NYT, MSNBC, The Hill -- even though the headline similarities are relatively low; suggesting, perhaps, that WaPo represents a voice that is both consistently different from other left-leaning outlets but also consistently interesting to audiences of other left-leaning outlets. (Perhaps a function of WaPo's somewhat unique role as both a national political outlet and D.C. local paper?)
 
-% TODO: WaPo CA.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ca-washingtonpost-composite.png}
+\end{figure}
 
 Last but not least, the three most right-leaning outlets -- Fox, Breitbart, and The Daily Caller -- all have very similar profiles -- strong audience correlations with each other and low audience overlap with everyone else; but a much more continuous distribution over headline similarities, with AP and The Hill registering unexpectedly high similarities with Fox and Daily Caller respectively, which run strongly against the grain of the audience-level similarities.
 
 % TODO: Fox/BB/DC CA.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ca-foxnews-composite.png}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ca-breitbart-composite.png}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/ca-dailycaller-composite.png}
+\end{figure}
 
 \section{Headlines as a historical process}
 
@@ -1171,7 +1191,7 @@ We could guard against this by, for example, splitting the data into deciles and
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{figures/tm-banding-1.jpg}
+  \includegraphics[width=0.5\textwidth]{figures/tm-banding-1.jpg}
   \caption{"Do topic models warp time?" Underwood.}
 \end{figure}
 
@@ -1179,7 +1199,7 @@ From this plot, it appears that the corpus changes very quickly at first, and th
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{figures/tm-banding-2.jpg}
+  \includegraphics[width=0.5\textwidth]{figures/tm-banding-2.jpg}
   \caption{"Do topic models warp time?" Underwood.}
 \end{figure}
 
@@ -1206,7 +1226,10 @@ So, there seems to be some trend, though the error bands are fairly large here -
 
 To get a clearer view of this, broken out by individual outlets -- we can do the same thing again, but this time training "one-vs-all" models for each outlet in each window. So, for example, for the New York Times in window 10 -- we first sample 18k random headlines from all outlets, like before; but then, holding out the 18k headlines from the New York Times -- the "foregrounded" outlet -- we randomly sample 18k headlines from across all of the other 14 outlets. This gives two sets of 18k headlines -- the "foreground" set, for the New York Times, and the "background" set, evenly sampled from everything else. We can then fit a regular binary model on these two splits, which will give a measurement for the degree to which that individual outlet is distinguishable with respect to all others at that particular moment in time. Like before, this is repeated on 100 random samples for each outlet in each window, giving a total of 136,500 accuracy scores, which can then be grouped by outlet. Here, sorted by the slope of a linear fit, sorted from most increasing to most decreasing:
 
-% \includegraphics[height=\textheight]{figures/ts-ova.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=\textheight]{figures/ts-ova.png}
+\end{figure}
 
 Now, the shape of things starts to come into closer focus -- the sudden rise in accuracy at the end that was visible in the all-vs-all accuracies is clearly driven almost entirely by BuzzFeed, which becomes rapidly and dramatically more distinctive at the very end of the data window, the accuracy jumping by almost 10\% in just a couple of months. Fox, meanwhile, has the strongest overall linear trend, becoming consistently more differentiated over the 18-month window, maybe with something of a phase shift at the end of 2017. Meanwhile, at the other end of the spectrum, four outlets show consistent falloffs in differentiability -- The Hill, The Daily Kos, Huffington Post, and CNN.
 
@@ -1216,17 +1239,26 @@ To get at this -- in the same way that we could train a battery of individual A-
 
 With this, we can break out a historical similarity trend for each individual pair. Again, sorting by the slope of a standard linear fit, here are the 10 pairs with the strongest increases in accuracy, pairs that have moved away from each other most significantly over the last 2 years:
 
-% \includegraphics[height=\textheight]{figures/ts-ab-rising.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=\textheight]{figures/ts-ab-rising.png}
+\end{figure}
 
 Most of these pairs include either BuzzFeed or Fox, paired with a number of different outlets, suggesting that these two outlets are becoming consistently more differentiated from a fairly wide range of other sources -- they drifting off into increasingly isolated, individually distinctive linguistic spaces. Meanwhile, in the other direction -- here are the 10 pairs with the strongest linear decreases in classification accuracy -- outlets that \textit{converged} most significantly over time:
 
-% \includegraphics[height=\textheight]{figures/ts-ab-falling.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=\textheight]{figures/ts-ab-falling.png}
+\end{figure}
 
 Here, again, we can spot a handful of outlets that crop up in a number of different pairs -- Huffington Post (in particular, present in each of the top three), The Daily Kos, and The Hill.
 
 Moving beyond just the 10 strongest trends in each direction -- from the full set of 105 pairwise relationships, we can assemble the fully connected graph for all 15 outlets. Here, we treat the slopes of the regression fits as signed edge weights between the outlets. The width of the edge represents the absolute magnitude of the slope -- the degree to which the relationship between the pair has changed over time -- and the color represents the direction -- blue for negative slopes, where outlets have become more similar over time (lower classification accuracies), and red for positive slopes, where outlets have become more dissimilar (higher classification accuracies).
 
-% \includegraphics{figures/ts-ab-radial.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.5\textheight]{figures/ts-ab-radial.png}
+\end{figure}
 
 From this, a number of clear trends start to fall out. First, there seems to be a core group of outlets that have undergone a significant convergence over the last two years -- Huffington Post, The Hill, Daily Kos, CNN. (All left-of-center, it's worth noting.) And, to a lesser extent, AP, The Washington Post, The New York Times and NPR have all become more confusable with some combination of these four, though in a somewhat more patchy and inconsistent way (Daily Kos, in particular, has become more confusable with WaPo, NYT, and NPR). Meanwhile, BuzzFeed and Fox have moved in the opposite direction -- they have become more differentiated from \textit{almost every single other outlet}. (And, notably, Fox has diverged significantly from WSJ, second only to the movement away from BuzzFeed.) Finally, of all outlets, Huffington Post has maybe the most mixed and extreme pattern of movements -- it moves from BuzzFeed and converges with CNN, DK, and The Hill; but it also converges with the (right-leaning) Daily Caller.
 
@@ -1236,7 +1268,10 @@ One very simple way to get at the "direction" of the movements is to just measur
 
 To ensure that the headline embeddings are consistently sampled for all outlets in all time periods, we split the data into 10 deciles, and then sample an even number of headlines for each \texttt{(domain, decile)} pair. Then, we re-train the original all-vs-all models on this time-balanced corpus, which then gives a set of embeddings for each outlet in each temporal decile of the corpus. Then, to get a standardized score for the size of the shift for each outlet, we take the cosine distance between the mean embeddings for each outlet in the first and last deciles. Which, then, makes it possible to redraw the original graph, but this time with a signal for the relative sizes of the changes. The larger the node, the larger the historical shift:
 
-% \includegraphics{figures/ts-ab-radial-magnitude.png}
+\begin{figure}[H]
+  \centering
+  \includegraphics[height=0.5\textheight]{figures/ts-ab-radial-magnitude.png}
+\end{figure}
 
 From this, a clearer picture comes into view -- the largest individual shifts are HuffPo, Fox, BuzzFeed, and then Daily Caller and CNN. What's actually going on with these? To get a specific sense of this, we can find the individual headlines that are most characteristic of the geometric movements in the embedding space. For example, to find headlines that "typify" the movement of BuzzFeed between the beginning and end of the data, we can take \texttt{(BuzzFeed 2018) - (BuzzFeed 2017)}, and then query for the individual BuzzFeed headlines that are closest to this difference vector -- headlines that mark BuzzFeed in 2018, specifically in comparison to BuzzFeed in 2017. Here are the top 20:
 
@@ -1514,7 +1549,6 @@ Along the way, we encounted a handful of uncertainties and challenges that could
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{figures/ca-dailycaller-composite.png}
-  \caption{Content and audience similarities between The Daily Caller and all other outlets.}
 \end{figure}
 
 Which is perhaps unintuitive, in the sense that The Daily Caller is (very) right-leaning, and The Daily Kos is (very) left-leaning; it's not entirely clear how to make sense of this, and it seems possible that a human reader might disagree, depending on the framing of the question.\footnote{Though, of course, it's also possible that this is evidence that our expectations are wrong, not the model -- that The Daily Caller and The Daily Kos are less ideologically separated that we might think. Such is the epistemological push-and-pull of this type of large-scale text analysis -- we only trust the method if the results are broadly intuitive, but the intellectual payoff often lies in the anomalies, places where the analysis surfaces something surprising.} More likely than not, the model is picking up on a high level of "shared attention" between the two -- The Daily Kos and The Daily Caller both focus mainly on political issues, which results in a highly overlapping set of topics, names, and keywords in the headlines. For example, maybe both produced a large number of headlines with the token "kavanaugh" in them, during the Supreme Court confirmation hearings.
