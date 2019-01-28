@@ -172,9 +172,17 @@ B15 2TT\\
 UK
 
 \newpage
-\tableofcontents
-\newpage
 
+\begin{center}
+\textbf{Acknowledgements}
+\end{center}
+
+This work would have been impossible without the incredibly generous support of my advisor, Deb Roy, and my readers on the project, Kathy Cramer and Jack Grieve, who have provided invaluable guidance as the thesis has evolved into its current form. I also owe a debt of gratitude to the engineering team at Cortico -- especially Wes Chow, and Allison King, and Sam Carliles -- who have maintained the technical infrastructure that archives the raw data from Twitter that this project builds on. I've also benefited from a long series of wonderful conversations with staff and fellow students the Laboratory for Social Machines, who have helped me think through methodological issues and situate the work in the context of shared initiatives -- especially Martin Saveski, Brandon Roy, and Doug Beeferman, and Shayne O'brien. Outside of our group, I've also benefited indirectly from the rich intellectual environment of the Media Lab -- in particular the work being done by Ethan Zuckerman's team in the Center for Civic Media, where work on the Media Cloud project has been a source of inspiration. Finally -- none of this would be possible without the support of my wife, Kara, and cat, Leo, who have been with me at every step.
+
+\newpage
+\tableofcontents
+
+\newpage
 \section{Introduction}
 
 Imagine that someone showed you a headline from a news article, but in complete isolation, stripped of all context -- just a sequence of words. All you were told is that the headline came from either the New York Times or Fox, and you were asked to guess which one. In some cases, this might be fairly easy. For example, if it's a recipe -- we might remember that The New York Times has a large cooking section:
@@ -202,7 +210,7 @@ But, other things might be significantly harder. For example -- one of these hea
   \item 4 freed from Thailand cave, but rescuers face "war with water and time" to get to others
 \end{itemize}
 
-Here, to my eye, there aren't any obvious "tells" -- there are certainly things that might seem to tip the scaled one direction or the other, but it's not clear.\footnote{The answer -- NYT, Fox.} In trying to guess where the headline came from, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, concerns, people, and locations that the outlet tends to focus on. And, beyond the raw content of what's being covered, we'd also pay attention to \textit{how} it's being covered -- the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
+There are certainly things that might seem to tip the scaled one direction or the other, but, to my eye, it's not obvious.\footnote{The answer -- NYT, Fox.} In trying to guess where the headline came from, we'd have to bring to bear a wide set of intuitions about what might be thought of as the "voice" of the outlet -- the set of issues, concerns, people, and locations that the outlet tends to focus on. And, beyond the raw content of what's being covered, we'd also pay attention to \textit{how} it's being covered -- the style, intonation, attitude, affect. Trying to guess the outlet, in other words, would force us to formalize a kind of mental model about precisely how the two outlets are similar or different.
 
 It also, indirectly, gives a way to reason about the \textit{degree} to which they're similar or different. Now, imagine that instead of just doing this once, we did it for 100 headlines, and counted up the number of correct guesses. We'd likely do better than random -- but how much better? 60\%, 70\%, 95\%? How differentiable are NYT and Fox, at a purely linguistic level? And, how does this compare to other pairs of outlets? What if we took headlines from NYT and CNN, instead of NYT and Fox, for example, and repeated the experiment. We might guess that NYT and CNN are more similar, and thus harder to tell apart. But, how true is this, exactly? Say we got 80 headlines right when guessing between NYT and Fox comparison -- would we get, perhaps, 70 right for NYT and CNN? Or 60, 55? In a rough sense, we could start to reason about the relative proximities between different pairs of outlets.
 
