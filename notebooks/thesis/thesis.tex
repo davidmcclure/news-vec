@@ -1479,7 +1479,7 @@ From this, a number of clear trends start to fall out. First, there seems to be 
 
 This makes it easier to reason about the full structure of all 105 pairwise accuracy changes, but, it still isn't a complete picture. One disadvantage to the classification metric, in this context, is that it's \textit{undirected}. We know, for example, that CNN and HuffPo have become more "confusable" with each other, but this could happen in a few different ways -- it could be that CNN headlines have migrated in the direction HuffPo; or, HuffPo could have shifted towards CNN; or both towards each other; or some mix of all of these. Or, with Fox, which becomes easier for the model to distinguish from almost every other outlet -- it could be that every other outlet is independently moving away from Fox, or that just Fox is moving away from everything else.
 
-Modeling this explicitly is tricky, and in a sense requires some kind of "anchoring" of the data out side of the pure notion of textual distance that we've been using in this study.\footnote{It's possible that we could get at this by looking at relative positions in the embedding spaces in the neural models -- for example, if outlets A and B become more confusable over time, we could try to figure out which outlet started out farther away from the combined ending position of the two. Which had to "travel" farther, essentially?} Provisionally, though -- how to start blocking in a rough sketch of this? It turns out that a number of things start to become clear just from just looking at changes undergone by some of the individual outlets involved in the strongest pairwise shifts. For example, with something like BuzzFeed -- what exactly is driving the sudden, huge spike in accuracy that kicks off in July of 2018? Which headlines are responsible for this?
+Modeling this explicitly is tricky, and in a sense requires some kind of "anchoring" of the data outside of the pure notion of textual distance that we've been using in this study.\footnote{It's possible that we could get at this by looking at relative positions in the embedding spaces in the neural models -- for example, if outlets A and B become more confusable over time, we could try to figure out which outlet started out farther away from the combined ending position of the two. Which had to "travel" farther, essentially?} Provisionally, though -- how to block in a very rough sketch of this? It turns out that a number of things start to become clear just from just looking at changes undergone by some of the individual outlets involved in the strongest pairwise shifts. For example, with something like BuzzFeed -- what exactly is driving the sudden, huge spike in accuracy that kicks off in July of 2018? Which headlines are responsible for this?
 
 In theory, we could try to get at this by looking the decision functions learned by the SVMs -- for example, look at headlines that were confused by the model in different periods, or look at what kinds of headlines get placed very far from the decision boundary. But, really, this kind of question about the actual content of the headlines calls out for the types of distributed representations learned by the neural models. The SVMs give a controlled, highly-sampled snapshot of the \textit{degree} to which outlets have reconfigured over time. As triangulation of this -- could we explore the \textit{substance} of these changes by treating them as movements in the vector space induced by the neural models?
 
@@ -1537,7 +1537,7 @@ This suggests, then, that the rise in accuracy for BuzzFeed in the summer of 201
 
 Which, in essence, is simply \textit{politics}. So, BuzzFeed's ratio of political-coverage-to-clickbait has gone down; in terms of its overall content profile, BuzzFeed is moving away from political coverage, towards quizzes.
 
-What about Huffington Post, which, more than any other other outlet, appears to have become more differentiated from BuzzFeed? Moving in chronological order this time -- here's \texttt{mean(HuffPo 2017) - mean(HuffPo 2018)}, headlines that are distinctive of HuffPo at the beginning of the window:
+What about Huffington Post, the outlet that BuzzFeed has diverged with most significantly? Moving in chronological order this time -- here's \texttt{mean(HuffPo 2017) - mean(HuffPo 2018)}, headlines that are distinctive of HuffPo at the beginning of the window:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
     connecting food and your mood
@@ -1562,7 +1562,7 @@ What about Huffington Post, which, more than any other other outlet, appears to 
     how do you know if your therapist is helping you
 \end{lstlisting}
 
-Which, though different, might be categorized alongside BuzzFeed's quizzes and listicles -- here, lifestyle and advice content, maybe with a particular focus on diet and food. Meanwhile, headlines that are distinctive of HuffPo at the end of the window are almost all politics:
+Which, though very distinct from BuzzFeed's quizzes, might fall under the same broad rubric of "entertainment" or "lifestyle" content -- here, maybe with a particular focus on diet and food. Meanwhile, headlines that are distinctive of HuffPo at the end of the window are dominated by politics:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
     trump honors fallen soldiers on memorial day with self congratulatory tweet
@@ -1587,9 +1587,9 @@ Which, though different, might be categorized alongside BuzzFeed's quizzes and l
     georgia cop suspended after liking racist kkk facebook posts
 \end{lstlisting}
 
-So, Huffington Post has undergone a kind of mirror-image version of BuzzFeed's evolution. To return to the question of directionality -- here, seems as if BuzzFeed and Huffington Post are both independently moving away from each other. BuzzFeed is shifting away from politics and towards clickbait; HuffPo is shifting away from clickbait and towards politics.
+So, Huffington Post has undergone a kind of exact inversion of BuzzFeed's evolution. To return to the question of \textit{directionality} -- here, seems as if BuzzFeed and Huffington Post are both independently moving away from each other. BuzzFeed is shifting away from politics and towards clickbait; HuffPo is shifting away from clickbait and towards politics.
 
-What about Daily Kos, which, as we can see in figure XX, is involved with 6 of the 10 most significant pairwise increases in similarity, has become dramatically more similar to NPR, WaPo, NYT, CNN? to the extent that these other outlets are largely other left-leaning political sources, perhaps tempting to read this a kind of convergence of political reporting. but, from looking at DK, which is the "central" node in this set of changes, suggests that these might actually driven by DK becoming less exclusively political in its coverage. here are the headlines that mark spring of 2017, which are almost exclusively about the trump admin -- some combination of "trump," "gop," and "republican" appears in almost every one:
+What about Daily Kos, which, as we saw in figure XX, has become significantly harder to tell apart from a large number of other outlets -- NPR, WaPo, NYT, CNN? (Daily Kos, in fact, is involved in 6 of the 10 largest increases in similarity.) To the extent that these outlets are all share a broad ideological orientation, it's perhaps tempting to read this as a kind of convergence in the content and style of left-leaning political reporting over the course of the first 18 months of the Trump presidency. But, just from looking at Daily Kos, which is the clear "central" node in this set of changes, it seems as if this might actually driven by Daily Kos simply becoming less focused on politics. Here are the headlines that mark spring of 2017 for Daily Kos, which are almost completely focused on the trump administration -- some combination of "trump," "gop," and "republican" appears in almost every one:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
     is trumpcare just a way for paul ryan to achieve his true dream of destroying medicare
@@ -1614,7 +1614,7 @@ What about Daily Kos, which, as we can see in figure XX, is involved with 6 of t
     top republican looks at facts from trumpcare s cbo score and all he has to say is fake news
 \end{lstlisting}
 
-and, hls that mark fall 2018, which have almost no politics.
+Whereas, the headlines that mark fall 2018 are strikingly light on politics:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
     teachers flee success high school
@@ -1639,7 +1639,7 @@ and, hls that mark fall 2018, which have almost no politics.
     day sixteen kremlinannex #pm et
 \end{lstlisting}
 
-again, important to remember that these lists aren't representative \textit{samples} of the coverage from the outlet in the period -- rather, they typify the difference, the delta, between the end and the beginning. DK, of course, hasn't stopped covering politics; but, this suggests that DK is less exclusively focused on politics that it was in the first months of the trump admin, which in turn has made it more difficult for the classifiers to tell apart from a number of other somewhat more general-interest outlets.
+Again, it's important to remember that these lists aren't representative samples of the outlets from different time periods -- rather, they're the headlines that most precisely characterize the change that has occurred between the beginning and the end, or vice versa. The Daily Kos, of course, hasn't stopped covering politics; but, this suggests that it's somewhat less \textit{exclusively} focused on politics that it was in the first months of the Trump administration. Which in turn has made it more difficult for the classifiers to tell apart from a number of other more general-interest outlets.
 
 Last but not least, what about Fox? Which, again, has shifted away from almost everything else -- WSJ, BuzzFeed, CNN, WSJ, NYT, WaPo, and even other conservative outlets like Breitbart and Daily Caller -- it appears to be drifting off into some largely unoccupied linguistic space, far from everything. Moving chronologically -- here are headlines that mark Fox in spring of 2017 relative to fall of 2018:
 
