@@ -1475,171 +1475,220 @@ Moving beyond just the 10 strongest trends in each direction -- from the full se
   \includegraphics[height=0.5\textheight]{figures/ts-ab-radial.png}
 \end{figure}
 
-From this, a number of clear trends start to fall out. First, there seems to be a core group of outlets that have undergone a significant convergence over the last two years -- Huffington Post, The Hill, Daily Kos, CNN. (All left-of-center, it's worth noting.) And, to a lesser extent, AP, The Washington Post, The New York Times and NPR have all become more confusable with some combination of these four, though in a somewhat more patchy and inconsistent way (Daily Kos, in particular, has become more confusable with WaPo, NYT, and NPR). Meanwhile, BuzzFeed and Fox have moved in the opposite direction -- they have become more differentiated from \textit{almost every single other outlet}. (And, notably, Fox has diverged significantly from WSJ, second only to the movement away from BuzzFeed.) Finally, of all outlets, Huffington Post has maybe the most mixed and extreme pattern of movements -- it moves from BuzzFeed and converges with CNN, DK, and The Hill; but it also converges with the (right-leaning) Daily Caller.
+From this, a number of clear trends start to fall out. First, there seems to be a core group of outlets that have undergone a significant convergence over the last two years -- Huffington Post, The Hill, Daily Kos, CNN. (All left-of-center, it's worth noting.) And, to a lesser extent, AP, The Washington Post, The New York Times and NPR have all become more confusable with some combination of these four, though in a somewhat more patchy and inconsistent way (Daily Kos, in particular, has become more confusable with WaPo, NYT, and NPR). Meanwhile, BuzzFeed and Fox have moved in the opposite direction -- they have become more differentiated from \textit{almost every single other outlet}. (And, notably, Fox has diverged significantly from WSJ, second only to the movement away from BuzzFeed.) Though, of all outlets, Huffington Post has maybe the most mixed and extreme pattern of movements -- it moves dramatically away from BuzzFeed (the single largest decrease in similarity) and converges strongly with CNN, Daily Kos, and The Hill.
 
-This makes it easier to reason about the full structure of all 105 pairwise accuracy changes, but, it still isn't a complete picture. One disadvantage to the classification metric is that it's undirected. We just know, for example, that CNN and HuffPo have become more "confusable" with each other. But, this could happen in a few different ways -- it could be that CNN has moved towards HuffPo; or, HuffPo towards CNN; or both towards each other; or some combination of all of these. In theory, we could try to get at this by looking under the hood at the decision functions learned by the SVM fits -- for example, look at headlines that were confused by the model in different periods, or look at what kinds of headlines get placed very far from the decision boundary. But, really, this calls out for the kinds of distributed representations learned by the neural models. The SVMs give a very controlled, highly-sampled snapshot of the pairwise changes in similarity over time; as a triangulation of this, could we explore the substance of these changes by treating them as movements in the vector space induced by the neural models?
+This makes it easier to reason about the full structure of all 105 pairwise accuracy changes, but, it still isn't a complete picture. One disadvantage to the classification metric, in this context, is that it's \textit{undirected}. We know, for example, that CNN and HuffPo have become more "confusable" with each other, but this could happen in a few different ways -- it could be that CNN headlines have migrated in the direction HuffPo; or, HuffPo could have shifted towards CNN; or both towards each other; or some mix of all of these. Or, with Fox, which becomes easier for the model to distinguish from almost every other outlet -- it could be that every other outlet is independently moving away from Fox, or that just Fox is moving away from everything else.
 
-One very simple way to get at the "direction" of the movements is to just measure the \textit{degree} to which each individual outlet has moved in the vector space, independent of the pairwise classification scores. Which, in turn, can often make it possible to infer the direction -- for example, if outlets A and B become more similar, and outlet A moved significantly in the vector space but outlet B stayed mostly stable, this suggests that A is moving towards B. To get at this, we can look at the angular distance between the mean vectors for each outlet in different time periods. For example, to measure the degree to which NYT has changed over the last two years, we would take the average of the embeddings for all NYT headlines from, say, spring of 2017, and calculate the cosine distance between this vector and the average of all NYT embeddings from fall of 2018.
+Modeling this explicitly is tricky, and in a sense requires some kind of "anchoring" of the data out side of the pure notion of textual distance that we've been using in this study.\footnote{It's possible that we could get at this by looking at relative positions in the embedding spaces in the neural models -- for example, if outlets A and B become more confusable over time, we could try to figure out which outlet started out farther away from the combined ending position of the two. Which had to "travel" farther, essentially?} Provisionally, though -- how to start blocking in a rough sketch of this? It turns out that a number of things start to become clear just from just looking at changes undergone by some of the individual outlets involved in the strongest pairwise shifts. For example, with something like BuzzFeed -- what exactly is driving the sudden, huge spike in accuracy that kicks off in July of 2018? Which headlines are responsible for this?
 
-To ensure that the headline embeddings are consistently sampled for all outlets in all time periods, we split the data into 10 deciles, and then sample an even number of headlines for each \texttt{(domain, decile)} pair. Then, we re-train the original all-vs-all models on this time-balanced corpus, which then gives a set of embeddings for each outlet in each temporal decile of the corpus. Then, to get a standardized score for the size of the shift for each outlet, we take the cosine distance between the mean embeddings for each outlet in the first and last deciles. Which, then, makes it possible to redraw the original graph, but this time with a signal for the relative sizes of the changes. The larger the node, the larger the historical shift:
+In theory, we could try to get at this by looking the decision functions learned by the SVMs -- for example, look at headlines that were confused by the model in different periods, or look at what kinds of headlines get placed very far from the decision boundary. But, really, this kind of question about the actual content of the headlines calls out for the types of distributed representations learned by the neural models. The SVMs give a controlled, highly-sampled snapshot of the \textit{degree} to which outlets have reconfigured over time. As triangulation of this -- could we explore the \textit{substance} of these changes by treating them as movements in the vector space induced by the neural models?
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[height=0.5\textheight]{figures/ts-ab-radial-magnitude.png}
-\end{figure}
+To ensure that all outlets are evenly represented in all time periods, we split the data into 10 deciles, and then sample an even number of headlines for each \texttt{(domain, decile)} pair. Then, we re-train the original all-vs-all models on this time-balanced corpus, which produces a set of embeddings for each outlet in each temporal decile of the corpus.
 
-From this, a clearer picture comes into view -- the largest individual shifts are HuffPo, Fox, BuzzFeed, and then Daily Caller and CNN. What's actually going on with these? To get a specific sense of this, we can find the individual headlines that are most characteristic of the geometric movements in the embedding space. For example, to find headlines that "typify" the movement of BuzzFeed between the beginning and end of the data, we can take \texttt{(BuzzFeed 2018) - (BuzzFeed 2017)}, and then query for the individual BuzzFeed headlines that are closest to this difference vector -- headlines that mark BuzzFeed in 2018, specifically in comparison to BuzzFeed in 2017. Here are the top 20:
+With this in hand, to get a sense of how these outlets have shifted over time, we can query for individual headlines that are \textit{most characteristic of the overall geometric movements in the embedding space}. For example, to find headlines that, for the model, "typify" the movement of BuzzFeed between the beginning and end of the data, we can take \texttt{mean(BuzzFeed 2018) - mean(BuzzFeed 2017)}, and then find the individual BuzzFeed headlines with the smallest angular distance from this difference vector -- headlines that mark BuzzFeed in 2018, specifically in comparison to BuzzFeed in 2017. Here are the top 20:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
-    pick some colors and we ll tell you which disney movie you should watch
-    pick your favorite dcoms and we ll tell you which disney heartthrob you belong with
-    pick # movies and we ll tell you if you re a pessimist or optimist
-    shop at sportsgirl and we ll tell you which pet you should adopt
-    pick some fruits and we ll guess your favorite disney princess
+    answer these five questions and we ll tell you which shrek character you are in bed
+    build your high school life and we ll reveal which character you are from finding nemo
+    take a trip to the beach and we ll tell you which summer bop you should listen to
     pick a movie from each year and we ll tell you which comedy show you belong on
-    pick some disney movies and we ll reveal your disney soulmate
-    build your own disney storyline and we ll reveal your prince
-    choose some food combos and we ll reveal which iconic duo you and your bff are
-    choose some disney channel characters and we ll reveal if you re more extroverted or introverted
+    check off all the classic disney movies you ve seen and we ll guess how old you are
+    tell us your perfect night in and we ll tell you which literature lady you are
+    create a breakup playlist and we ll tell you which iconic movie character you were in a past life
+    tell us your favorite female tv character and we ll tell you what your greatest strength is
+    plan a movie night and we ll tell you which character from the incredibles you re most like
+    decorate your apartment with uo decor and we ll reveal which celebrity will live with you
+    plan your dream first date and we ll tell you how old your soulmate is right now
+    make a break up playlist and we ll tell you which marvel superhero you re most compatible with
     pick nine random things and we ll tell you which sex and the city girl you are
-    choose your favourite lyrics from the harry styles album and we ll tell you which of his suits you are
-    build your own spooky restaurant and we ll tell you what costume you should wear for halloween
-    eat a bunch of food and we ll tell you which spongebob character you are
-    shop at the disney store and we ll give you a cute disney movie to watch
-    which harry styles hair style are you
-    which harry styles body part are you
+    create your perfect fall day and we ll tell you what book to read next
+    choose your meals for the day and we ll tell you which parks and rec character you are
+    choose your fave cartoon grandparents and we ll give you an activity to do with your grandparents
+    make a breakup playlist and we ll tell you which marvel superhero you re most compatible with
     eat at taco bell and we ll tell you which avenger would be your best friend
-    build your dream home and we ll tell you which twice song you are
-    which disney cat are you
+    plan your perfect hogwarts feast and we ll tell you which house table to sit at
+    tell us your harry potter preferences and we ll give you a european city to visit this summer
 \end{lstlisting}
 
-This suggests, then, that the rise in differentiability for BuzzFeed in the summer of 2018 is driven by a sudden explosion of this "quiz" genre, of the form "[Do a quiz], and [we'll tell you something about yourself]" -- which, evidently, is highly distinctive of BuzzFeed. Going in the other direction, though, gives a clearer sense of the overall shift. Here's \texttt{(BuzzFeed 2017) - (BuzzFeed 2018)}, things that mark the beginning of the corpus as compared to the end:
+This suggests, then, that the rise in accuracy for BuzzFeed in the summer of 2018 is driven by a sudden explosion of this "quiz" genre, of the form "[Do a quiz], and [we'll tell you something about yourself]." Going in the other direction, though, gives a clearer sense of the overall shift. Here's \texttt{mean(BuzzFeed 2017) - mean(BuzzFeed 2018)}, headlines that mark the beginning of the corpus as compared to the end:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
-    congressmen seek to lift propaganda ban
     as trump takes office birth control startups see demand spike
     trump hotel contractor drops $ # million lawsuit
+    taiwanese court delivers landmark ruling in favour of marriage equality
+    trump administration punts again on obamacare subsidy lawsuit
+    congressmen seek to lift propaganda ban
+    trump picks patriot act lawyer for top state department job
+    us and cuba to open diplomatic relations in historic agreement
     north carolina officials seek to stop special elections
-    guardian ditches move to kushner building after newsroom revolt
-    two key republicans express doubts over devos s nomination
-    trump warns republicans about botching obamacare repeal before thursday s climactic vote
-    clinton iowa volunteers train when to push backers to omalley to block bernie
-    prosecutors win back broad authority to charge supreme court protesters
+    obama warns inequality could derail climate change efforts
+    police fired gas at protesters outside trump s rally
+    mike pence on confederate statues i m someone who believes in more monuments not less
     libyan dissident wins right to sue ex foreign secretary jack straw over rendition
-    guardian announces layoffs after $ # kushner lease debacle
-    prosecutors charge protesters with rioting over inauguration day protests
-    newly designated national monuments highlight nation s civil rights struggle
-    president trump speaks at cpac conference
-    trump to address the nation tonight
-    trump administration keeps major news orgs out of closed press briefing
-    fear grips immigrants as enforcement raids sweep across us
-    governor senator call for investigation of troubled youth psych facility
-    prosecutors pursue rioting charges over inauguration day protests
-    congressman met with sanctioned putin friend in moscow
+    clinton iowa volunteers train when to push backers to omalley to block bernie
+    guardian ditches move to kushner building after newsroom revolt
+    alex jones suffers defeat in custody hearing
+    bannon ally leaves white house as mcmaster consolidates power
+    devos first # days marred by rollbacks missteps and blunders
+    britain heads to the polls
+    texas sues over feds withholding of overseas execution drugs
+    uk general election polling day and count
 \end{lstlisting}
 
-Which, in essence, is simply \textit{politics}. So, BuzzFeed's ratio of political-coverage-to-listicles has gone down; in terms of its overall content profile, BuzzFeed is moving away from political coverage, towards quizzes.
+Which, in essence, is simply \textit{politics}. So, BuzzFeed's ratio of political-coverage-to-clickbait has gone down; in terms of its overall content profile, BuzzFeed is moving away from political coverage, towards quizzes.
 
-What about Huffington Post, which, more than the other outlets, appears to have undergone a kind of "repulsive" shift relative to BuzzFeed? Moving in chronological order this time -- here's \texttt{(HuffPo 2017) - (HuffPo 2018)}, headlines that are distinctive of HuffPo at the beginning of the window:
+What about Huffington Post, which, more than any other other outlet, appears to have become more differentiated from BuzzFeed? Moving in chronological order this time -- here's \texttt{mean(HuffPo 2017) - mean(HuffPo 2018)}, headlines that are distinctive of HuffPo at the beginning of the window:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
-    how many people are vegetarian
+    connecting food and your mood
+    a tale of two globalizations
+    a true omnichannel experience reaps the biggest rewards
     the rise of deaftalent
+    yes you can get bbq from a drive thru
+    what s your dietary footprint
     the problem with tickling
-    do women really need a yearly pelvic exam
-    your favorite book characters are as real as you feel they are
+    how s your grammarly mine s great
     the genius trick for oatmeal that ll make your mornings easier
-    make your goals stick
-    start where you are
-    a life in transitions the firsts
-    shopping with an avatar
-    the future of food is black
-    the art of being kind
-    how to make vegan parmesan cheese and make your dreams come true
-    a lesson in organicology
-    how dieting makes you gain weight
+    how many people are vegetarian
+    the future of work is collective
+    a beginner s guide to digital advertising
+    do women really need a yearly pelvic exam
     tired of mid century modern try these cozy couches instead
-    the revolting reason you might want to avoid canned greens
-    why the floor is your friend
-    the most anticipated books of # thus far
-    the easiest salmon teriyaki you ve ever made
+    how to create thought leading ideas
+    your gut feeling fear or intuition
+    make your goals stick
+    how to make vegan parmesan cheese and make your dreams come true
+    how dieting makes you gain weight
+    how do you know if your therapist is helping you
 \end{lstlisting}
 
 Which, though different, might be categorized alongside BuzzFeed's quizzes and listicles -- here, lifestyle and advice content, maybe with a particular focus on diet and food. Meanwhile, headlines that are distinctive of HuffPo at the end of the window are almost all politics:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
-    susan collins receives # coat hangers ahead of kavanaugh vote
-    tennessee man accused of burning black man alive was known white supremacist
-    karl rove likens trump to stalin tells him to tone down anti press rants
+    trump honors fallen soldiers on memorial day with self congratulatory tweet
     omarosa claims trump has mental decline that could not be denied
+    tennessee man accused of burning black man alive was known white supremacist
+    ambien maker denounces roseanne barr for blaming racist tweet on insomnia drug
+    editorial cartoonist critical of trump fired from pittsburgh newspaper
+    man yelling about trump opens fire in president s florida golf club
+    susan collins receives # coat hangers ahead of kavanaugh vote
+    tsa apologizes to ny giants player for spilling mom s ashes during bag search
+    man who refused to hand over immigrant info to ice do nt collaborate with fascists
+    federal prosecutor put on leave for targeting maxine waters with hateful facebook post
+    karl rove likens trump to stalin tells him to tone down anti press rants
+    tennessee pastor resigns after admitting sexual incident was abuse of power
+    florida dem candidate for governor relying on vocal trump supporter
     country star gretchen wilson arrested after altercation on american airlines flight
-    georgia cop suspended after liking racist kkk facebook posts
-    c span caller unleashes racist rant about barack obama on air
-    kathy griffin tells tomi lahren to go herself in scathing tweet
-    twitter users shred trump for attacking labor leader on labor day
-    gop rep duncan hunter wife indicted by grand jury in san diego
-    democrats denounce ivanka trump for hypocrisy after she touts american jobs
-    omarosa releases secret tape of lara trump discussing high paying campaign job
     it s time to decriminalize immigration say top texas dems
-    maxine waters warns trump cabinet steel yourself for more public confrontations
-    trump supporter arrested for threatening to kill journalists at boston globe
-    statue of liberty protester trolls melania s i do nt care jacket
-    cindy mccain kisses husband john mccain s casket during arizona service
-    bob woodward fires back at eric trump over anti semitic slur
-    colbert mocks humiliating moron trump for still obsessing over obama
-    msnbc host mocks trump s phone call wishes for english to english translator
+    gop rep duncan hunter wife indicted by grand jury in san diego
+    mollie tibbetts relative slams racist fear mongering and white house hyperbole
+    conservatives and liberals alike find gun ban at nra s pence event hypocritical
+    late night writer vows to take red hats back from trump supporters
+    georgia cop suspended after liking racist kkk facebook posts
 \end{lstlisting}
 
-So, Huffington Post has undergone a kind of mirror-image version of BuzzFeed's evolution. BuzzFeed shifted away from politics and towards clickbait; HuffPo shifted away from clickbait and towards politics.
+So, Huffington Post has undergone a kind of mirror-image version of BuzzFeed's evolution. To return to the question of directionality -- here, seems as if BuzzFeed and Huffington Post are both independently moving away from each other. BuzzFeed is shifting away from politics and towards clickbait; HuffPo is shifting away from clickbait and towards politics.
 
-What about Fox? Which, again, has shifted away from almost everything else -- WSJ, BuzzFeed, CNN, WSJ, NYT, WaPo, and even other conservative outlets like Breitbart and Daily Caller -- it appears to be drifting off into some largely unoccupied linguistic space, far from everything. Moving chronologically -- here are headlines that mark Fox in spring of 2017 relative to fall of 2018:
+What about Daily Kos, which, as we can see in figure XX, is involved with 6 of the 10 most significant pairwise increases in similarity, has become dramatically more similar to NPR, WaPo, NYT, CNN? to the extent that these other outlets are largely other left-leaning political sources, perhaps tempting to read this a kind of convergence of political reporting. but, from looking at DK, which is the "central" node in this set of changes, suggests that these might actually driven by DK becoming less exclusively political in its coverage. here are the headlines that mark spring of 2017, which are almost exclusively about the trump admin -- some combination of "trump," "gop," and "republican" appears in almost every one:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
+    is trumpcare just a way for paul ryan to achieve his true dream of destroying medicare
+    rep jamie raskin nails the gop s blatant healthcare hypocrisy every american should see this
+    the everything terrible the trump administration has done so far omnibus week #
+    republicans have a solution to finding the votes they need for their healthcare bill massive bribery
+    q poll on trumpcare backing this bill could be very hazardous to your political health
+    joe biden on trumpcare it s enough to make your blood boil
+    by reviving the trumpcare zombie tom macarthur may have lobotomized his own career
+    the photo of a regretful trump supporter is going viral on donald s own playground twitter
+    promises promises donald trump s made them and trumpcare will break them
+    the fight continues daily kos proudly endorses three great democrats to resist the trump agenda
+    how incompetent is paul ryan the house might have to revote on zombie trumpcare
+    this is not normal republican senators in the dark on trumpcare bill they ll vote on soon
+    are republicans learning from their trumpcare failure of course not
+    forget that confirmation nonsense trump s state dept pick will absolutely get a full senate vote
+    aarp is onto mitch mcconnell s trumpcare tricks wo nt let republicans play dumb
+    special committee or special prosecutor devin nunes can not be trusted to investigate trump
+    trump promises tea party groups he will punish america if trumpcare fails he will let aca fail
+    do nt call it trumpcare us trumpcare trumpcare trumpcare you own it pal trumpcare
+    republicans are weaponizing the census to further disenfranchise non white non straight americans
+    top republican looks at facts from trumpcare s cbo score and all he has to say is fake news
+\end{lstlisting}
+
+and, hls that mark fall 2018, which have almost no politics.
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    teachers flee success high school
+    freed from death row sabrina butler smith s story
+    uk identifies russians who made nerve agent attack on skripals
+    selling fossils lizard origins probiotic flies
+    north korea snubs united states on talks over returning war dead
+    retired teacher sentenced to # # months in case brought by energy transfer partners
+    for starters bernie say his name
+    individuals can change world mumbai man drives beach clean ups species return
+    stone age cow surgery high carbon grasses ocean churning shrimp
+    investing in early childhood education means big long term gains
+    opt out of high stakes testing begins this week
+    bad news hodgkin s has returned
+    wells fargo blames computer glitch for hundreds of customers lost homes
+    purported drone footage of texas tent city for separated children released by bbc
+    amazon delivery drivers report wage theft and other abuses
+    criminal charges in manhattan wage theft and insurance fraud case
+    november coming into focus
+    it came from outer space
+    but her pocketses the inside scoop on wheat robot peer pressure
+    day sixteen kremlinannex #pm et
+\end{lstlisting}
+
+again, important to remember that these lists aren't representative \textit{samples} of the coverage from the outlet in the period -- rather, they typify the difference, the delta, between the end and the beginning. DK, of course, hasn't stopped covering politics; but, this suggests that DK is less exclusively focused on politics that it was in the first months of the trump admin, which in turn has made it more difficult for the classifiers to tell apart from a number of other somewhat more general-interest outlets.
+
+Last but not least, what about Fox? Which, again, has shifted away from almost everything else -- WSJ, BuzzFeed, CNN, WSJ, NYT, WaPo, and even other conservative outlets like Breitbart and Daily Caller -- it appears to be drifting off into some largely unoccupied linguistic space, far from everything. Moving chronologically -- here are headlines that mark Fox in spring of 2017 relative to fall of 2018:
+
+\begin{lstlisting}[basicstyle=\tiny\hlfont]
+    haier boss looks far beyond appliances
     are government leaders turning a blind eye toward debt
-    biggest movies to look forward to in #
-    bao bao ready for new life in china
-    mayim bialik to register as muslim
-    testing wearable sensors as check engine light for health
-    why outdated seat belts may be putting lives at risk
-    alitalia workers vote on cuts to stave off bankruptcy
+    power prices in focus as heat wave hits
+    china s geely to buy lotus take stake in malaysia s proton
+    investment fund providing financing for health care
+    peru s finance minister quits over audio recordings
+    taiwan holds war games simulating chinese island attack
+    india s modi discusses trade ties with turkey s erdogan
     eurozone economic sentiment at near decade highs
-    severe bolivian drought hurts crops threatens capital
-    # minutes to a flatter firmer belly
-    schools in rural areas shifting toward a # day week
-    swede who made numbers and facts entertaining dies at #
+    biggest movies to look forward to in #
+    republicans struggle to resuscitate health bill
+    ancient root with modern benefits
+    get the fugitives back from cuba
+    many students voted twice in uk election
     fewer fret over more focus on politics
-    seiu s fight for $ # a flop despite spending $ # million
-    winds from monster black holes can rapidly change their temperature
-    a crash course in creative destruction
-    dubai has new safety rules after high rise fires but few details
-    apple s new spaceship hq set to open
-    a former model starved to death but not from anorexia
-    nigerian governor aid agencies misusing refugee funds
+    strong winds dry forests fuel portugal fires
+    severe bolivian drought hurts crops threatens capital
+    bao bao ready for new life in china
+    alitalia workers vote on cuts to stave off bankruptcy
+    mayim bialik to register as muslim
 \end{lstlisting}
 
 Quite a bit of general political news -- often with an economic angle -- and international stories. In the other direction -- stories that mark 2018, compared to 2017:
 
 \begin{lstlisting}[basicstyle=\tiny\hlfont]
+    florida man drops meth off at sheriff s office for testing after suffering bad reaction police say
     stars rally around liberal james gunn after offensive tweets unlike reaction to trump supporting roseanne barr
+    professor banned from restaurant for profanity laced rant against white children university investigating
     washington state store clerk left to die by teen robbers after suffering heart attack cops say
-    until the kneeling happened fl police union official backs call to return nfl tickets over protests
-    ocasio cortez claims solidarity with cab drivers while campaign buys rides from uber other alternatives fec data show
-    gunman shot by florida armed bystander still hospitalized nra says shooting example of good guy with a gun
+    nbc news president noah oppenheim killed ronan farrow s harvey weinstein expose to protect his hollywood ambitions report says
+    florida school resource officer slams unruly student to ground do nt give me your sh
+    new jersey cops used sex toy big blue to harass co workers played game with genitals lawsuit says
+    cheryl slams nasty false liam payne breakup reports says her mom has absolutely nothing to do with any of it
     papa john schnatter allegedly refused to work with kanye west because of n word in his lyrics
     anne hathaway calls out white privilege in wake of black woman stabbed to death at bart station
-    abc news star joy behar finally apologizes for anti christian remarks vice president pence is right
-    trump predicts electoral doom for democrats with abolish ice push they re going to get beaten so badly
-    matt lauer complains he s an easy mark victim of misinformation in first interview since sex scandal
-    good times star jimmie walker reveals what went on behind the scenes and explains why he does nt mock trump
-    philadelphia checkers employee allegedly threw hot grease on customer in drive thru over order dispute
-    flip this seat red dem socialist ocasio cortez mixes up political colors on campaign trail
+    colorado police officers suspended for leaking body camera footage of denver mayor s son yelling at cop
+    cnn star jim acosta rips kim kardashian s prison reform meeting with trump but lauded john legend s activism on same during obama years
+    shark in shallow water reportedly spooks beachgoers on north carolina s bald head island
+    a horrible day for democracy jeff flake blasts mccabe firing encourages # primary challenge to trump
+    illinois death penalty would be reinstated for mass murderers cop killers under gov rauner s proposal
+    ocasio cortez claims solidarity with cab drivers while campaign buys rides from uber other alternatives fec data show
     wwe legend jerry lawler s son reportedly on life support after attempting suicide in his jail cell
-    verbally abusive united airlines passenger caused massive delay after refusing to check bag leave aircraft
-    fbi left out important facts when presenting dossier to court to obtain fisa warrant jordan tells fox news
-    gold star wife nike kaepernick should visit arlington natl cemetery to see true sacrifice
-    anthony scaramucci rips traitors and cockroaches who wrote ny times op ed this is a disgusting day for america
-    delta passenger claims man sexually assaulted her on flight but was nt detained i was left devastated
-    hannity blasts nike kaepernick soldiers officers firefighters are the ones who sacrificed everything
+    until the kneeling happened fl police union official backs call to return nfl tickets over protests
+    fury as feminist activist says she s confused seeing black man with pro nra and tea party bumper stickers
+    chloe bennet confirms she s dating logan paul by defending the decision to fans
 \end{lstlisting}
 
 Which is a very distinctive list -- for lack of a better word, it's a sort of "tabloid" style, focusing on crime (often grisly, bizarre), misbehavior, personal misfortune, and socially charged political issues. This suggests, then, that the "departure" of Fox -- its monotonic rise in distinctiveness, the shift away from almost all other outlets -- is defined by a movement away from (relatively) centrist political and business reporting, and in the direction of something like the National Enquirer.
@@ -1648,58 +1697,6 @@ Which is a very distinctive list -- for lack of a better word, it's a sort of "t
   \centering
   \includegraphics[width=\textwidth]{figures/ts-ova-fox.png}
 \end{figure}
-
-Last but not least -- a similar shift can be seen with The Daily Caller. Here are headlines distinctive of spring 2017:
-
-\begin{lstlisting}[basicstyle=\tiny\hlfont]
-    # s record warmth brought record crop yields fewer storms
-    astronomers may soon restore pluto to planet status
-    millions of us jobs lost to trade with china study shows
-    will the lewis gambit work
-    watch the first ever robotic bee pollinate a flower
-    a positive jobs report could mean interest rate hike
-    trump s immigration order has investors buying prison bonds
-    mulvaney set to tell agencies to prep for substantial cuts
-    daywithoutimmigrants leads to immigrantswithoutjobs
-    the tower may have fallen
-    how dictators and dummies get started
-    boys with vaginas cause confusion in emergency rooms
-    trump files appeal to reverse judge s halt on immigration order
-    bush twins to release joint memoir
-    russia s trump problem
-    snap chat just went public and
-    signature solutions s# usa safety
-    # us troops roll up at russia s doorstep
-    first private fusion reactor to go online in #
-    where should the apostrophe go in today s holiday
-\end{lstlisting}
-
-Which (with some exceptions) look broadly similar to the Fox headlines from the same time -- mostly political and foreign-affairs stories, often with an economic bent. By comparison, in summer of 2018:
-
-\begin{lstlisting}[basicstyle=\tiny\hlfont]
-    black conservative activist stands with judge jeanine in viral video no group in america more bigoted than leftists
-    candace owens trashes jim acosta for complaining about anti cnn chants after getting attacked
-    donna brazile lays out how obama s obsession with his image leeched the democratic party of its vitality
-    student charged with battery after ripping maga hat off classmate s head slapping teacher
-    newt gingrich gets real with left wing illegal immigrants you must be an american citizen to vote
-    dan bongino rips into war on cops so many officers have lost their lives to keep your neighborhoods safe
-    nike has become a social justice corporation trying to mold colin kaepernick into the next malcolm x says michelle malkin
-    maryland democrat attempted to shut down immigration conversation by urging the featured speaker to cancel appearance
-    twitter suspends conservative commentator for opposing trans in military tying extreme muslim beliefs to honor killings
-    liberal women s group ellison must resign drop out of ag race following domestic abuse allegations
-    cis director twitter refuses to promote illegal aliens tweet despite it being used in supreme court rulings
-    cnn anchor melts down after twitter user asks if he ll hold obama accountable for russian meddling
-    white house blames biased media for omarosa s newfound popularity now that she s turned on trump
-    dem senator claims the left has no equivalent to dark trump rallies he must have forgotten these incidents
-    tucker carlson slams nike for using colin kaepernick as a pawn in its decadent scheme
-    trump supporter paris dennard hits back against accusations of no black people in the trump administration cnn is peddling lies
-    cnn s david gregory declares trump desperate to be loved and says he suffers from paranoia
-    an organization behind massive super eid muslim celebration at minnesota vikings stadium labeled a terrorist organization
-    liberals accuse woman sitting behind kavanaugh of being a white supremacist she s actually a hispanic descendent of holocaust survivors
-    kellyanne conway reveals what the establishment media is doing and attacks them for it
-\end{lstlisting}
-
-Which share the sensational, tabloid style with the Fox headlines, though here the focus is more specifically on politically polarizing issues -- "black conservative activist[s]," "anti-CNN chants," "Obama's obsession with his image," Nike as a "social justice corporation," etc.
 
 Stepping back, and doubling back to the original idea of modeling a kind of linguistic "plate tectonics" of the media ecosystem -- this is just a start, but from these examples we can start to reason about some of the most significant changes. BuzzFeed has doubled down on clickbait, perhaps at the expense of political reporting; HuffPo has done the opposite, shifting away from clickbait and towards political reporting; and, Fox and The Daily Caller have drifted off in the direction of a sensationalized and hyper-partisan style of coverage.
 
