@@ -1,5 +1,6 @@
-SUBMITTED TO THE DEPARTMENT OF MEDIA ARTS AND SCIENCES IN PARTIAL
-FULFILLMENT OF THE REQUIREMENTS FOR THE DEGREE OF
+SUBMITTED TO THE PROGRAM IN MEDIA ARTS AND SCIENCES, SCHOOL OF
+ARCHITECTURE AND PLANNING, IN PARTIAL FULFILLMENT OF THE REQUIREMENTS
+FOR THE DEGREE OF
 
 MASTER OF SCIENCE\
 AT THE\
@@ -32,42 +33,40 @@ the Requirements for the Degree of Master of Science.
 
 **ABSTRACT**
 
-How different, in a precise sense, is a typical headline published by
-the New York Times from a headline published by Fox News? Or -- a Fox
-headline from an NPR headline, NPR from CNN, CNN from Breitbart? If we
-think of news organizations as producers of language, as \"speakers\" --
-how similar or different are the voices? This question of the *textual
-distance* between news sources is fundamental to concerns about
-fragmentation and polarization in the news ecosystem -- often alongside
-a parallel notion of fragmentation at the level of *audience*. In many
-cases, audience and content have been treated as two sides of the same
-coin -- for example, a number of projects have scored ideological
-orientation of outlets in terms of fraction of the readership who have
-shared content from particular political candidates. The \"content
-graph\" of the news ecosystem -- the set of similarities and differences
-at the level of the raw content -- is often assumed to be tightly linked
-to the \"audience graph\"; and the two are even defined in terms of each
-other.
+How different, in a precise sense, is The New York Times from Fox News?
+Or -- Fox from NPR, NPR from CNN, CNN from Breitbart? If we think of
+news organizations as producers of language, as \"speakers\" -- how
+similar or different are the voices? This question of the *distance*
+between news sources is fundamental to concerns about fragmentation and
+polarization in the news ecosystem. A number of studies have measured
+the proximity between outlets in terms of overlap at the level of
+audience, and then defined content-level differences in terms of the
+underlying audience composition -- for example, the fraction of the
+readership who have shared content from particular political candidates.
+The \"content graph\" of the news ecosystem -- the set of similarities
+and differences at the level of the actual coverage -- is often assumed
+to be tightly linked to the \"audience graph\"; and the two are even
+defined in terms of each other.
 
-How exactly do these two systems interact, though? In many ways, though,
-our knowledge of the content graph is less precise than knowledge about
-the audience graph, which in some ways is simpler to measure. A rich
-line of work has studied the coverage of specific issues in news
-content, and recent work has started to systematically survey
-content-level differences across a range of outlets, often by way of
-unsupervised approaches that characterize differences at the level of
-topic. Building on this, I attempt to precisely quantify the relative
-similarities among major media organizations from a standpoint of
-*textual discriminability*, focusing on a corpus of  1.2 million article
-headlines from 15 major US news outlets, extracted from an archive of
- 73 million links posted on Twitter over a 625-day period running from
-the beginning of 2017 through the summer of 2018. I formulate the
-question as a supervised learning problem, in which classifiers are
-presented with a headline and trained to identify the outlet that
-produced it. This training objective is used to induce high-quality
-distributed representations of headlines, and also makes it possible to
-precisely quantify the degree to which different outlets produce similar
-and dissimilar content.
+How exactly do these two systems interact, though? In many ways, our
+knowledge of the content graph is less precise than knowledge about the
+audience graph, which in some ways is simpler to measure. A rich line of
+work has studied the coverage of specific issues in news content, and
+recent work has started to systematically survey content-level
+differences across a range of outlets, often by way of unsupervised
+approaches that characterize differences at the level of topic. Building
+on this, I attempt to precisely quantify the relative similarities among
+major media organizations from a standpoint of *textual
+discriminability*, focusing on a corpus of 1.2 million article headlines
+from 15 major US news outlets, extracted from an archive of 73 million
+links posted on Twitter over a 625-day period running from the beginning
+of 2017 through the summer of 2018. I formulate the question as a
+supervised learning problem, in which classifiers are presented with a
+headline and trained to identify the outlet that produced it. This
+training objective is used to induce high-quality distributed
+representations of headlines, and also makes it possible to measure the
+degree to which different outlets produce similar and dissimilar
+content.
 
 I then contextualize these language-level similarities against two
 backdrops. First, I examine the degree to which similarities at the
@@ -85,8 +84,8 @@ Second -- I study headlines as a historical process. How stable are the
 linguistic profiles of major news organizations, and to what degree have
 they evolved into new configurations? I find significant changes over
 first 18 months of the Trump presidency, with BuzzFeed doubling down on
-\"quiz\" artiles; Huffington Post moving away from lifestyle content and
-towards political reporting; The Daily Kos becoming less exclusively
+\"quiz\" articles; Huffington Post moving away from lifestyle content
+and towards political reporting; The Daily Kos becoming less exclusively
 focused on politics; and Fox shifting towards a kind of \"tabloid\"
 style, with a focus on violent crime, personal misfortune, and
 socially-charged political issues.
@@ -216,7 +215,7 @@ This question of the *distinguishability* or *separability* of headlines
 touches on a question that sits at the core of a number of recent
 studies that have explored processes of fragmentation and polarization
 in the media ecosystem. Building generally on the widely-popularized
-notions of \"filter bubbles\" and \"echo chamgers\" developed
+notions of \"filter bubbles\" and \"echo chambers\" developed
 Pariser[@pariser2011filter] and Sunstein,[@sunstein2003republic] a rich
 line of work has started to document the degree to which new patterns of
 news production and consumption have pushed audiences into more isolated
@@ -227,13 +226,13 @@ push readers towards more or less ideologically polarized content,
 arriving at interestingly mixed results -- social media and search
 engines expose users to more polarized content, but also expose them to
 a wider range of views.[@flaxman2016filter] Meraz studied the structure
-of hyperlinks among a set of political blogs during the 2012 presidental
-election, finding that left-leaning sources were more densely connected
-than right-leaning sources.[@meraz2015quantifying] And, most recently,
-Benkler et al. explored the outsized influence of right-leaning blogs --
-particularly Breitbart -- on media coverage during the 2016 presidental
-election, building on a map of the media ecosystem derived from
-correlations in sharing patterns on Twitter and
+of hyperlinks among a set of political blogs during the 2012
+presidential election, finding that left-leaning sources were more
+densely connected than right-leaning sources.[@meraz2015quantifying]
+And, most recently, Benkler et al. explored the outsized influence of
+right-leaning blogs -- particularly Breitbart -- on media coverage
+during the 2016 presidential election, building on a map of the media
+ecosystem derived from correlations in sharing patterns on Twitter and
 Facebook.[@benkler2017study] (The same technique used to model
 audience-level similarity later in this study).
 
@@ -251,36 +250,43 @@ and echo chambers are fundamentally about an interaction between the
 become both highly fragmented and also highly aligned, when isolated
 audiences are being exposed to isolated content.
 
-How to operationalize these differences at the level of conent? In a
+How to operationalize these differences at the level of content? In a
 number of cases, content-level similarities have been derived directly
 from audience composition -- for example, the percentage of an outlet's
-audience that follow Donald Trump or Hillary Clinton on Twitter, voted
-for a Republican candidate in last election, etc. Where, of course, the
-assumption is that differences at the level of content are strongly
-correlated with differences in audience; the content of an outlet is
-defined in terms of who reads it. Recently, some studies has gone beyond
-this, most notably in the context of the Media Cloud project at the
-Center for Civic Media at the MIT Media Lab. Chuang et al. trained topic
-models on a corpus of 430,000 news articles, giving a high-level view of
-which outlets focus on which issues -- Forbes on business news, CNET on
-technology, The Washington Post on President Obama.[@chuang2014large]
-Along similar lines, Benkler et al., in describing the impact of
-Breitbart on the 2016 election, conduct a sentence-level analysis of the
-amount of coverage dedicated to different scandals associated with
-Clinton and Trump, and measure the degree to which different outlets
-focused on issues related to immigration.
+audience that share content from Donald Trump or Hillary Clinton on
+Twitter,[@benkler2018network] voted for a Republican candidate in recent
+elections,[@flaxman2016filter] etc. Where, of course, the assumption is
+that differences at the level of content are strongly correlated with
+differences in audience; the content of an outlet is defined in terms of
+who reads it. Recently, a number of studies have started to go beyond
+this to characterize the content profile of outlets in more robust ways,
+most notably in the context of the Media Cloud[@media-cloud] project at
+the Center for Civic Media at the MIT Media Lab. Chuang et al. trained
+topic models on a corpus of 430,000 news articles, giving a high-level
+view of which outlets focus on which issues -- Forbes on business news,
+CNET on technology, The Washington Post on President
+Obama.[@chuang2014large] Along similar lines, Benkler et al., in an
+extensive survey of the American media ecosystem before and after the
+2016 election, conduct deep analyses of specific topics, phrases, and
+stories across a range of
+outlets.[@benkler2018network][@benkler2017study]
 
-Generally, though, less is known, about content graph than audience
-graph. Or, at least -- our knowledge about content graph is less
-precise. One reason for this, perhaps, is that measuring \"textual
-distance\" -- the level of similarity or dissimilarity between documents
--- is fundamentally more complex and open-ended than measuring
-similarity at the level of audience, where outlets are often connected
-in unambiguous ways that can simply be counted (the number of shared
-followers, the number of times the same user tweets articles to two
-outlets). Whereas with text, as Underwood notes, the question how to
-meaningfully score the similarity between two documents is a strand that
-unravels into a large and difficult set of interpretive questions.
+In some ways, though, our understanding of content is less comprehensive
+than our understanding audience. Or, at least, knowledge about content
+is less *relational* -- we can study specific threads of coverage, but
+have less of a holistic view of how similar and different outlets are
+overall. To borrow from Benkler et al. -- we have an \"architectural\"
+view of the media ecosystem at the level of audience; but perhaps
+somewhat less so at the level of content. One reason for this, perhaps,
+is that measuring \"textual distance\" -- the level of similarity or
+dissimilarity between textual objects -- is more complex and open-ended
+than measuring distance at the level of audience, where outlets are
+often connected in unambiguous ways that can simply be counted (the
+number of shared followers, the number of times the same user tweets
+articles to two outlets). Whereas with text, as Underwood notes, the
+question how to meaningfully score the similarity between two documents
+is a strand that unravels into a large and difficult set of interpretive
+questions.
 
 If we approach this head-on, though -- what could we learn from a very
 precise representation of the content graph? Beyond just describing
@@ -291,7 +297,7 @@ them in a way that would make it possible to put them back into
 conversation with other quantitative views of the media ecosystem?
 
 This is fundamentally the question that this thesis takes up. My
-conjecture is that there are a number of intersting (but difficult)
+conjecture is that there are a number of interesting (but difficult)
 questions that become tractable when we're able to precisely quantify
 these content-level similarities. First, if we can say, for example that
 outlets A and B are separated by `1.0` units of distance, and B and C
@@ -419,7 +425,7 @@ In summary, I find:
     changes in the structure of the content graph in the last two years.
     First, The Huffington Post and BuzzFeed have moved away from each
     other, due to mirror-image changes -- HuffPo has moved away from
-    \"clickbait\" content (advice colums, diet recommendations) and
+    \"clickbait\" content (advice columns, diet recommendations) and
     towards more narrowly-focused political reporting, similar to The
     Hill, DailyKos, and CNN; whereas BuzzFeed doubled down on clickbait
     content (specifically, a certain type of \"quiz\" article), pushing
@@ -466,7 +472,7 @@ specific patterns of audience engagement.
 
 To get a snapshot of the content produced by different news outlets, we
 could scrape their websites directly. But, with this in hand, it would
-difficult to then consisently map this text data back to fine-grained
+difficult to then consistently map this text data back to fine-grained
 patterns of audience behavior -- just from the raw pages, we have no way
 to know who read them, when they were read, paired with what, etc. And,
 even if we had access to some approximation of this from internal data
@@ -581,7 +587,7 @@ news, in a constitutive sense. According to a 2014 survey from the
 American Press Institute, just  41% of Americans said that they had
 \"watched, read, or heard any in-depth news stories, *beyond the
 headlines*, in the last week\" (emphasis added).[@api2014rational]
-Headlines represent extraordinarily high-leverage langauge. If we
+Headlines represent extraordinarily high-leverage language. If we
 imagine placing different types of textual objects on a continuum that
 represents the level of social, political, economic \"stopping power\"
 that they command -- then headlines, on a per-word basis, would sit very
@@ -606,17 +612,17 @@ At a more theoretical register in the linguistics literature,
 Dor[@dor2003newspaper] describes headlines in the context of linguistic
 notion of \"relevance optimization\" -- headlines try to maximize
 \"contextual effects\" for a reader, while also being short and easy to
-process. In a sense, this threorization of headlines represents an ideal
+process. In a sense, this theorization of headlines represents an ideal
 framing for the question here about the interplay between content and
 audience -- Dor essentially describes them as highly condensed sites of
 negotiation between content and audience, textual objects that try to
 bridge the gap, as efficiently as possible, between the substance of the
 article and the assumptions and expectations of the (assumed) reader.
 
-Meanwhile, in the natural languge processing literature, there are two
+Meanwhile, in the natural language processing literature, there are two
 active lines of work that have focused on headlines. First, a series of
 studies that treat headlines as evidence about the future, in different
-ways -- in quantative finance, a number of studies have explored
+ways -- in quantitative finance, a number of studies have explored
 correlations between news headlines and price movements in different
 kinds of investment
 vehicles.[@chan2003stock][@jotaki2018analyzing][@meyer2017fine][@ghosal2017iitp]
@@ -625,7 +631,7 @@ headlines themselves in the content marketplace of the web -- diffusion
 on social networks, click-through rates,
 etc.[@kim2016compete][@gabielkov2016social][@piotrkowicz2017headlines][@trilling2017newsworthiness][@reis2015breaking]
 Meanwhile, alongside this -- another line of work has focused on what
-might be thought of as \"pathalogical\" headlines. For example, a number
+might be thought of as \"pathological\" headlines. For example, a number
 of studies have examined \"clickbait\"[@blom2015click] or
 \"sensational\"[@molek2013towards] headlines and explored the degree to
 which they can be automatically flagged by
@@ -1679,7 +1685,7 @@ more likely, so does B, in general -- but that, on a head-to-head basis,
 the model almost never actually confuses them for each other.
 
 The point being -- for almost any metric, we can imagine both ideal and
-pathalogical cases, situations where that particular formulation of
+pathological cases, situations where that particular formulation of
 similarity seems either very good or very bad. \"Similarity\" is
 fundamentally complex, especially in a case like this where the things
 being compared are actually large, heterogeneous aggregations over
@@ -1987,7 +1993,7 @@ interest in a specific type of content rather than a loyalty to a
 particular media brand. That is -- there's a segment of the audience on
 Twitter that wants business and financial news, but doesn't particularly
 care where it comes from. So, if NYT produces articles about these
-issues, then the same readers who engage with WSJ content will a,so
+issues, then the same readers who engage with WSJ content will also
 engage with these articles from NYT. Business reporting, perhaps, is a
 kind of \"fungible\" commodity in the attention marketplace of Twitter
 -- relative to other types of content, the *article* is more important
@@ -2151,7 +2157,7 @@ version of the AP article from `apnews.com`. There could be headlines
 from `foxnews.com` in the corpus, in other words, that originate from AP
 but don't also show up in our sample from `apnews.com`.
 
-To get a more reliable approxiation of this, I explicitly checked this
+To get a more reliable approximation of this, I explicitly checked this
 on a subset of Fox articles that look similar to AP to the model. I took
 the mean embedding vector for all AP articles and then queried the 500
 `foxnews.com` headlines that are closest to the AP mean. Then, for each
@@ -2171,10 +2177,10 @@ headlines that are getting syndicated. In a sense, then, rather than
 thinking of AP as a conduit that moves right-leaning content from Fox
 into left-leaning WaPo feeds, it might be more accurate to interpret the
 flow as moving in the opposite direction -- Fox's AP-heavy content
-profil runs very against the grain of its underlying audience structure.
-Fox, rather, is pushing AP-esque content into Daily Caller and Breitbart
-feeds. This becomes clearer when looking at Fox's full set of content /
-audience weights:
+profile runs very against the grain of its underlying audience
+structure. Fox, rather, is pushing AP-esque content into Daily Caller
+and Breitbart feeds. This becomes clearer when looking at Fox's full set
+of content / audience weights:
 
 ![image](figures/ca-foxnews-composite.png){width="\textwidth"}
 
@@ -2511,9 +2517,9 @@ Taxonomies of (mis)match
 ------------------------
 
 Beyond these two most dramatic misalignments, there are a number of
-other intersting patterns that can be seen with other outlets that at
+other interesting patterns that can be seen with other outlets that at
 times seem to suggest different \"taxonomies\" for the content-audience
-fit, the range of diffrent ways that an outlet can occupy these graphs.
+fit, the range of different ways that an outlet can occupy these graphs.
 For example, Huffington Post has extremely low audience correlations
 with Fox, Daily Caller and Breitbart, even though the content distances
 are right around average; suggesting, perhaps, a very strong ideological
@@ -2581,7 +2587,7 @@ outlets -- then individual headlines form a kind of emergent syntagmatic
 chain -- a progression, a linear movement forward through a sequence of
 events, stories, opinions.
 
-Intead of rolling up the data into a single unit -- what if we add back
+Instead of rolling up the data into a single unit -- what if we add back
 in the timestamps on the original links, and study the headline space as
 a diachronic system, unfolding over 625 days? This opens the door to an
 intriguing set of questions. Instead of just modeling the overall
@@ -2609,23 +2615,23 @@ from across the full window of data -- and look at changes in the
 structure of the predictions according to the timestamps on the
 underlying tweets.
 
-This could be useful as a way to start reasoning about the actual contnt
-of changes over time -- for example, the types of headlines that are
-most typical of an outlet at one point in time relative to another. But,
-as a means of *measuring* changes over time and identifying the most
-significant shifts, there are some potential risks with this. First,
-very simply -- as we saw earlier, a number of outlets have undergone
-large changes in the raw quantity of content that they have produced
-over the time period in question. For example, counting the number of
-unique articles that circulate on Twitter each day, HuffPo produced less
-than 50% as much content in the summer of 2018 than in the spring of
-2017. Because of this, a model trained on the full dataset would see
-significantly more examples of 2017 headlines from HuffPo than 2018
-headlines, which would likely make it less accurate on the 2018 data.
-Which, then, if we take classification accuracy as a proxy for distance,
-might give the appearance that HuffPo is getting more similar to some
-other outlet(s) -- classification accuracy is falling -- when in fact
-the score is just proxying the underlying change in volume.
+This could be useful as a way to start reasoning about the actual
+content of changes over time -- for example, the types of headlines that
+are most typical of an outlet at one point in time relative to another.
+But, as a means of *measuring* changes over time and identifying the
+most significant shifts, there are some potential risks with this.
+First, very simply -- as we saw earlier, a number of outlets have
+undergone large changes in the raw quantity of content that they have
+produced over the time period in question. For example, counting the
+number of unique articles that circulate on Twitter each day, HuffPo
+produced less than 50% as much content in the summer of 2018 than in the
+spring of 2017. Because of this, a model trained on the full dataset
+would see significantly more examples of 2017 headlines from HuffPo than
+2018 headlines, which would likely make it less accurate on the 2018
+data. Which, then, if we take classification accuracy as a proxy for
+distance, might give the appearance that HuffPo is getting more similar
+to some other outlet(s) -- classification accuracy is falling -- when in
+fact the score is just proxying the underlying change in volume.
 
 We could guard against this by, for example, splitting the data into
 deciles and then downsampling each outlet to an equal size in each
@@ -3188,7 +3194,7 @@ outlets that migrated into different linguistic configurations over time
 -- HuffPo is shifting away from BuzzFeed and towards The Hill and
 DailyKos; BuzzFeed is doubling down on clickbait; Fox is moving away
 from almost everything else, shifting away from standard political
-reporting and towards a more senstaionalized tabloid style. The
+reporting and towards a more sensationalized tabloid style. The
 \"content graph,\" then, is a dynamic system -- the composite view we
 got in section [9](#section:hl-graph){reference-type="ref"
 reference="section:hl-graph"} is a kind of synchronic blending of a
@@ -3261,14 +3267,14 @@ audience similarity, then the interpretation seems fairly
 straightforward -- these outlets produce content that is \"fungible,\"
 in a sense? That is -- there's a market for a particular type of
 content, and as two outlets start to produce more of it, readers
-intersted in that content will tweet more links to both outlets. But,
+interested in that content will tweet more links to both outlets. But,
 are the headlines actually leading the audience changes? Sometimes it
 looks like yes, but other times, the opposite. Another possible
 complication -- there's some possibility that changes in the audience
 composition could directly affect the sample of headlines that we get,
 since the corpus emerges from reader behavior. For example, if some
 external pressure causes the audience composition of NYT to shift
-torwards a group that's intersted in, say, foreign affairs, then this
+towards a group that's interested in, say, foreign affairs, then this
 new audience might then tweet more foreign affairs articles, which in
 turn might cause more of these headlines to make it into the Decahose
 sample. (At the same time, though, this would likely be buffered by the
@@ -3308,7 +3314,7 @@ graph,\" the degree to which headlines produced by different outlets are
 similar and different. Then, I compared these language-level
 similarities to the underlying \"audience graph,\" and found that media
 organizations with similar linguistic profiles also tend to have similar
-audiences -- though with some signficant exceptions. Then, I unrolled
+audiences -- though with some significant exceptions. Then, I unrolled
 the headline similarities over time, and identified outlets that have
 \"drifted\" in linguistic space to focus on different topics or styles
 over the course of an 18-month window. And, last, I started to explore
@@ -3317,12 +3323,12 @@ audience -- interact with each other over time. Which, in turn, opens
 the door to a much larger set of questions about how changes in language
 impact the composition of the audience, and vice versa.
 
-Along the way, we encounted a handful of uncertainties and challenges
+Along the way, we encountered a handful of uncertainties and challenges
 that could be addressed by future treatments of these questions. In
 particular:
 
-1.  It's clear that the classifiers are able to pick up on differencs at
-    the level of topic and word choice -- what's being covered, which
+1.  It's clear that the classifiers are able to pick up on differences
+    at the level of topic and word choice -- what's being covered, which
     words are being used. But, it's less clear how much they are able to
     model what might be thought of as the *stance* of the coverage --
     the ideological positioning, implications, suggestions of a
@@ -3363,7 +3369,7 @@ particular:
     Ultimately, to really evaluate this, it would be interesting to
     ground-truth these models at a kind of psycholinguistic level with
     real human readers. Returning to the thought experiment from the
-    beginning, where we're shown a headling and asked to guess the
+    beginning, where we're shown a headline and asked to guess the
     outlet -- what if we literally did this, and then compared the human
     performance on, for example, the Daily Kos / Daily Caller comparison
     to the model's performance?
@@ -3371,8 +3377,8 @@ particular:
 2.  Second, at a more brass-tacks level -- at times this thesis switches
     back and forth between different model architectures in the context
     of a single analysis, which is less than ideal. Namely, in the
-    analysis of how headlines have changed over time, wher we first used
-    the SVM to model the trends, and then switch back to the neural
+    analysis of how headlines have changed over time, where we first
+    used the SVM to model the trends, and then switch back to the neural
     models to understand and interpret the trends. This is just due to
     cost -- ideally, everything would use the stronger neural models,
     but this would require hundreds or thousands of hours of GPU time,
