@@ -49,13 +49,15 @@ class CorpusEncoder:
 
         for lines, yt in loader:
 
-            embeds = self.model.embed(lines)
+            embeds, weights = self.model.embed(lines)
             yps = self.model.predict(embeds).exp()
 
             embeds = tensor_to_np(embeds)
             yps = tensor_to_np(yps)
 
-            for line, embed, yp in zip(lines, embeds, yps):
+            for line, embed, weight, yp in zip(lines, embeds, weights, yps):
+
+                weight = tensor_to_np(weight)
 
                 preds = {
                     f'p_{domain}': mass
@@ -63,7 +65,7 @@ class CorpusEncoder:
                 }
 
                 # Metadata + clf output.
-                data = dict(**line, **preds, embedding=embed)
+                data = dict(**line, **preds, embedding=embed, attn=weight)
                 yield data
 
     def segments_iter(self):
